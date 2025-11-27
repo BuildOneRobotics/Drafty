@@ -49,6 +49,12 @@ export default function Dashboard() {
   const [whiteboards, setWhiteboards] = useState<Whiteboard[]>([])
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<string | null>(null)
   const [draggedItem, setDraggedItem] = useState<{id: string, startX: number, startY: number} | null>(null)
+  const [showNotebookForm, setShowNotebookForm] = useState(false)
+  const [notebookName, setNotebookName] = useState('')
+  const [showFlashcardForm, setShowFlashcardForm] = useState(false)
+  const [flashcardName, setFlashcardName] = useState('')
+  const [showWhiteboardForm, setShowWhiteboardForm] = useState(false)
+  const [whiteboardName, setWhiteboardName] = useState('')
 
   const loadNotes = async () => {
     try {
@@ -222,7 +228,7 @@ export default function Dashboard() {
       <div className="flex flex-1 overflow-hidden relative">
         <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:relative w-80 bg-[var(--surface-color,white)] flex flex-col border-r border-[var(--accent-color)]/30 z-40 transition-transform duration-300 h-full transition-colors duration-[2000ms]`}>
           <div className="p-6 border-b bg-[var(--accent-color)] transition-colors duration-[2000ms]">
-            <p className="text-sm text-white">Hello, {user?.name || 'User'}</p>
+            <p className="text-sm text-white">Hello, {user?.name}</p>
           </div>
 
           <div className="flex border-b border-[var(--accent-color)]/30 bg-[var(--accent-color)]/5 transition-colors duration-[2000ms]">
@@ -281,19 +287,52 @@ export default function Dashboard() {
             )}
             {activeTab === 'notebooks' && (
               <div className="p-4 space-y-3">
-                <button 
-                  onClick={() => {
-                    const name = prompt('Notebook name:')
-                    if (name) setNotebooks([...notebooks, {id: Date.now().toString(), name, folder: selectedFolder}])
-                  }}
-                  className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all"
-                >
-                  + Create Notebook
-                </button>
+                {!showNotebookForm ? (
+                  <button 
+                    onClick={() => setShowNotebookForm(true)}
+                    className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all"
+                  >
+                    + Create Notebook
+                  </button>
+                ) : (
+                  <div className="p-3 border-2 border-[var(--accent-color)]/30 rounded-xl space-y-2">
+                    <input 
+                      type="text"
+                      value={notebookName}
+                      onChange={(e) => setNotebookName(e.target.value)}
+                      placeholder="Notebook name"
+                      className="w-full px-3 py-2 border border-[var(--accent-color)]/30 rounded-lg focus:outline-none focus:border-[var(--accent-color)] bg-[var(--bg-color,white)]"
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => {
+                          if (notebookName.trim()) {
+                            setNotebooks([...notebooks, {id: Date.now().toString(), name: notebookName, folder: selectedFolder}])
+                            setNotebookName('')
+                            setShowNotebookForm(false)
+                          }
+                        }}
+                        className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-lg hover:opacity-90"
+                      >
+                        Create
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setNotebookName('')
+                          setShowNotebookForm(false)
+                        }}
+                        className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-400"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <select 
                   value={selectedFolder} 
                   onChange={(e) => setSelectedFolder(e.target.value)}
-                  className="w-full p-2 border border-[var(--accent-color)]/30 rounded-lg"
+                  className="w-full p-2 border border-[var(--accent-color)]/30 rounded-lg bg-[var(--surface-color,white)]"
                 >
                   {folders.map(f => <option key={f} value={f}>{f}</option>)}
                 </select>
@@ -302,7 +341,7 @@ export default function Dashboard() {
                     const name = prompt('Folder name:')
                     if (name && !folders.includes(name)) setFolders([...folders, name])
                   }}
-                  className="w-full p-2 text-sm border border-[var(--accent-color)]/30 rounded-lg hover:bg-[var(--accent-color)]/5"
+                  className="w-full p-2 text-sm border border-[var(--accent-color)]/30 rounded-lg hover:bg-[var(--accent-color)]/5 bg-[var(--surface-color,white)]"
                 >
                   + New Folder
                 </button>
@@ -315,15 +354,48 @@ export default function Dashboard() {
             )}
             {activeTab === 'flashcards' && (
               <div className="p-4 space-y-3">
-                <button 
-                  onClick={() => {
-                    const name = prompt('Deck name:')
-                    if (name) setFlashcards([...flashcards, {id: Date.now().toString(), name, cards: [{front: 'Front', back: 'Back', flipped: false}]}])
-                  }}
-                  className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all"
-                >
-                  + Create Flashcard Deck
-                </button>
+                {!showFlashcardForm ? (
+                  <button 
+                    onClick={() => setShowFlashcardForm(true)}
+                    className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all"
+                  >
+                    + Create Flashcard Deck
+                  </button>
+                ) : (
+                  <div className="p-3 border-2 border-[var(--accent-color)]/30 rounded-xl space-y-2">
+                    <input 
+                      type="text"
+                      value={flashcardName}
+                      onChange={(e) => setFlashcardName(e.target.value)}
+                      placeholder="Deck name"
+                      className="w-full px-3 py-2 border border-[var(--accent-color)]/30 rounded-lg focus:outline-none focus:border-[var(--accent-color)] bg-[var(--bg-color,white)]"
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => {
+                          if (flashcardName.trim()) {
+                            setFlashcards([...flashcards, {id: Date.now().toString(), name: flashcardName, cards: [{front: 'Front', back: 'Back', flipped: false}]}])
+                            setFlashcardName('')
+                            setShowFlashcardForm(false)
+                          }
+                        }}
+                        className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-lg hover:opacity-90"
+                      >
+                        Create
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setFlashcardName('')
+                          setShowFlashcardForm(false)
+                        }}
+                        className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-400"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {flashcards.map(deck => (
                   <div key={deck.id} className="p-3 bg-[var(--accent-color)]/10 rounded-xl space-y-2">
                     <div className="font-semibold text-[var(--text-color)]">{deck.name}</div>
@@ -347,15 +419,48 @@ export default function Dashboard() {
             )}
             {activeTab === 'whiteboards' && (
               <div className="p-4 space-y-3">
-                <button 
-                  onClick={() => {
-                    const name = prompt('Whiteboard name:')
-                    if (name) setWhiteboards([...whiteboards, {id: Date.now().toString(), name, items: []}])
-                  }}
-                  className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all"
-                >
-                  + Create Whiteboard
-                </button>
+                {!showWhiteboardForm ? (
+                  <button 
+                    onClick={() => setShowWhiteboardForm(true)}
+                    className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all"
+                  >
+                    + Create Whiteboard
+                  </button>
+                ) : (
+                  <div className="p-3 border-2 border-[var(--accent-color)]/30 rounded-xl space-y-2">
+                    <input 
+                      type="text"
+                      value={whiteboardName}
+                      onChange={(e) => setWhiteboardName(e.target.value)}
+                      placeholder="Whiteboard name"
+                      className="w-full px-3 py-2 border border-[var(--accent-color)]/30 rounded-lg focus:outline-none focus:border-[var(--accent-color)] bg-[var(--bg-color,white)]"
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => {
+                          if (whiteboardName.trim()) {
+                            setWhiteboards([...whiteboards, {id: Date.now().toString(), name: whiteboardName, items: []}])
+                            setWhiteboardName('')
+                            setShowWhiteboardForm(false)
+                          }
+                        }}
+                        className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-lg hover:opacity-90"
+                      >
+                        Create
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setWhiteboardName('')
+                          setShowWhiteboardForm(false)
+                        }}
+                        className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-400"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {whiteboards.map(wb => (
                   <button key={wb.id} onClick={() => { setSelectedWhiteboard(wb.id); setSidebarOpen(false) }} className="w-full text-left p-3 bg-[var(--accent-color)]/10 rounded-xl hover:bg-[var(--accent-color)]/20 transition-colors">
                     <span className="text-[var(--text-color)]">{wb.name}</span>
