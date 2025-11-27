@@ -7,6 +7,7 @@ import { notesAPI, authAPI } from '@/lib/api'
 import NoteEditor from '@/components/NoteEditor'
 import NoteList from '@/components/NoteList'
 import Navbar from '@/components/Navbar'
+import LoadingScreen from '@/components/LoadingScreen'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -73,11 +74,7 @@ export default function Dashboard() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[#faf8f5]">
-        <div className="animate-pulse text-[#c17d4a] text-2xl">Loading...</div>
-      </div>
-    )
+    return <LoadingScreen />
   }
 
   return (

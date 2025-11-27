@@ -24,6 +24,17 @@ const fonts = [
 export default function Settings() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'account' | 'customize' | 'friends' | 'privacy'>('account')
+  const [fadeOut, setFadeOut] = useState(false)
+
+  const handleTabChange = (tab: 'account' | 'customize' | 'friends' | 'privacy') => {
+    if (tab !== activeTab) {
+      setFadeOut(true)
+      setTimeout(() => {
+        setActiveTab(tab)
+        setFadeOut(false)
+      }, 300)
+    }
+  }
   const [selectedTheme, setSelectedTheme] = useState('beige')
   const [selectedFont, setSelectedFont] = useState('inter')
 
@@ -98,7 +109,7 @@ export default function Settings() {
         <div className="flex flex-col md:flex-row gap-6">
           <div className="md:w-64 bg-white rounded-2xl shadow-lg p-4 border border-[#e8d5c4] h-fit">
             <button
-              onClick={() => setActiveTab('account')}
+              onClick={() => handleTabChange('account')}
               className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
                 activeTab === 'account' ? 'bg-[#f5ebe1] text-[#c17d4a] font-semibold' : 'hover:bg-[#faf8f5]'
               }`}
@@ -112,7 +123,7 @@ export default function Settings() {
             </button>
 
             <button
-              onClick={() => setActiveTab('customize')}
+              onClick={() => handleTabChange('customize')}
               className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
                 activeTab === 'customize' ? 'bg-[#f5ebe1] text-[#c17d4a] font-semibold' : 'hover:bg-[#faf8f5]'
               }`}
@@ -126,7 +137,7 @@ export default function Settings() {
             </button>
 
             <button
-              onClick={() => setActiveTab('friends')}
+              onClick={() => handleTabChange('friends')}
               className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
                 activeTab === 'friends' ? 'bg-[#f5ebe1] text-[#c17d4a] font-semibold' : 'hover:bg-[#faf8f5]'
               }`}
@@ -140,7 +151,7 @@ export default function Settings() {
             </button>
 
             <button
-              onClick={() => setActiveTab('privacy')}
+              onClick={() => handleTabChange('privacy')}
               className={`w-full text-left px-4 py-3 rounded-xl transition-all ${
                 activeTab === 'privacy' ? 'bg-[#f5ebe1] text-[#c17d4a] font-semibold' : 'hover:bg-[#faf8f5]'
               }`}
@@ -154,7 +165,7 @@ export default function Settings() {
             </button>
           </div>
 
-          <div className="flex-1">
+          <div className="flex-1" style={{ opacity: fadeOut ? 0 : 1, transition: 'opacity 0.3s ease' }}>
             {activeTab === 'account' && (
               <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
                 <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Account Settings</h2>

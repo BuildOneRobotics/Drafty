@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import LoadingScreen from '@/components/LoadingScreen'
 
 export default function Home() {
   const router = useRouter()
@@ -16,7 +17,7 @@ export default function Home() {
   }, [])
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>
+    return <LoadingScreen />
   }
 
   if (isLoggedIn) {
