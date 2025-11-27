@@ -37,6 +37,10 @@ export default function Settings() {
   }, [])
   const [searchUsername, setSearchUsername] = useState('')
   const [friends, setFriends] = useState<string[]>([])
+  const [pendingRequests, setPendingRequests] = useState<string[]>([])
+  const [sentRequests, setSentRequests] = useState<string[]>([])
+  const [searchResults, setSearchResults] = useState<string[]>([])
+  const [selectedNotes, setSelectedNotes] = useState<string[]>([])
 
 
   const handleLogout = () => {
@@ -44,10 +48,43 @@ export default function Settings() {
     router.push('/login')
   }
 
-  const handleAddFriend = () => {
-    if (searchUsername && !friends.includes(searchUsername)) {
-      setFriends([...friends, searchUsername])
+  const handleSearch = () => {
+    if (searchUsername.length > 0) {
+      // Mock user database - in real app this would be an API call
+      const mockUsers = ['alice', 'bob', 'charlie', 'david', 'emma']
+      const exactMatch = mockUsers.filter(u => u === searchUsername.toLowerCase())
+      setSearchResults(exactMatch)
+    } else {
+      setSearchResults([])
+    }
+  }
+
+  const handleSendRequest = (username: string) => {
+    if (!friends.includes(username) && !sentRequests.includes(username)) {
+      setSentRequests([...sentRequests, username])
       setSearchUsername('')
+      setSearchResults([])
+    }
+  }
+
+  const handleAcceptRequest = (username: string) => {
+    setFriends([...friends, username])
+    setPendingRequests(pendingRequests.filter(u => u !== username))
+  }
+
+  const handleRejectRequest = (username: string) => {
+    setPendingRequests(pendingRequests.filter(u => u !== username))
+  }
+
+  const handleRemoveFriend = (username: string) => {
+    setFriends(friends.filter(f => f !== username))
+  }
+
+  const handleToggleNote = (noteId: string) => {
+    if (selectedNotes.includes(noteId)) {
+      setSelectedNotes(selectedNotes.filter(id => id !== noteId))
+    } else {
+      setSelectedNotes([...selectedNotes, noteId])
     }
   }
 
@@ -189,34 +226,87 @@ export default function Settings() {
             {activeTab === 'friends' && (
               <div className="space-y-6">
                 <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
-                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Add Friends</h2>
-                  <div className="flex gap-2 mb-6">
+                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Search Users</h2>
+                  <div className="flex gap-2 mb-4">
                     <input
                       type="text"
                       value={searchUsername}
-                      onChange={(e) => setSearchUsername(e.target.value)}
-                      placeholder="Search username..."
+                      onChange={(e) => {
+                        setSearchUsername(e.target.value)
+                        handleSearch()
+                      }}
+                      placeholder="Type exact username..."
                       className="flex-1 px-4 py-3 border-2 border-[#e8d5c4] rounded-xl focus:outline-none focus:border-[#c17d4a] transition-colors"
                     />
-                    <button
-                      onClick={handleAddFriend}
-                      className="bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white px-6 py-3 rounded-xl hover:from-[#a86a3d] hover:to-[#c17d4a] font-medium transition-all"
-                    >
-                      Add
-                    </button>
                   </div>
+                  {searchResults.length > 0 && (
+                    <div className="space-y-2 mb-6">
+                      {searchResults.map((username) => (
+                        <div key={username} className="flex items-center justify-between p-3 bg-[#f5ebe1] rounded-xl">
+                          <span className="font-medium text-[#4a3f35]">{username}</span>
+                          <button
+                            onClick={() => handleSendRequest(username)}
+                            className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 text-sm font-medium"
+                          >
+                            Send Request
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-                  <h3 className="font-bold text-[#4a3f35] mb-4">Your Friends</h3>
+                  {pendingRequests.length > 0 && (
+                    <>
+                      <h3 className="font-bold text-[#4a3f35] mb-4 mt-6">Pending Requests</h3>
+                      <div className="space-y-2 mb-6">
+                        {pendingRequests.map((username) => (
+                          <div key={username} className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl border border-yellow-200">
+                            <span className="font-medium text-[#4a3f35]">{username}</span>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleAcceptRequest(username)}
+                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 text-sm font-medium"
+                              >
+                                Accept
+                              </button>
+                              <button
+                                onClick={() => handleRejectRequest(username)}
+                                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 text-sm font-medium"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {sentRequests.length > 0 && (
+                    <>
+                      <h3 className="font-bold text-[#4a3f35] mb-4 mt-6">Sent Requests</h3>
+                      <div className="space-y-2 mb-6">
+                        {sentRequests.map((username) => (
+                          <div key={username} className="flex items-center justify-between p-3 bg-blue-50 rounded-xl border border-blue-200">
+                            <span className="font-medium text-[#4a3f35]">{username}</span>
+                            <span className="text-sm text-blue-600">Pending...</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  <h3 className="font-bold text-[#4a3f35] mb-4 mt-6">Your Friends</h3>
                   <div className="space-y-2">
                     {friends.length === 0 ? (
-                      <p className="text-[#8b6f47] text-sm">No friends yet. Search and add friends!</p>
+                      <p className="text-[#8b6f47] text-sm">No friends yet. Search and send friend requests!</p>
                     ) : (
                       friends.map((friend) => (
                         <div key={friend} className="flex items-center justify-between p-3 bg-[#f5ebe1] rounded-xl">
                           <span className="font-medium text-[#4a3f35]">{friend}</span>
                           <button 
-                            onClick={() => setFriends(friends.filter(f => f !== friend))}
-                            className="text-red-500 hover:text-red-700 text-sm"
+                            onClick={() => handleRemoveFriend(friend)}
+                            className="text-red-500 hover:text-red-700 text-sm font-medium"
                           >
                             Remove
                           </button>
@@ -226,20 +316,39 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
-                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Share Documents</h2>
-                  <p className="text-[#8b6f47] mb-4">Select notes or notebooks to share with friends</p>
-                  <div className="space-y-2">
-                    <label className="flex items-center space-x-3 p-3 bg-[#f5ebe1] rounded-xl cursor-pointer hover:bg-[#f0e5d5] transition-colors">
-                      <input type="checkbox" className="w-5 h-5 text-[#c17d4a] rounded" />
-                      <span className="text-[#4a3f35]">My First Note</span>
-                    </label>
-                    <label className="flex items-center space-x-3 p-3 bg-[#f5ebe1] rounded-xl cursor-pointer hover:bg-[#f0e5d5] transition-colors">
-                      <input type="checkbox" className="w-5 h-5 text-[#c17d4a] rounded" />
-                      <span className="text-[#4a3f35]">Math Notebook</span>
-                    </label>
+                {friends.length > 0 && (
+                  <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
+                    <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Share Notes with Friends</h2>
+                    <p className="text-[#8b6f47] mb-4">Select notes to share with your friends</p>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-3 p-3 bg-[#f5ebe1] rounded-xl cursor-pointer hover:bg-[#f0e5d5] transition-colors">
+                        <input 
+                          type="checkbox" 
+                          className="w-5 h-5 text-[#c17d4a] rounded"
+                          onChange={() => handleToggleNote('note1')}
+                          checked={selectedNotes.includes('note1')}
+                        />
+                        <span className="text-[#4a3f35]">My First Note</span>
+                      </label>
+                      <label className="flex items-center space-x-3 p-3 bg-[#f5ebe1] rounded-xl cursor-pointer hover:bg-[#f0e5d5] transition-colors">
+                        <input 
+                          type="checkbox" 
+                          className="w-5 h-5 text-[#c17d4a] rounded"
+                          onChange={() => handleToggleNote('note2')}
+                          checked={selectedNotes.includes('note2')}
+                        />
+                        <span className="text-[#4a3f35]">Math Notebook</span>
+                      </label>
+                    </div>
+                    {selectedNotes.length > 0 && (
+                      <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-xl">
+                        <p className="text-sm text-green-700">
+                          {selectedNotes.length} note(s) shared with {friends.length} friend(s)
+                        </p>
+                      </div>
+                    )}
                   </div>
-                </div>
+                )}
               </div>
             )}
 
