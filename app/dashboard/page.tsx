@@ -101,12 +101,12 @@ export default function Dashboard() {
       </button>
 
       <div className="flex flex-1 overflow-hidden relative">
-        <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:relative w-80 bg-white flex flex-col border-r border-[var(--accent-color)]/30 z-40 transition-transform duration-300 h-full`}>
-          <div className="p-6 border-b bg-[var(--accent-color)]">
-            <p className="text-sm text-white">Hello, {user?.name}</p>
+        <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:relative w-80 bg-[var(--surface-color,white)] flex flex-col border-r border-[var(--accent-color)]/30 z-40 transition-transform duration-300 h-full transition-colors duration-[2000ms]`}>
+          <div className="p-6 border-b bg-[var(--accent-color)] transition-colors duration-[2000ms]">
+            <p className="text-sm text-white">Hello, {user?.name || 'User'}</p>
           </div>
 
-          <div className="flex border-b border-[var(--accent-color)]/30 bg-[var(--accent-color)]/5">
+          <div className="flex border-b border-[var(--accent-color)]/30 bg-[var(--accent-color)]/5 transition-colors duration-[2000ms]">
             <button
               onClick={() => setActiveTab('notes')}
               className="flex-1 py-3 text-xs md:text-sm font-medium relative group"
@@ -142,7 +142,7 @@ export default function Dashboard() {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto bg-[var(--surface-color,white)] transition-colors duration-[2000ms]">
             {activeTab === 'notes' && (
               <NoteList notes={notes} selectedNote={selectedNote} onSelectNote={(note) => {
                 setSelectedNote(note)
