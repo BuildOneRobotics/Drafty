@@ -9,6 +9,21 @@ import NoteList from '@/components/NoteList'
 import Navbar from '@/components/Navbar'
 import LoadingScreen from '@/components/LoadingScreen'
 
+interface WhiteboardItem {
+  id: string
+  type: 'note' | 'circle' | 'square' | 'triangle'
+  x: number
+  y: number
+  text: string
+  color: string
+}
+
+interface Whiteboard {
+  id: string
+  name: string
+  items: WhiteboardItem[]
+}
+
 export default function Dashboard() {
   const router = useRouter()
   const user = useStore((state) => state.user)
@@ -25,12 +40,15 @@ export default function Dashboard() {
     }, 30000)
     return () => clearInterval(interval)
   }, [])
-  const [activeTab, setActiveTab] = useState<'notes' | 'notebooks' | 'flashcards'>('notes')
+  const [activeTab, setActiveTab] = useState<'notes' | 'notebooks' | 'flashcards' | 'whiteboards'>('notes')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [notebooks, setNotebooks] = useState<{id: string, name: string, folder: string}[]>([])
   const [flashcards, setFlashcards] = useState<{id: string, name: string, cards: {front: string, back: string, flipped: boolean}[]}[]>([])
   const [folders, setFolders] = useState<string[]>(['General'])
   const [selectedFolder, setSelectedFolder] = useState('General')
+  const [whiteboards, setWhiteboards] = useState<Whiteboard[]>([])
+  const [selectedWhiteboard, setSelectedWhiteboard] = useState<string | null>(null)
+  const [draggedItem, setDraggedItem] = useState<{id: string, startX: number, startY: number} | null>(null)
 
   const loadNotes = async () => {
     try {
@@ -77,9 +95,110 @@ export default function Dashboard() {
     }
   }
 
+  const addItemToWhiteboard = (type: 'note' | 'circle' | 'square' | 'triangle') => {
+    if (!selectedWhiteboard) return
+    const wb = whiteboards.find(w => w.id === selectedWhiteboard)
+    if (!wb) return
+    const newItem: WhiteboardItem = {
+      id: Date.now().toString(),
+      type,
+      x: 50,
+      y: 50,
+      text: 'New item',
+      color: '#fef3c7'
+    }
+    const updated = whiteboards.map(w => w.id === selectedWhiteboard ? {...w, items: [...w.items, newItem]} : w)
+    setWhiteboards(updated)
+  }
+
+  const updateItemPosition = (itemId: string, x: number, y: number) => {
+    const updated = whiteboards.map(w => w.id === selectedWhiteboard ? {
+      ...w,
+      items: w.items.map(i => i.id === itemId ? {...i, x, y} : i)
+    } : w)
+    setWhiteboards(updated)
+  }
+
+  const updateItemText = (itemId: string, text: string) => {
+    const updated = whiteboards.map(w => w.id === selectedWhiteboard ? {
+      ...w,
+      items: w.items.map(i => i.id === itemId ? {...i, text} : i)
+    } : w)
+    setWhiteboards(updated)
+  }
+
+  const deleteItem = (itemId: string) => {
+    const updated = whiteboards.map(w => w.id === selectedWhiteboard ? {
+      ...w,
+      items: w.items.filter(i => i.id !== itemId)
+    } : w)
+    setWhiteboards(updated)
+  }
+
+  const renderShape = (item: WhiteboardItem) => {
+    const baseClass = 'absolute cursor-move p-2 rounded transition-all'
+    const colors: {[key: string]: string} = {
+      '#fef3c7': 'bg-yellow-100',
+      '#fce7f3': 'bg-pink-100',
+      '#dbeafe': 'bg-blue-100',
+      '#dcfce7': 'bg-green-100'
+    }
+    
+    if (item.type === 'note') {
+      return (
+        <div
+          key={item.id}
+          style={{left: `${item.x}px`, top: `${item.y}px`}}
+          className={`${baseClass} ${colors[item.color] || 'bg-yellow-100'} w-32 h-32 shadow-lg`}
+          onMouseDown={(e) => setDraggedItem({id: item.id, startX: e.clientX - item.x, startY: e.clientY - item.y})}
+        >
+          <textarea
+            value={item.text}
+            onChange={(e) => updateItemText(item.id, e.target.value)}
+            className="w-full h-full bg-transparent outline-none text-sm resize-none"
+          />
+          <button onClick={() => deleteItem(item.id)} className="absolute top-1 right-1 text-red-500 text-xs">×</button>
+        </div>
+      )
+    } else if (item.type === 'circle') {
+      return (
+        <div
+          key={item.id}
+          style={{left: `${item.x}px`, top: `${item.y}px`}}
+          className={`${baseClass} w-20 h-20 rounded-full ${colors[item.color] || 'bg-blue-100'} shadow-lg flex items-center justify-center`}
+          onMouseDown={(e) => setDraggedItem({id: item.id, startX: e.clientX - item.x, startY: e.clientY - item.y})}
+        >
+          <button onClick={() => deleteItem(item.id)} className="text-red-500 text-xs">×</button>
+        </div>
+      )
+    } else if (item.type === 'square') {
+      return (
+        <div
+          key={item.id}
+          style={{left: `${item.x}px`, top: `${item.y}px`}}
+          className={`${baseClass} w-20 h-20 ${colors[item.color] || 'bg-green-100'} shadow-lg flex items-center justify-center`}
+          onMouseDown={(e) => setDraggedItem({id: item.id, startX: e.clientX - item.x, startY: e.clientY - item.y})}
+        >
+          <button onClick={() => deleteItem(item.id)} className="text-red-500 text-xs">×</button>
+        </div>
+      )
+    } else if (item.type === 'triangle') {
+      return (
+        <div
+          key={item.id}
+          style={{left: `${item.x}px`, top: `${item.y}px`, width: 0, height: 0, borderLeft: '20px solid transparent', borderRight: '20px solid transparent', borderBottom: '40px solid #fca5a5'}}
+          className="absolute cursor-move"
+          onMouseDown={(e) => setDraggedItem({id: item.id, startX: e.clientX - item.x, startY: e.clientY - item.y})}
+        />
+      )
+    }
+  }
+
   if (loading) {
     return <LoadingScreen />
   }
+
+  const currentWhiteboard = whiteboards.find(w => w.id === selectedWhiteboard)
 
   return (
     <div className="flex flex-col h-screen bg-[var(--bg-color,#faf8f5)] transition-colors duration-[2000ms]" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
@@ -139,6 +258,17 @@ export default function Dashboard() {
               <span className={`relative z-10 ${
                 activeTab === 'flashcards' ? 'text-[var(--accent-color)] font-semibold' : 'text-[var(--text-color)]/70'
               }`}>Cards</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('whiteboards')}
+              className="flex-1 py-3 text-xs md:text-sm font-medium relative group"
+            >
+              <div className={`absolute inset-1 rounded-lg transition-opacity duration-300 ${
+                activeTab === 'whiteboards' ? 'bg-[var(--accent-color)]/15 opacity-100' : 'bg-[var(--accent-color)]/10 opacity-0 group-hover:opacity-100'
+              }`}></div>
+              <span className={`relative z-10 ${
+                activeTab === 'whiteboards' ? 'text-[var(--accent-color)] font-semibold' : 'text-[var(--text-color)]/70'
+              }`}>Board</span>
             </button>
           </div>
 
@@ -206,12 +336,30 @@ export default function Dashboard() {
                           updated[deckIndex].cards[i].flipped = !updated[deckIndex].cards[i].flipped
                           setFlashcards(updated)
                         }}
-                        className="p-3 bg-white rounded-lg cursor-pointer hover:scale-105 transition-transform"
+                        className="p-3 bg-[var(--surface-color,white)] rounded-lg cursor-pointer hover:scale-105 transition-transform"
                       >
                         <p className="text-sm text-[var(--text-color)]">{card.flipped ? card.back : card.front}</p>
                       </div>
                     ))}
                   </div>
+                ))}
+              </div>
+            )}
+            {activeTab === 'whiteboards' && (
+              <div className="p-4 space-y-3">
+                <button 
+                  onClick={() => {
+                    const name = prompt('Whiteboard name:')
+                    if (name) setWhiteboards([...whiteboards, {id: Date.now().toString(), name, items: []}])
+                  }}
+                  className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all"
+                >
+                  + Create Whiteboard
+                </button>
+                {whiteboards.map(wb => (
+                  <button key={wb.id} onClick={() => { setSelectedWhiteboard(wb.id); setSidebarOpen(false) }} className="w-full text-left p-3 bg-[var(--accent-color)]/10 rounded-xl hover:bg-[var(--accent-color)]/20 transition-colors">
+                    <span className="text-[var(--text-color)]">{wb.name}</span>
+                  </button>
                 ))}
               </div>
             )}
@@ -227,6 +375,27 @@ export default function Dashboard() {
         <div className="flex-1 flex flex-col overflow-hidden">
           {selectedNote ? (
             <NoteEditor note={selectedNote} onSave={loadNotes} />
+          ) : currentWhiteboard ? (
+            <div className="flex-1 flex flex-col bg-[var(--bg-color,#faf8f5)]">
+              <div className="p-4 border-b bg-[var(--surface-color,white)] flex gap-2">
+                <button onClick={() => addItemToWhiteboard('note')} className="px-3 py-2 bg-yellow-100 rounded hover:bg-yellow-200">📝 Note</button>
+                <button onClick={() => addItemToWhiteboard('circle')} className="px-3 py-2 bg-blue-100 rounded hover:bg-blue-200">⭕ Circle</button>
+                <button onClick={() => addItemToWhiteboard('square')} className="px-3 py-2 bg-green-100 rounded hover:bg-green-200">⬜ Square</button>
+                <button onClick={() => addItemToWhiteboard('triangle')} className="px-3 py-2 bg-red-100 rounded hover:bg-red-200">🔺 Triangle</button>
+              </div>
+              <div 
+                className="flex-1 relative overflow-hidden bg-[var(--surface-color,white)]"
+                onMouseMove={(e) => {
+                  if (draggedItem) {
+                    updateItemPosition(draggedItem.id, e.clientX - draggedItem.startX, e.clientY - draggedItem.startY)
+                  }
+                }}
+                onMouseUp={() => setDraggedItem(null)}
+                onMouseLeave={() => setDraggedItem(null)}
+              >
+                {currentWhiteboard.items.map(item => renderShape(item))}
+              </div>
+            </div>
           ) : (
             <div className="flex items-center justify-center h-full bg-[var(--surface-color,white)] p-4 transition-colors duration-[2000ms]">
               <div className="text-center animate-fade-in">
