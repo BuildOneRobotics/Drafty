@@ -228,12 +228,12 @@ export default function Dashboard() {
           {selectedNote ? (
             <NoteEditor note={selectedNote} onSave={loadNotes} />
           ) : (
-            <div className="flex items-center justify-center h-full bg-white p-4">
+            <div className="flex items-center justify-center h-full bg-[var(--surface-color,white)] p-4 transition-colors duration-[2000ms]">
               <div className="text-center animate-fade-in">
-                <svg className="w-20 h-20 md:w-28 md:h-28 mx-auto mb-6 text-[#c17d4a] animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-20 h-20 md:w-28 md:h-28 mx-auto mb-6 text-[var(--accent-color)] animate-bounce transition-colors duration-[2000ms]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <p className="text-[#8b6f47] text-xl md:text-2xl mb-8">No notes yet</p>
+                <p className="text-[var(--accent-color)]/70 text-xl md:text-2xl mb-8 transition-colors duration-[2000ms]">No notes yet</p>
                 <button
                   onClick={() => {
                     const newNote: Note = {
@@ -246,7 +246,7 @@ export default function Dashboard() {
                     }
                     setSelectedNote(newNote)
                   }}
-                  className="bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white px-8 md:px-10 py-3 md:py-4 rounded-2xl hover:from-[#a86a3d] hover:to-[#c17d4a] font-semibold shadow-xl transition-all transform hover:scale-110"
+                  className="bg-[var(--accent-color)] text-white px-8 md:px-10 py-3 md:py-4 rounded-2xl hover:opacity-90 font-semibold shadow-xl transition-all transform hover:scale-110 duration-[2000ms]"
                 >
                   Create First Note
                 </button>
