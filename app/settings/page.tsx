@@ -214,7 +214,12 @@ export default function Settings() {
                       friends.map((friend) => (
                         <div key={friend} className="flex items-center justify-between p-3 bg-[#f5ebe1] rounded-xl">
                           <span className="font-medium text-[#4a3f35]">{friend}</span>
-                          <button className="text-red-500 hover:text-red-700 text-sm">Remove</button>
+                          <button 
+                            onClick={() => setFriends(friends.filter(f => f !== friend))}
+                            className="text-red-500 hover:text-red-700 text-sm"
+                          >
+                            Remove
+                          </button>
                         </div>
                       ))
                     )}
