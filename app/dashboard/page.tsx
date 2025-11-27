@@ -105,33 +105,62 @@ export default function Dashboard() {
           <div className="flex border-b border-[var(--accent-color)]/30 bg-[var(--accent-color)]/5">
             <button
               onClick={() => setActiveTab('notes')}
-              className={`flex-1 py-3 text-xs md:text-sm font-medium transition-all ${
-                activeTab === 'notes'
-                  ? 'bg-white text-[var(--accent-color)] border-b-2 border-[var(--accent-color)]'
-                  : 'text-[var(--text-color)]/70 hover:bg-white/50'
-              }`}
+              className="flex-1 py-3 text-xs md:text-sm font-medium relative group"
             >
-              Notes
+              <div className={`absolute inset-1 rounded-lg transition-opacity duration-300 ${
+                activeTab === 'notes' ? 'bg-[var(--accent-color)]/15 opacity-100' : 'bg-[var(--accent-color)]/10 opacity-0 group-hover:opacity-100'
+              }`}></div>
+              <span className={`relative z-10 ${
+                activeTab === 'notes' ? 'text-[var(--accent-color)] font-semibold' : 'text-[var(--text-color)]/70'
+              }`}>Notes</span>
             </button>
             <button
-              disabled
-              className="flex-1 py-3 text-xs md:text-sm font-medium text-[var(--text-color)]/30 cursor-not-allowed"
+              onClick={() => setActiveTab('notebooks')}
+              className="flex-1 py-3 text-xs md:text-sm font-medium relative group"
             >
-              Books
+              <div className={`absolute inset-1 rounded-lg transition-opacity duration-300 ${
+                activeTab === 'notebooks' ? 'bg-[var(--accent-color)]/15 opacity-100' : 'bg-[var(--accent-color)]/10 opacity-0 group-hover:opacity-100'
+              }`}></div>
+              <span className={`relative z-10 ${
+                activeTab === 'notebooks' ? 'text-[var(--accent-color)] font-semibold' : 'text-[var(--text-color)]/70'
+              }`}>Books</span>
             </button>
             <button
-              disabled
-              className="flex-1 py-3 text-xs md:text-sm font-medium text-[var(--text-color)]/30 cursor-not-allowed"
+              onClick={() => setActiveTab('flashcards')}
+              className="flex-1 py-3 text-xs md:text-sm font-medium relative group"
             >
-              Cards
+              <div className={`absolute inset-1 rounded-lg transition-opacity duration-300 ${
+                activeTab === 'flashcards' ? 'bg-[var(--accent-color)]/15 opacity-100' : 'bg-[var(--accent-color)]/10 opacity-0 group-hover:opacity-100'
+              }`}></div>
+              <span className={`relative z-10 ${
+                activeTab === 'flashcards' ? 'text-[var(--accent-color)] font-semibold' : 'text-[var(--text-color)]/70'
+              }`}>Cards</span>
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            <NoteList notes={notes} selectedNote={selectedNote} onSelectNote={(note) => {
-              setSelectedNote(note)
-              setSidebarOpen(false)
-            }} />
+            {activeTab === 'notes' && (
+              <NoteList notes={notes} selectedNote={selectedNote} onSelectNote={(note) => {
+                setSelectedNote(note)
+                setSidebarOpen(false)
+              }} />
+            )}
+            {activeTab === 'notebooks' && (
+              <div className="p-4 space-y-3">
+                <button className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all">
+                  + Create Notebook
+                </button>
+                <p className="text-center text-[var(--text-color)]/70 text-sm py-8">No notebooks yet. Create one to get started!</p>
+              </div>
+            )}
+            {activeTab === 'flashcards' && (
+              <div className="p-4 space-y-3">
+                <button className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all">
+                  + Create Flashcard Deck
+                </button>
+                <p className="text-center text-[var(--text-color)]/70 text-sm py-8">No flashcard decks yet. Create one to get started!</p>
+              </div>
+            )}
           </div>
 
           <div className="p-4 border-t bg-[var(--accent-color)]/5">
