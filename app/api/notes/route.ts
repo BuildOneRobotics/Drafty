@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const notesDB: any = {}
+import { loadFromGist, saveToGist } from '@/lib/gist'
 
 function getUserId(request: NextRequest): string | null {
   const authHeader = request.headers.get('authorization')
@@ -20,7 +19,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }
 
-  const userNotes = notesDB[userId] || []
+  const data = await loadFromGist()
+  const userNotes = data.notes[userId] || []
   return NextResponse.json(userNotes)
 }
 
@@ -32,6 +32,8 @@ export async function POST(request: NextRequest) {
 
   try {
     const { title, content, tags } = await request.json()
+    const data = await loadFromGist()
+    
     const note = {
       id: Date.now().toString(),
       title,
@@ -41,10 +43,11 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     }
 
-    if (!notesDB[userId]) {
-      notesDB[userId] = []
+    if (!data.notes[userId]) {
+      data.notes[userId] = []
     }
-    notesDB[userId].push(note)
+    data.notes[userId].push(note)
+    await saveToGist(data)
 
     return NextResponse.json(note, { status: 201 })
   } catch (error) {

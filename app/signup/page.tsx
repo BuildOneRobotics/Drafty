@@ -39,15 +39,7 @@ export default function Signup() {
     }
   }
 
-  const handleGoogleSignup = async () => {
-    const { supabase } = await import('@/lib/supabase')
-    await supabase.auth.signInWithOAuth({ provider: 'google' })
-  }
 
-  const handleGithubSignup = async () => {
-    const { supabase } = await import('@/lib/supabase')
-    await supabase.auth.signInWithOAuth({ provider: 'github' })
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -114,27 +106,7 @@ export default function Signup() {
           </button>
         </form>
 
-        <div className="my-6 flex items-center">
-          <div className="flex-1 border-t border-gray-300"></div>
-          <span className="px-2 text-gray-500">or</span>
-          <div className="flex-1 border-t border-gray-300"></div>
-        </div>
-
-        <button
-          onClick={handleGoogleSignup}
-          className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 mb-2"
-        >
-          Sign Up with Google
-        </button>
-
-        <button
-          onClick={handleGithubSignup}
-          className="w-full bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-900 mb-4"
-        >
-          Sign Up with GitHub
-        </button>
-
-        <p className="text-center text-gray-600">
+        <p className="text-center text-gray-600 mt-6">
           Already have an account?{' '}
           <Link href="/login" className="text-indigo-600 hover:underline">
             Login

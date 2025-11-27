@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const users: any = {}
+import { loadFromGist } from '@/lib/gist'
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
+    const data = await loadFromGist()
 
-    const user = users[email]
+    const user = data.users[email]
     if (!user || user.password !== password) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 })
     }
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       token,
-      user: { id: user.id, email: user.email, name: user.name, buildoneId: user.buildoneId },
+      user: { id: user.id, email: user.email, name: user.name },
     })
   } catch (error) {
     return NextResponse.json({ message: 'Login failed' }, { status: 500 })

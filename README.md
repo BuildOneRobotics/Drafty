@@ -6,7 +6,7 @@ A modern web application for creating, organizing, and syncing notes and ideas w
 
 - **Create & Organize Notes**: Quickly capture and organize your thoughts
 - **Auto Sync**: Notes sync automatically across devices
-- **OAuth Integration**: Secure login with Google and GitHub
+- **Simple Authentication**: Email and password login
 - **Tags & Organization**: Organize notes with custom tags
 - **Real-time Updates**: Changes save automatically
 
@@ -16,7 +16,7 @@ A modern web application for creating, organizing, and syncing notes and ideas w
 - **Backend**: Next.js API Routes
 - **State Management**: Zustand
 - **Deployment**: Vercel
-- **Authentication**: Supabase (Google, GitHub) + Local Auth
+- **Storage**: GitHub Gist for data persistence
 
 ## Getting Started
 
@@ -36,19 +36,19 @@ npm install
 Create a `.env.local` file:
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_API_URL=http://localhost:3000
+GITHUB_TOKEN=your_github_personal_access_token
+GIST_ID=your_gist_id
 ```
 
-### Supabase Setup
+### GitHub Gist Setup
 
-1. Create account at [supabase.com](https://supabase.com)
-2. Create new project
-3. Go to Settings → API
-4. Copy Project URL and anon key to `.env.local`
-5. Go to Authentication → Providers
-6. Enable Google and GitHub OAuth
+1. Go to [GitHub Settings → Tokens](https://github.com/settings/tokens)
+2. Generate new token (classic) with `gist` scope
+3. Create a new gist at [gist.github.com](https://gist.github.com)
+4. Add file `drafty-data.json` with content: `{"users":{},"notes":{}}`
+5. Copy gist ID from URL (e.g., `abc123def456`)
+6. Add `GITHUB_TOKEN` and `GIST_ID` to `.env.local`
 
 ### Development
 
@@ -81,7 +81,7 @@ vercel
 ### Authentication
 - `POST /api/auth/signup` - Create account
 - `POST /api/auth/login` - Login
-- OAuth via Supabase (Google, GitHub)
+
 - `GET /api/auth/me` - Get current user
 
 ### Notes

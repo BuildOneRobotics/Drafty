@@ -1,29 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const users: any = {}
+import { loadFromGist, saveToGist } from '@/lib/gist'
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password, name } = await request.json()
+    const data = await loadFromGist()
 
-    if (users[email]) {
+    if (data.users[email]) {
       return NextResponse.json({ message: 'User already exists' }, { status: 400 })
     }
 
     const userId = Date.now().toString()
-    users[email] = {
-      id: userId,
-      email,
-      password,
-      name,
-      buildoneId: null,
-    }
+    data.users[email] = { id: userId, email, password, name }
+    await saveToGist(data)
 
     const token = Buffer.from(JSON.stringify({ id: userId, email })).toString('base64')
 
     return NextResponse.json({
       token,
-      user: { id: userId, email, name, buildoneId: null },
+      user: { id: userId, email, name },
     })
   } catch (error) {
     return NextResponse.json({ message: 'Signup failed' }, { status: 500 })

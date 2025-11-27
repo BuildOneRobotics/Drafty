@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const notesDB: any = {}
+import { loadFromGist, saveToGist } from '@/lib/gist'
 
 function getUserId(request: NextRequest): string | null {
   const authHeader = request.headers.get('authorization')
@@ -22,7 +21,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
   try {
     const { title, content, tags } = await request.json()
-    const userNotes = notesDB[userId] || []
+    const data = await loadFromGist()
+    const userNotes = data.notes[userId] || []
     const noteIndex = userNotes.findIndex((n: any) => n.id === params.id)
 
     if (noteIndex === -1) {
@@ -36,6 +36,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       tags,
       updatedAt: new Date().toISOString(),
     }
+    
+    data.notes[userId] = userNotes
+    await saveToGist(data)
 
     return NextResponse.json(userNotes[noteIndex])
   } catch (error) {
@@ -50,7 +53,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   }
 
   try {
-    const userNotes = notesDB[userId] || []
+    const data = await loadFromGist()
+    const userNotes = data.notes[userId] || []
     const noteIndex = userNotes.findIndex((n: any) => n.id === params.id)
 
     if (noteIndex === -1) {
@@ -58,6 +62,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     userNotes.splice(noteIndex, 1)
+    data.notes[userId] = userNotes
+    await saveToGist(data)
+    
     return NextResponse.json({ message: 'Note deleted' })
   } catch (error) {
     return NextResponse.json({ message: 'Failed to delete note' }, { status: 500 })
