@@ -43,8 +43,8 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-color,#faf8f5)] transition-colors duration-[2000ms] flex items-center justify-center p-4" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
-      <div className="bg-white p-8 rounded-2xl border border-[var(--accent-color)]/30 w-full max-w-md relative">
-        <Link href="/" className="absolute top-6 left-6 text-gray-400 hover:text-gray-600 transition-colors">
+      <div className="bg-[var(--surface-color,white)] p-6 md:p-8 rounded-2xl border border-[var(--accent-color)]/30 w-full max-w-md relative transition-colors duration-[2000ms]">
+        <Link href="/" className="absolute top-6 left-6 text-[var(--text-color)]/40 hover:text-[var(--text-color)]/60 transition-colors">
           ← Back
         </Link>
         <div className="text-center mb-8">
@@ -63,46 +63,50 @@ export default function Signup() {
 
         <form onSubmit={handleSignup} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+            <label className="block text-sm font-medium text-[var(--text-color)] mb-2">Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-lg focus:outline-none focus:border-[var(--accent-color)] transition-all bg-[var(--bg-color,white)]"
               required
+              autoComplete="name"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label className="block text-sm font-medium text-[var(--text-color)] mb-2">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-lg focus:outline-none focus:border-[var(--accent-color)] transition-all bg-[var(--bg-color,white)]"
               required
+              autoComplete="email"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label className="block text-sm font-medium text-[var(--text-color)] mb-2">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-lg focus:outline-none focus:border-[var(--accent-color)] transition-all bg-[var(--bg-color,white)]"
               required
+              autoComplete="new-password"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+            <label className="block text-sm font-medium text-[var(--text-color)] mb-2">Confirm Password</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-lg focus:outline-none focus:border-[var(--accent-color)] transition-all bg-[var(--bg-color,white)]"
               required
+              autoComplete="new-password"
             />
           </div>
 
@@ -115,7 +119,7 @@ export default function Signup() {
           </button>
         </form>
 
-        <p className="text-center text-gray-600 mt-6">
+        <p className="text-center text-[var(--text-color)]/70 mt-6">
           Already have an account?{' '}
           <Link href="/login" className="text-[var(--accent-color)] hover:underline">
             Login
