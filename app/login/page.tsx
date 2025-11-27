@@ -31,11 +31,14 @@ export default function Login() {
     }
   }
 
-  const handleBuildOneLogin = () => {
-    const clientId = process.env.NEXT_PUBLIC_BUILDONE_CLIENT_ID
-    const redirectUri = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/buildone/callback`
-    const authUrl = `${process.env.NEXT_PUBLIC_BUILDONE_API_URL}/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`
-    window.location.href = authUrl
+  const handleGoogleLogin = async () => {
+    const { supabase } = await import('@/lib/supabase')
+    await supabase.auth.signInWithOAuth({ provider: 'google' })
+  }
+
+  const handleGithubLogin = async () => {
+    const { supabase } = await import('@/lib/supabase')
+    await supabase.auth.signInWithOAuth({ provider: 'github' })
   }
 
   return (
@@ -88,10 +91,17 @@ export default function Login() {
         </div>
 
         <button
-          onClick={handleBuildOneLogin}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 mb-4"
+          onClick={handleGoogleLogin}
+          className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 mb-2"
         >
-          Login with BuildOne
+          Login with Google
+        </button>
+
+        <button
+          onClick={handleGithubLogin}
+          className="w-full bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-900 mb-4"
+        >
+          Login with GitHub
         </button>
 
         <p className="text-center text-gray-600">

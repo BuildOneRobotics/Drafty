@@ -68,8 +68,8 @@ export default function Home() {
             <p className="text-gray-600">Your notes sync automatically across all your devices</p>
           </div>
           <div className="bg-white p-8 rounded-lg shadow-md">
-            <h3 className="text-xl font-bold mb-4">🔐 BuildOne Secure</h3>
-            <p className="text-gray-600">Integrated with BuildOne for secure account management</p>
+            <h3 className="text-xl font-bold mb-4">🔐 Secure Login</h3>
+            <p className="text-gray-600">Sign in with Google or GitHub for secure access</p>
           </div>
         </div>
       </div>

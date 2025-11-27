@@ -6,7 +6,7 @@ A modern web application for creating, organizing, and syncing notes and ideas w
 
 - **Create & Organize Notes**: Quickly capture and organize your thoughts
 - **Auto Sync**: Notes sync automatically across devices
-- **BuildOne Integration**: Secure login with BuildOne accounts
+- **OAuth Integration**: Secure login with Google and GitHub
 - **Tags & Organization**: Organize notes with custom tags
 - **Real-time Updates**: Changes save automatically
 
@@ -16,7 +16,7 @@ A modern web application for creating, organizing, and syncing notes and ideas w
 - **Backend**: Next.js API Routes
 - **State Management**: Zustand
 - **Deployment**: Vercel
-- **Authentication**: BuildOne OAuth + Local Auth
+- **Authentication**: Supabase (Google, GitHub) + Local Auth
 
 ## Getting Started
 
@@ -36,12 +36,19 @@ npm install
 Create a `.env.local` file:
 
 ```
-NEXT_PUBLIC_BUILDONE_API_URL=https://api.buildone.com
-NEXT_PUBLIC_BUILDONE_CLIENT_ID=your_buildone_client_id
-BUILDONE_CLIENT_SECRET=your_buildone_client_secret
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_API_URL=http://localhost:3000
-JWT_SECRET=your_jwt_secret_key
 ```
+
+### Supabase Setup
+
+1. Create account at [supabase.com](https://supabase.com)
+2. Create new project
+3. Go to Settings → API
+4. Copy Project URL and anon key to `.env.local`
+5. Go to Authentication → Providers
+6. Enable Google and GitHub OAuth
 
 ### Development
 
@@ -74,7 +81,7 @@ vercel
 ### Authentication
 - `POST /api/auth/signup` - Create account
 - `POST /api/auth/login` - Login
-- `POST /api/auth/buildone` - BuildOne OAuth
+- OAuth via Supabase (Google, GitHub)
 - `GET /api/auth/me` - Get current user
 
 ### Notes
