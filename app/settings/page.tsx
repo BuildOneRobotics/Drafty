@@ -30,6 +30,9 @@ export default function Settings() {
   const [newFolderName, setNewFolderName] = useState('')
   const [newFolderColor, setNewFolderColor] = useState('#b8803d')
   const [showNewFolder, setShowNewFolder] = useState(false)
+  const [editingFolder, setEditingFolder] = useState<string | null>(null)
+  const [menuOpen, setMenuOpen] = useState<string | null>(null)
+  const [colorPickerOpen, setColorPickerOpen] = useState<string | null>(null)
 
   const handleTabChange = (tab: 'account' | 'customize' | 'friends' | 'files' | 'privacy') => {
     if (tab !== activeTab) {
@@ -443,19 +446,51 @@ export default function Settings() {
                 )}
                 <div className="space-y-2">
                   {folders.map(folder => (
-                    <div key={folder.id} className="flex items-center justify-between p-3 rounded-xl" style={{backgroundColor: folder.color + '20'}}>
+                    <div key={folder.id} className="flex items-center justify-between p-3 rounded-xl relative" style={{backgroundColor: folder.color + '20'}}>
                       <div className="flex items-center gap-3">
                         <div className="w-4 h-4 rounded-full" style={{backgroundColor: folder.color}}></div>
-                        <input 
-                          value={folder.name}
-                          onChange={(e) => {
-                            const updated = folders.map(f => f.id === folder.id ? {...f, name: e.target.value} : f)
-                            setFolders(updated)
-                          }}
-                          className="bg-transparent border-none outline-none font-medium"
-                        />
+                        <span className="font-medium">{folder.name}</span>
                       </div>
-                      <button onClick={() => setFolders(folders.filter(f => f.id !== folder.id))} className="text-red-500 text-sm">Delete</button>
+                      <div className="relative">
+                        <button onClick={() => setMenuOpen(menuOpen === folder.id ? null : folder.id)} className="p-1 hover:bg-black/10 rounded">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="5" r="2"/>
+                            <circle cx="12" cy="12" r="2"/>
+                            <circle cx="12" cy="19" r="2"/>
+                          </svg>
+                        </button>
+                        {menuOpen === folder.id && (
+                          <div className="absolute right-0 mt-1 bg-white border border-[var(--accent-color)]/30 rounded-lg shadow-lg z-10 w-40">
+                            <button onClick={() => { setEditingFolder(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10 rounded-t-lg">Rename</button>
+                            <button onClick={() => { setColorPickerOpen(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10">Change Color</button>
+                            <button onClick={() => { setFolders(folders.filter(f => f.id !== folder.id)); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 rounded-b-lg">Delete</button>
+                          </div>
+                        )}
+                        {colorPickerOpen === folder.id && (
+                          <div className="absolute right-0 mt-1 bg-white border border-[var(--accent-color)]/30 rounded-lg shadow-lg z-10 p-3">
+                            <input 
+                              type="color"
+                              value={folder.color}
+                              onChange={(e) => setFolders(folders.map(f => f.id === folder.id ? {...f, color: e.target.value} : f))}
+                              className="w-20 h-10 rounded cursor-pointer"
+                            />
+                            <button onClick={() => setColorPickerOpen(null)} className="mt-2 w-full bg-[var(--accent-color)] text-white px-3 py-1 rounded text-sm">Done</button>
+                          </div>
+                        )}
+                      </div>
+                      {editingFolder === folder.id && (
+                        <div className="absolute inset-0 bg-white rounded-xl p-3 flex items-center gap-2 border-2 border-[var(--accent-color)]">
+                          <input 
+                            value={folder.name}
+                            onChange={(e) => setFolders(folders.map(f => f.id === folder.id ? {...f, name: e.target.value} : f))}
+                            onBlur={() => setEditingFolder(null)}
+                            onKeyDown={(e) => e.key === 'Enter' && setEditingFolder(null)}
+                            className="flex-1 px-2 py-1 border border-[var(--accent-color)]/30 rounded outline-none"
+                            autoFocus
+                          />
+                          <button onClick={() => setEditingFolder(null)} className="text-green-600 font-medium">✓</button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

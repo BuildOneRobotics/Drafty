@@ -16,6 +16,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
   const [saving, setSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<string | null>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     setTitle(note.title)
@@ -25,6 +26,19 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
       contentRef.current.innerHTML = note.content
     }
   }, [note])
+
+  useEffect(() => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    saveTimeoutRef.current = setTimeout(() => {
+      if (title || contentRef.current?.innerHTML) handleSave()
+    }, 2000)
+    return () => { if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current) }
+  }, [title, tags])
+
+  const handleContentChange = () => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    saveTimeoutRef.current = setTimeout(() => handleSave(), 2000)
+  }
 
   const handleTitleClick = () => {
     if (title === 'Untitled Note') {
@@ -141,6 +155,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
       <div
         ref={contentRef}
         contentEditable
+        onInput={handleContentChange}
         className="flex-1 p-6 md:p-10 outline-none text-[#4a3f35] text-base md:text-lg leading-relaxed bg-white overflow-y-auto"
         style={{ minHeight: '300px' }}
         suppressContentEditableWarning
