@@ -110,11 +110,14 @@ export default function Settings() {
           <div className="md:w-64 bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-4 border border-[var(--accent-color)]/30 h-fit">
             <button
               onClick={() => handleTabChange('account')}
-              className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
-                activeTab === 'account' ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
-              }`}
+              className="w-full text-left px-4 py-3 rounded-xl mb-2 relative group"
             >
-              <div className="flex items-center space-x-3">
+              <div className={`absolute inset-1 rounded-lg transition-opacity duration-300 ${
+                activeTab === 'account' ? 'bg-[var(--accent-color)]/15 opacity-100' : 'bg-[var(--accent-color)]/10 opacity-0 group-hover:opacity-100'
+              }`}></div>
+              <div className={`flex items-center space-x-3 relative z-10 ${
+                activeTab === 'account' ? 'text-[var(--accent-color)] font-semibold' : ''
+              }`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -375,3 +378,4 @@ export default function Settings() {
     </div>
   )
 }
+
