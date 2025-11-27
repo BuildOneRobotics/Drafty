@@ -17,10 +17,12 @@ export async function POST(request: NextRequest) {
 
     const token = Buffer.from(JSON.stringify({ id: user.id, email, name: user.name })).toString('base64')
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       token,
       user: { id: user.id, email: user.email, name: user.name },
     })
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    return response
   } catch (error: any) {
     console.error('Login error:', error)
     return NextResponse.json({ message: error.message || 'Login failed' }, { status: 500 })

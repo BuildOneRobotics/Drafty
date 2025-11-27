@@ -14,12 +14,14 @@ export async function POST(request: NextRequest) {
     data.users[email] = { id: userId, email, password, name }
     await saveToGist(data)
 
-    const token = Buffer.from(JSON.stringify({ id: userId, email })).toString('base64')
+    const token = Buffer.from(JSON.stringify({ id: userId, email, name })).toString('base64')
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       token,
       user: { id: userId, email, name },
     })
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    return response
   } catch (error) {
     return NextResponse.json({ message: 'Signup failed' }, { status: 500 })
   }
