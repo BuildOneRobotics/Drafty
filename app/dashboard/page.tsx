@@ -138,42 +138,18 @@ export default function Dashboard() {
             )}
             {activeTab === 'notebooks' && (
               <div className="p-4 space-y-3">
-                {['Math', 'Science', 'History', 'English'].map((subject) => (
-                  <div
-                    key={subject}
-                    className="p-4 bg-[#f5ebe1] rounded-2xl border border-[#e8d5c4] hover:shadow-xl hover:scale-105 transition-all transform cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-bold text-[#4a3f35]">{subject}</h3>
-                        <p className="text-xs text-[#8b6f47]">0 notes</p>
-                      </div>
-                      <svg className="w-8 h-8 text-[#c17d4a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                    </div>
-                  </div>
-                ))}
+                <button className="w-full p-4 border-2 border-dashed border-[#e8d5c4] rounded-2xl text-[#8b6f47] hover:border-[#c17d4a] hover:bg-[#f5ebe1] transition-all">
+                  + Create Notebook
+                </button>
+                <p className="text-center text-[#8b6f47] text-sm py-8">No notebooks yet. Create one to get started!</p>
               </div>
             )}
             {activeTab === 'flashcards' && (
               <div className="p-4 space-y-3">
-                {['Vocabulary', 'Formulas', 'Dates'].map((deck) => (
-                  <div
-                    key={deck}
-                    className="p-4 bg-[#f5ebe1] rounded-2xl border border-[#e8d5c4] hover:shadow-xl hover:scale-105 transition-all transform cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-bold text-[#4a3f35]">{deck}</h3>
-                        <p className="text-xs text-[#8b6f47]">0 cards</p>
-                      </div>
-                      <svg className="w-8 h-8 text-[#c17d4a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                      </svg>
-                    </div>
-                  </div>
-                ))}
+                <button className="w-full p-4 border-2 border-dashed border-[#e8d5c4] rounded-2xl text-[#8b6f47] hover:border-[#c17d4a] hover:bg-[#f5ebe1] transition-all">
+                  + Create Flashcard Deck
+                </button>
+                <p className="text-center text-[#8b6f47] text-sm py-8">No flashcard decks yet. Create one to get started!</p>
               </div>
             )}
           </div>

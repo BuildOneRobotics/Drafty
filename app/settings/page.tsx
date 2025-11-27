@@ -11,23 +11,39 @@ const themes = [
   { id: 'sunset', name: 'Sunset Purple', bg: '#faf5ff', accent: '#9333ea' },
 ]
 
-const colorPresets = [
+const fonts = [
+  { id: 'inter', name: 'Inter', family: 'Inter, sans-serif' },
+  { id: 'serif', name: 'Serif', family: 'Georgia, serif' },
+  { id: 'mono', name: 'Mono', family: 'Courier New, monospace' },
+  { id: 'system', name: 'System', family: '-apple-system, BlinkMacSystemFont, sans-serif' },
+]
+
+const pastelColors = [
+  { name: 'Pink', value: '#ffc0cb' },
+  { name: 'Lavender', value: '#e6e6fa' },
+  { name: 'Mint', value: '#98fb98' },
+  { name: 'Peach', value: '#ffdab9' },
+  { name: 'Sky', value: '#87ceeb' },
+  { name: 'Lemon', value: '#fffacd' },
+]
+
+const normalColors = [
   { name: 'Black', value: '#000000' },
-  { name: 'Gray', value: '#6b7280' },
   { name: 'Red', value: '#ef4444' },
-  { name: 'Orange', value: '#f97316' },
   { name: 'Blue', value: '#3b82f6' },
   { name: 'Green', value: '#10b981' },
   { name: 'Purple', value: '#a855f7' },
+  { name: 'Orange', value: '#f97316' },
 ]
 
 export default function Settings() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'account' | 'customize' | 'friends' | 'privacy'>('account')
   const [selectedTheme, setSelectedTheme] = useState('beige')
+  const [selectedFont, setSelectedFont] = useState('inter')
   const [searchUsername, setSearchUsername] = useState('')
   const [friends, setFriends] = useState<string[]>([])
-  const [sharedNotes, setSharedNotes] = useState<string[]>([])
+
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -147,9 +163,47 @@ export default function Settings() {
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
-                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Text Color Presets</h2>
-                  <div className="grid grid-cols-3 md:grid-cols-7 gap-3">
-                    {colorPresets.map((color) => (
+                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Fonts</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {fonts.map((font) => (
+                      <button
+                        key={font.id}
+                        onClick={() => setSelectedFont(font.id)}
+                        className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
+                          selectedFont === font.id ? 'border-[#c17d4a] shadow-lg' : 'border-[#e8d5c4]'
+                        }`}
+                      >
+                        <div className="font-semibold text-[#4a3f35] mb-2">{font.name}</div>
+                        <p style={{ fontFamily: font.family }} className="text-sm text-[#8b6f47]">
+                          The quick brown fox
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
+                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Pastel Colors</h2>
+                  <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+                    {pastelColors.map((color) => (
+                      <button
+                        key={color.value}
+                        className="flex flex-col items-center space-y-2 p-3 rounded-xl hover:bg-[#f5ebe1] transition-all"
+                      >
+                        <div
+                          className="w-12 h-12 rounded-full border-2 border-[#e8d5c4]"
+                          style={{ backgroundColor: color.value }}
+                        ></div>
+                        <span className="text-xs text-[#8b6f47]">{color.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
+                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Normal Colors</h2>
+                  <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+                    {normalColors.map((color) => (
                       <button
                         key={color.value}
                         className="flex flex-col items-center space-y-2 p-3 rounded-xl hover:bg-[#f5ebe1] transition-all"
