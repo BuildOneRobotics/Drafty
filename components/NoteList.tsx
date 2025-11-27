@@ -29,7 +29,7 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
   const handleNewNote = () => {
     const newNote: Note = {
       id: Date.now().toString(),
-      title: 'New Note',
+      title: 'Untitled Note',
       content: '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

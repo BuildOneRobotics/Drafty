@@ -110,22 +110,14 @@ export default function Dashboard() {
               Notes
             </button>
             <button
-              onClick={() => setActiveTab('notebooks')}
-              className={`flex-1 py-3 text-xs md:text-sm font-medium transition-all ${
-                activeTab === 'notebooks'
-                  ? 'bg-white text-[#c17d4a] border-b-2 border-[#c17d4a]'
-                  : 'text-[#8b6f47] hover:bg-white/50'
-              }`}
+              disabled
+              className="flex-1 py-3 text-xs md:text-sm font-medium text-[#d4c4b0] cursor-not-allowed"
             >
               Books
             </button>
             <button
-              onClick={() => setActiveTab('flashcards')}
-              className={`flex-1 py-3 text-xs md:text-sm font-medium transition-all ${
-                activeTab === 'flashcards'
-                  ? 'bg-white text-[#c17d4a] border-b-2 border-[#c17d4a]'
-                  : 'text-[#8b6f47] hover:bg-white/50'
-              }`}
+              disabled
+              className="flex-1 py-3 text-xs md:text-sm font-medium text-[#d4c4b0] cursor-not-allowed"
             >
               Cards
             </button>
@@ -188,7 +180,7 @@ export default function Dashboard() {
                   onClick={() => {
                     const newNote: Note = {
                       id: Date.now().toString(),
-                      title: 'New Note',
+                      title: 'Untitled Note',
                       content: '',
                       createdAt: new Date().toISOString(),
                       updatedAt: new Date().toISOString(),
