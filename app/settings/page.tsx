@@ -23,10 +23,12 @@ const fonts = [
 
 export default function Settings() {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<'account' | 'customize' | 'friends' | 'privacy'>('account')
+  const [activeTab, setActiveTab] = useState<'account' | 'customize' | 'friends' | 'files' | 'privacy'>('account')
+  const [folders, setFolders] = useState([{id: '1', name: 'General', color: '#b8803d'}])
+  const [exportSelected, setExportSelected] = useState<string[]>([])
   const [fadeOut, setFadeOut] = useState(false)
 
-  const handleTabChange = (tab: 'account' | 'customize' | 'friends' | 'privacy') => {
+  const handleTabChange = (tab: 'account' | 'customize' | 'friends' | 'files' | 'privacy') => {
     if (tab !== activeTab) {
       setFadeOut(true)
       setTimeout(() => {
@@ -150,6 +152,20 @@ export default function Settings() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <span>Friends</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => handleTabChange('files')}
+              className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
+                activeTab === 'files' ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                </svg>
+                <span>Files</span>
               </div>
             </button>
 
@@ -366,10 +382,75 @@ export default function Settings() {
               </div>
             )}
 
-            {activeTab === 'privacy' && (
+            {activeTab === 'files' && (
               <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
-                <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Privacy Settings</h2>
-                <p className="text-[#8b6f47]">Your data is encrypted and stored securely in GitHub Gist</p>
+                <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Folder Management</h2>
+                <button 
+                  onClick={() => {
+                    const name = prompt('Folder name:')
+                    const color = prompt('Color (hex):', '#b8803d')
+                    if (name) setFolders([...folders, {id: Date.now().toString(), name, color: color || '#b8803d'}])
+                  }}
+                  className="w-full p-3 mb-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-xl hover:bg-[var(--accent-color)]/5"
+                >
+                  + New Folder
+                </button>
+                <div className="space-y-2">
+                  {folders.map(folder => (
+                    <div key={folder.id} className="flex items-center justify-between p-3 rounded-xl" style={{backgroundColor: folder.color + '20'}}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 rounded-full" style={{backgroundColor: folder.color}}></div>
+                        <input 
+                          value={folder.name}
+                          onChange={(e) => {
+                            const updated = folders.map(f => f.id === folder.id ? {...f, name: e.target.value} : f)
+                            setFolders(updated)
+                          }}
+                          className="bg-transparent border-none outline-none font-medium"
+                        />
+                      </div>
+                      <button onClick={() => setFolders(folders.filter(f => f.id !== folder.id))} className="text-red-500 text-sm">Delete</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'privacy' && (
+              <div className="space-y-6">
+                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Privacy Settings</h2>
+                  <p className="text-[#8b6f47] mb-4">Your data is encrypted and stored securely in GitHub Gist</p>
+                </div>
+                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Export Data</h2>
+                  <p className="text-[#8b6f47] mb-4">Select files to export</p>
+                  <div className="space-y-2 mb-4">
+                    <label className="flex items-center space-x-3 p-3 bg-[var(--accent-color)]/5 rounded-xl cursor-pointer">
+                      <input type="checkbox" onChange={(e) => e.target.checked ? setExportSelected([...exportSelected, 'note1']) : setExportSelected(exportSelected.filter(id => id !== 'note1'))} />
+                      <span>My First Note</span>
+                    </label>
+                    <label className="flex items-center space-x-3 p-3 bg-[var(--accent-color)]/5 rounded-xl cursor-pointer">
+                      <input type="checkbox" onChange={(e) => e.target.checked ? setExportSelected([...exportSelected, 'note2']) : setExportSelected(exportSelected.filter(id => id !== 'note2'))} />
+                      <span>Math Notebook</span>
+                    </label>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const data = JSON.stringify({files: exportSelected}, null, 2)
+                      const blob = new Blob([data], {type: 'application/json'})
+                      const url = URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = url
+                      a.download = 'drafty-export.json'
+                      a.click()
+                    }}
+                    disabled={exportSelected.length === 0}
+                    className="bg-[var(--accent-color)] text-white px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50 font-medium"
+                  >
+                    Export Selected ({exportSelected.length})
+                  </button>
+                </div>
               </div>
             )}
           </div>
