@@ -1,8 +1,8 @@
 export const themes = {
-  beige: { bg: '#faf8f5', accent: '#c8934d', text: '#4a3f35' },
-  ocean: { bg: '#e0f2fe', accent: '#38bdf8', text: '#0c4a6e' },
-  forest: { bg: '#dcfce7', accent: '#4ade80', text: '#14532d' },
-  sunset: { bg: '#f3e8ff', accent: '#c084fc', text: '#581c87' },
+  beige: { bg: '#f5f0e8', accent: '#b8803d', text: '#3d3328', surface: '#fdf9f3' },
+  ocean: { bg: '#d1ecfd', accent: '#0ea5e9', text: '#0a3a5c', surface: '#f0f9ff' },
+  forest: { bg: '#c6f6d5', accent: '#22c55e', text: '#0f3d1f', surface: '#f0fdf4' },
+  sunset: { bg: '#ead9ff', accent: '#a855f7', text: '#4a1d75', surface: '#faf5ff' },
 }
 
 export const fonts = {
@@ -19,6 +19,7 @@ export function applyTheme(themeId: string, fontId: string) {
   document.documentElement.style.setProperty('--bg-color', theme.bg)
   document.documentElement.style.setProperty('--accent-color', theme.accent)
   document.documentElement.style.setProperty('--text-color', theme.text)
+  document.documentElement.style.setProperty('--surface-color', theme.surface)
   document.documentElement.style.setProperty('--font-family', font)
   
   localStorage.setItem('theme', themeId)

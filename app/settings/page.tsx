@@ -6,10 +6,10 @@ import Navbar from '@/components/Navbar'
 import { applyTheme } from '@/lib/theme'
 
 const themes = [
-  { id: 'beige', name: 'Warm Beige', bg: '#faf8f5', accent: '#c8934d' },
-  { id: 'ocean', name: 'Ocean Blue', bg: '#e0f2fe', accent: '#38bdf8' },
-  { id: 'forest', name: 'Forest Green', bg: '#dcfce7', accent: '#4ade80' },
-  { id: 'sunset', name: 'Sunset Purple', bg: '#f3e8ff', accent: '#c084fc' },
+  { id: 'beige', name: 'Warm Beige', bg: '#f5f0e8', accent: '#b8803d' },
+  { id: 'ocean', name: 'Ocean Blue', bg: '#d1ecfd', accent: '#0ea5e9' },
+  { id: 'forest', name: 'Forest Green', bg: '#c6f6d5', accent: '#22c55e' },
+  { id: 'sunset', name: 'Sunset Purple', bg: '#ead9ff', accent: '#a855f7' },
 ]
 
 const fonts = [
@@ -107,7 +107,7 @@ export default function Settings() {
         <h1 className="text-3xl md:text-4xl font-bold text-[#4a3f35] mb-8">Settings</h1>
 
         <div className="flex flex-col md:flex-row gap-6">
-          <div className="md:w-64 bg-white rounded-2xl shadow-lg p-4 border border-[#e8d5c4] h-fit">
+          <div className="md:w-64 bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-4 border border-[var(--accent-color)]/30 h-fit">
             <button
               onClick={() => handleTabChange('account')}
               className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
@@ -167,7 +167,7 @@ export default function Settings() {
 
           <div className="flex-1" style={{ opacity: fadeOut ? 0 : 1, transition: 'opacity 0.3s ease' }}>
             {activeTab === 'account' && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
+              <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
                 <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Account Settings</h2>
                 <button
                   onClick={handleLogout}
@@ -180,7 +180,7 @@ export default function Settings() {
 
             {activeTab === 'customize' && (
               <div className="space-y-6">
-                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
+                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
                   <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Themes</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {themes.map((theme) => (
@@ -207,7 +207,7 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
+                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
                   <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Fonts</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {fonts.map((font) => (
@@ -236,7 +236,7 @@ export default function Settings() {
 
             {activeTab === 'friends' && (
               <div className="space-y-6">
-                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
+                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
                   <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Search Users</h2>
                   <div className="flex gap-2 mb-4">
                     <input
@@ -247,7 +247,7 @@ export default function Settings() {
                         handleSearch()
                       }}
                       placeholder="Type exact username..."
-                      className="flex-1 px-4 py-3 border-2 border-[#e8d5c4] rounded-xl focus:outline-none focus:border-[#c17d4a] transition-colors"
+                      className="flex-1 px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-xl focus:outline-none focus:border-[#c17d4a] transition-colors"
                     />
                   </div>
                   {searchResults.length > 0 && (
@@ -328,7 +328,7 @@ export default function Settings() {
                 </div>
 
                 {friends.length > 0 && (
-                  <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
+                  <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
                     <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Share Notes with Friends</h2>
                     <p className="text-[#8b6f47] mb-4">Select notes to share with your friends</p>
                     <div className="space-y-2">
@@ -364,7 +364,7 @@ export default function Settings() {
             )}
 
             {activeTab === 'privacy' && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
+              <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
                 <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Privacy Settings</h2>
                 <p className="text-[#8b6f47]">Your data is encrypted and stored securely in GitHub Gist</p>
               </div>
