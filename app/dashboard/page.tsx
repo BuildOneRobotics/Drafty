@@ -95,7 +95,7 @@ export default function Dashboard() {
       <div className="flex flex-1 overflow-hidden relative">
         <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:relative w-80 bg-white shadow-2xl flex flex-col border-r border-[#e8d5c4] z-40 transition-transform duration-300 h-full`}>
           <div className="p-6 border-b bg-gradient-to-r from-[#c17d4a] to-[#d4956f]">
-            <p className="text-sm text-[#faf8f5]">{user?.email}</p>
+            <p className="text-sm text-[#faf8f5]">Hello, {user?.name}</p>
           </div>
 
           <div className="flex border-b border-[#e8d5c4] bg-[#f5ebe1]">
