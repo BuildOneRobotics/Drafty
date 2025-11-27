@@ -141,7 +141,7 @@ export default function Dashboard() {
     setWhiteboards(updated)
   }
 
-  const renderShape = (item: WhiteboardItem) => {
+  const renderShape = (item: WhiteboardItem): JSX.Element | null => {
     const baseClass = 'absolute cursor-move p-2 rounded transition-all'
     const colors: {[key: string]: string} = {
       '#fef3c7': 'bg-yellow-100',
@@ -166,7 +166,8 @@ export default function Dashboard() {
           <button onClick={() => deleteItem(item.id)} className="absolute top-1 right-1 text-red-500 text-xs">×</button>
         </div>
       )
-    } else if (item.type === 'circle') {
+    }
+    if (item.type === 'circle') {
       return (
         <div
           key={item.id}
@@ -177,7 +178,8 @@ export default function Dashboard() {
           <button onClick={() => deleteItem(item.id)} className="text-red-500 text-xs">×</button>
         </div>
       )
-    } else if (item.type === 'square') {
+    }
+    if (item.type === 'square') {
       return (
         <div
           key={item.id}
@@ -188,7 +190,8 @@ export default function Dashboard() {
           <button onClick={() => deleteItem(item.id)} className="text-red-500 text-xs">×</button>
         </div>
       )
-    } else if (item.type === 'triangle') {
+    }
+    if (item.type === 'triangle') {
       return (
         <div
           key={item.id}
@@ -198,6 +201,7 @@ export default function Dashboard() {
         />
       )
     }
+    return null
   }
 
   if (loading) {
