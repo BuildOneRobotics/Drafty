@@ -42,17 +42,17 @@ export default function Signup() {
 
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
+    <div className="min-h-screen bg-[var(--bg-color,#faf8f5)] transition-colors duration-[2000ms] flex items-center justify-center p-4" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
+      <div className="bg-white p-8 rounded-2xl border border-[var(--accent-color)]/30 w-full max-w-md relative">
         <Link href="/" className="absolute top-6 left-6 text-gray-400 hover:text-gray-600 transition-colors">
           ← Back
         </Link>
         <div className="text-center mb-8">
-          <svg className="w-16 h-16 mx-auto mb-3 text-[#c17d4a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-16 h-16 mx-auto mb-3 text-[var(--accent-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <h1 className="text-4xl font-bold text-[#c17d4a]">Drafty</h1>
-          <p className="text-[#8b6f47] mt-2">Create your account</p>
+          <h1 className="text-4xl font-bold text-[var(--accent-color)]">Drafty</h1>
+          <p className="text-[var(--text-color)] mt-2">Create your account</p>
         </div>
 
         {error && (
@@ -109,7 +109,7 @@ export default function Signup() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white py-3 rounded-lg hover:from-[#a86a3d] hover:to-[#c17d4a] disabled:opacity-50 font-semibold shadow-lg transition-all transform hover:scale-[1.02]"
+            className="w-full bg-[var(--accent-color)] text-white py-3 rounded-lg hover:opacity-90 disabled:opacity-50 font-semibold transition-all transform hover:scale-[1.02]"
           >
             {loading ? 'Creating account...' : 'Sign Up'}
           </button>
@@ -117,7 +117,7 @@ export default function Signup() {
 
         <p className="text-center text-gray-600 mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-[#c17d4a] hover:underline">
+          <Link href="/login" className="text-[var(--accent-color)] hover:underline">
             Login
           </Link>
         </p>

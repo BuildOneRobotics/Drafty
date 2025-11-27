@@ -1,8 +1,8 @@
 export const themes = {
-  beige: { bg: '#faf8f5', accent: '#c17d4a', text: '#4a3f35' },
-  ocean: { bg: '#f0f9ff', accent: '#0284c7', text: '#1e3a8a' },
-  forest: { bg: '#f0fdf4', accent: '#16a34a', text: '#14532d' },
-  sunset: { bg: '#faf5ff', accent: '#9333ea', text: '#581c87' },
+  beige: { bg: '#faf8f5', accent: '#d4a574', text: '#5a4f45' },
+  ocean: { bg: '#f0f9ff', accent: '#7dd3fc', text: '#0c4a6e' },
+  forest: { bg: '#f0fdf4', accent: '#86efac', text: '#14532d' },
+  sunset: { bg: '#faf5ff', accent: '#d8b4fe', text: '#581c87' },
 }
 
 export const fonts = {

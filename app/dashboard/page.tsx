@@ -176,12 +176,12 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <footer className="bg-[#f97316] border-t border-[#ea580c] py-4 px-4">
-        <div className="flex flex-col md:flex-row justify-between items-center text-xs text-white space-y-2 md:space-y-0">
+      <footer className="bg-[var(--accent-color)]/20 border-t border-[var(--accent-color)]/30 py-6 px-4 mt-auto">
+        <div className="flex flex-col md:flex-row justify-between items-center text-xs text-[var(--text-color)] space-y-2 md:space-y-0">
           <div className="flex gap-4">
-            <a href="/" className="hover:text-[#fef3c7]">Home</a>
-            <a href="/settings" className="hover:text-[#fef3c7]">Settings</a>
-            <a href="https://github.com/BuildOneRobotics/Drafty" target="_blank" className="hover:text-[#fef3c7]">GitHub</a>
+            <a href="/" className="hover:text-[var(--accent-color)]">Home</a>
+            <a href="/settings" className="hover:text-[var(--accent-color)]">Settings</a>
+            <a href="https://github.com/BuildOneRobotics/Drafty" target="_blank" className="hover:text-[var(--accent-color)]">GitHub</a>
           </div>
           <div>© 2024 Drafty • CC BY-NC 4.0 License</div>
         </div>
