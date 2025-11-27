@@ -47,6 +47,8 @@ export default function Dashboard() {
       return
     }
 
+    const { loadTheme } = require('@/lib/theme')
+    loadTheme()
     loadNotes()
   }, [])
 
@@ -72,7 +74,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[#faf8f5]">
+    <div className="flex flex-col h-screen bg-[var(--bg-color,#faf8f5)] transition-colors duration-[2000ms]" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
       <Navbar />
       
       <button
@@ -160,6 +162,17 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        <footer className="bg-white border-t border-[#e8d5c4] py-4 px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center text-xs text-[#8b6f47] space-y-2 md:space-y-0">
+            <div className="flex gap-4">
+              <a href="/" className="hover:text-[#c17d4a]">Home</a>
+              <a href="/settings" className="hover:text-[#c17d4a]">Settings</a>
+              <a href="https://github.com/BuildOneRobotics/Drafty" target="_blank" className="hover:text-[#c17d4a]">GitHub</a>
+            </div>
+            <div>© 2024 Drafty • CC BY-NC 4.0 License</div>
+          </div>
+        </footer>
 
         <div className="flex-1 flex flex-col overflow-hidden">
           {selectedNote ? (

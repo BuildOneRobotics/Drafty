@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
+import { applyTheme } from '@/lib/theme'
 
 const themes = [
   { id: 'beige', name: 'Warm Beige', bg: '#faf8f5', accent: '#c17d4a' },
@@ -39,8 +40,15 @@ const normalColors = [
 export default function Settings() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'account' | 'customize' | 'friends' | 'privacy'>('account')
-  const [selectedTheme, setSelectedTheme] = useState('beige')
-  const [selectedFont, setSelectedFont] = useState('inter')
+  const [selectedTheme, setSelectedTheme] = useState(localStorage.getItem('theme') || 'beige')
+  const [selectedFont, setSelectedFont] = useState(localStorage.getItem('font') || 'inter')
+
+  useEffect(() => {
+    const theme = localStorage.getItem('theme') || 'beige'
+    const font = localStorage.getItem('font') || 'inter'
+    setSelectedTheme(theme)
+    setSelectedFont(font)
+  }, [])
   const [searchUsername, setSearchUsername] = useState('')
   const [friends, setFriends] = useState<string[]>([])
 
@@ -144,7 +152,10 @@ export default function Settings() {
                     {themes.map((theme) => (
                       <button
                         key={theme.id}
-                        onClick={() => setSelectedTheme(theme.id)}
+                        onClick={() => {
+                          setSelectedTheme(theme.id)
+                          applyTheme(theme.id, selectedFont)
+                        }}
                         className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
                           selectedTheme === theme.id ? 'border-[#c17d4a] shadow-lg' : 'border-[#e8d5c4]'
                         }`}
@@ -168,7 +179,10 @@ export default function Settings() {
                     {fonts.map((font) => (
                       <button
                         key={font.id}
-                        onClick={() => setSelectedFont(font.id)}
+                        onClick={() => {
+                          setSelectedFont(font.id)
+                          applyTheme(selectedTheme, font.id)
+                        }}
                         className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
                           selectedFont === font.id ? 'border-[#c17d4a] shadow-lg' : 'border-[#e8d5c4]'
                         }`}
