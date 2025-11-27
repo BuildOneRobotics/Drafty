@@ -40,14 +40,16 @@ const normalColors = [
 export default function Settings() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'account' | 'customize' | 'friends' | 'privacy'>('account')
-  const [selectedTheme, setSelectedTheme] = useState(localStorage.getItem('theme') || 'beige')
-  const [selectedFont, setSelectedFont] = useState(localStorage.getItem('font') || 'inter')
+  const [selectedTheme, setSelectedTheme] = useState('beige')
+  const [selectedFont, setSelectedFont] = useState('inter')
 
   useEffect(() => {
-    const theme = localStorage.getItem('theme') || 'beige'
-    const font = localStorage.getItem('font') || 'inter'
-    setSelectedTheme(theme)
-    setSelectedFont(font)
+    if (typeof window !== 'undefined') {
+      const theme = localStorage.getItem('theme') || 'beige'
+      const font = localStorage.getItem('font') || 'inter'
+      setSelectedTheme(theme)
+      setSelectedFont(font)
+    }
   }, [])
   const [searchUsername, setSearchUsername] = useState('')
   const [friends, setFriends] = useState<string[]>([])
