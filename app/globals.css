@@ -22,10 +22,25 @@
   100% { width: 100%; }
 }
 
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .loading-text {
   overflow: hidden;
   white-space: nowrap;
   animation: pencilWrite 2s ease-in-out infinite;
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out;
 }
 
 body {
