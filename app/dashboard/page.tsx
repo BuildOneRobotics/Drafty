@@ -86,7 +86,7 @@ export default function Dashboard() {
       
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="md:hidden fixed bottom-4 right-4 z-50 bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white p-4 rounded-full shadow-2xl"
+        className="md:hidden fixed bottom-4 right-4 z-50 bg-[var(--accent-color)] text-white p-4 rounded-full"
       >
         {sidebarOpen ? (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,31 +100,31 @@ export default function Dashboard() {
       </button>
 
       <div className="flex flex-1 overflow-hidden relative">
-        <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:relative w-80 bg-white shadow-2xl flex flex-col border-r border-[#e8d5c4] z-40 transition-transform duration-300 h-full`}>
-          <div className="p-6 border-b bg-gradient-to-r from-[#c17d4a] to-[#d4956f]">
-            <p className="text-sm text-[#faf8f5]">Hello, {user?.name}</p>
+        <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:relative w-80 bg-white flex flex-col border-r border-[var(--accent-color)]/30 z-40 transition-transform duration-300 h-full`}>
+          <div className="p-6 border-b bg-[var(--accent-color)]">
+            <p className="text-sm text-white">Hello, {user?.name}</p>
           </div>
 
-          <div className="flex border-b border-[#e8d5c4] bg-[#f5ebe1]">
+          <div className="flex border-b border-[var(--accent-color)]/30 bg-[var(--accent-color)]/5">
             <button
               onClick={() => setActiveTab('notes')}
               className={`flex-1 py-3 text-xs md:text-sm font-medium transition-all ${
                 activeTab === 'notes'
-                  ? 'bg-white text-[#c17d4a] border-b-2 border-[#c17d4a]'
-                  : 'text-[#8b6f47] hover:bg-white/50'
+                  ? 'bg-white text-[var(--accent-color)] border-b-2 border-[var(--accent-color)]'
+                  : 'text-[var(--text-color)]/70 hover:bg-white/50'
               }`}
             >
               Notes
             </button>
             <button
               disabled
-              className="flex-1 py-3 text-xs md:text-sm font-medium text-[#d4c4b0] cursor-not-allowed"
+              className="flex-1 py-3 text-xs md:text-sm font-medium text-[var(--text-color)]/30 cursor-not-allowed"
             >
               Books
             </button>
             <button
               disabled
-              className="flex-1 py-3 text-xs md:text-sm font-medium text-[#d4c4b0] cursor-not-allowed"
+              className="flex-1 py-3 text-xs md:text-sm font-medium text-[var(--text-color)]/30 cursor-not-allowed"
             >
               Cards
             </button>
@@ -137,8 +137,8 @@ export default function Dashboard() {
             }} />
           </div>
 
-          <div className="p-4 border-t bg-[#f5ebe1]">
-            <div className="text-center text-xs text-[#8b6f47]">
+          <div className="p-4 border-t bg-[var(--accent-color)]/5">
+            <div className="text-center text-xs text-[var(--text-color)]/70">
               {syncing ? 'Syncing...' : 'Auto-sync enabled'}
             </div>
           </div>

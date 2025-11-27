@@ -42,7 +42,7 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
     <div className="p-4">
       <button
         onClick={handleNewNote}
-        className="w-full bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white py-3 rounded-2xl mb-4 hover:from-[#a86a3d] hover:to-[#c17d4a] font-semibold shadow-lg transition-all transform hover:scale-105"
+        className="w-full bg-[var(--accent-color)] text-white py-3 rounded-2xl mb-4 hover:opacity-90 font-semibold transition-all transform hover:translate-y-[-2px]"
       >
         + New Note
       </button>
@@ -52,17 +52,17 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
           <div
             key={note.id}
             onClick={() => onSelectNote(note)}
-            className={`p-4 rounded-2xl cursor-pointer transition-all transform hover:scale-105 ${
+            className={`p-4 rounded-2xl cursor-pointer transition-all transform hover:translate-y-[-2px] ${
               selectedNote?.id === note.id
-                ? 'bg-gradient-to-r from-[#f5ebe1] to-[#faf8f5] border-l-4 border-[#c17d4a] shadow-lg'
-                : 'bg-[#faf8f5] hover:bg-[#f5ebe1] hover:shadow-md'
+                ? 'bg-[var(--accent-color)]/10 border-l-4 border-[var(--accent-color)]'
+                : 'bg-[var(--bg-color)] hover:bg-[var(--accent-color)]/5'
             }`}
           >
             <div className="flex justify-between items-start">
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-[#4a3f35] truncate">{note.title}</h3>
-                <p className="text-sm text-[#8b6f47] truncate mt-1">{note.content.substring(0, 50)}</p>
-                <p className="text-xs text-[#a89080] mt-2">
+                <h3 className="font-bold text-[var(--text-color)] truncate">{note.title}</h3>
+                <p className="text-sm text-[var(--text-color)]/70 truncate mt-1">{note.content.substring(0, 50)}</p>
+                <p className="text-xs text-[var(--text-color)]/50 mt-2">
                   {new Date(note.updatedAt).toLocaleDateString()}
                 </p>
               </div>
