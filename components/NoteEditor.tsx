@@ -28,10 +28,8 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
       const tagArray = tags.split(',').map((t) => t.trim()).filter(Boolean)
       
       if (note.id.length < 10) {
-        // New note
         await notesAPI.createNote(title, content, tagArray)
       } else {
-        // Existing note
         await notesAPI.updateNote(note.id, title, content, tagArray)
       }
       
@@ -46,32 +44,32 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <div className="bg-white border-b shadow-sm p-6 flex justify-between items-start">
+      <div className="bg-[#faf8f5] border-b border-[#e8d5c4] shadow-sm p-8 flex justify-between items-start">
         <div className="flex-1">
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Untitled Note"
-            className="text-3xl font-bold w-full outline-none mb-3 text-gray-800 placeholder-gray-300"
+            className="text-4xl font-bold w-full outline-none mb-4 text-[#4a3f35] placeholder-[#d4c4b0] bg-transparent"
           />
           <input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             placeholder="🏷️ Add tags (comma separated)"
-            className="text-sm text-gray-500 w-full outline-none placeholder-gray-400"
+            className="text-sm text-[#8b6f47] w-full outline-none placeholder-[#c4b5a0] bg-transparent"
           />
         </div>
-        <div className="text-right ml-4">
+        <div className="text-right ml-6">
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-2.5 rounded-lg hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 font-medium shadow-md transition-all"
+            className="bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white px-10 py-3 rounded-2xl hover:from-[#a86a3d] hover:to-[#c17d4a] disabled:opacity-50 font-semibold shadow-lg transition-all transform hover:scale-105"
           >
             {saving ? '⏳ Saving...' : '💾 Save'}
           </button>
-          {lastSaved && <p className="text-xs text-green-600 mt-2">✓ Saved at {lastSaved}</p>}
+          {lastSaved && <p className="text-xs text-green-600 mt-3">✓ Saved at {lastSaved}</p>}
         </div>
       </div>
 
@@ -79,7 +77,8 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="Start writing your ideas..."
-        className="flex-1 p-8 outline-none resize-none text-gray-700 text-lg leading-relaxed placeholder-gray-300"
+        className="flex-1 p-10 outline-none resize-none text-[#4a3f35] text-lg leading-relaxed placeholder-[#d4c4b0] bg-white"
+        style={{ fontFamily: 'inherit' }}
       />
     </div>
   )

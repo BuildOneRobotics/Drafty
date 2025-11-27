@@ -42,7 +42,7 @@ export default function Signup() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#faf8f5] to-[#f5ebe1] flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative">
         <Link href="/" className="absolute top-6 left-6 text-gray-400 hover:text-gray-600 transition-colors">
           ← Back

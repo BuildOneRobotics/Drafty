@@ -18,7 +18,6 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
     setDeleting(id)
     try {
       await notesAPI.deleteNote(id)
-      // Refresh notes list
       window.location.reload()
     } catch (error) {
       console.error('Failed to delete note:', error)
@@ -43,34 +42,34 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
     <div className="p-4">
       <button
         onClick={handleNewNote}
-        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg mb-4 hover:from-indigo-700 hover:to-purple-700 font-medium shadow-md transition-all"
+        className="w-full bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white py-3 rounded-2xl mb-4 hover:from-[#a86a3d] hover:to-[#c17d4a] font-semibold shadow-lg transition-all transform hover:scale-105"
       >
-        ➕ New Note
+        ✨ New Note
       </button>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {notes.map((note) => (
           <div
             key={note.id}
             onClick={() => onSelectNote(note)}
-            className={`p-3 rounded-lg cursor-pointer transition-all ${
+            className={`p-4 rounded-2xl cursor-pointer transition-all transform hover:scale-105 ${
               selectedNote?.id === note.id
-                ? 'bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-600 shadow-sm'
-                : 'bg-gray-50 hover:bg-gray-100 hover:shadow-sm'
+                ? 'bg-gradient-to-r from-[#f5ebe1] to-[#faf8f5] border-l-4 border-[#c17d4a] shadow-lg'
+                : 'bg-[#faf8f5] hover:bg-[#f5ebe1] hover:shadow-md'
             }`}
           >
             <div className="flex justify-between items-start">
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm truncate">{note.title}</h3>
-                <p className="text-xs text-gray-500 truncate">{note.content.substring(0, 50)}</p>
-                <p className="text-xs text-gray-400 mt-1">
+                <h3 className="font-bold text-[#4a3f35] truncate">{note.title}</h3>
+                <p className="text-sm text-[#8b6f47] truncate mt-1">{note.content.substring(0, 50)}</p>
+                <p className="text-xs text-[#a89080] mt-2">
                   {new Date(note.updatedAt).toLocaleDateString()}
                 </p>
               </div>
               <button
                 onClick={(e) => handleDelete(note.id, e)}
                 disabled={deleting === note.id}
-                className="text-red-500 hover:text-red-700 text-xs ml-2"
+                className="text-red-400 hover:text-red-600 text-sm ml-2 transition-colors"
               >
                 {deleting === note.id ? '...' : '✕'}
               </button>
