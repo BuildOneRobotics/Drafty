@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useStore, Note } from '@/lib/store'
-import { notesAPI } from '@/lib/api'
+import { notesAPI, authAPI } from '@/lib/api'
 import NoteEditor from '@/components/NoteEditor'
 import NoteList from '@/components/NoteList'
 import Navbar from '@/components/Navbar'
@@ -11,6 +11,7 @@ import Navbar from '@/components/Navbar'
 export default function Dashboard() {
   const router = useRouter()
   const user = useStore((state) => state.user)
+  const setUser = useStore((state) => state.setUser)
   const notes = useStore((state) => state.notes)
   const setNotes = useStore((state) => state.setNotes)
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
@@ -50,6 +51,12 @@ export default function Dashboard() {
     const { loadTheme } = require('@/lib/theme')
     loadTheme()
     loadNotes()
+    
+    authAPI.getMe().then(response => {
+      setUser(response.data)
+    }).catch(() => {
+      router.push('/login')
+    })
   }, [])
 
   const handleSync = async () => {
@@ -155,17 +162,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <footer className="bg-white border-t border-[#e8d5c4] py-4 px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center text-xs text-[#8b6f47] space-y-2 md:space-y-0">
-            <div className="flex gap-4">
-              <a href="/" className="hover:text-[#c17d4a]">Home</a>
-              <a href="/settings" className="hover:text-[#c17d4a]">Settings</a>
-              <a href="https://github.com/BuildOneRobotics/Drafty" target="_blank" className="hover:text-[#c17d4a]">GitHub</a>
-            </div>
-            <div>© 2024 Drafty • CC BY-NC 4.0 License</div>
-          </div>
-        </footer>
-
         <div className="flex-1 flex flex-col overflow-hidden">
           {selectedNote ? (
             <NoteEditor note={selectedNote} onSave={loadNotes} />
@@ -197,6 +193,17 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      <footer className="bg-[#f97316] border-t border-[#ea580c] py-4 px-4">
+        <div className="flex flex-col md:flex-row justify-between items-center text-xs text-white space-y-2 md:space-y-0">
+          <div className="flex gap-4">
+            <a href="/" className="hover:text-[#fef3c7]">Home</a>
+            <a href="/settings" className="hover:text-[#fef3c7]">Settings</a>
+            <a href="https://github.com/BuildOneRobotics/Drafty" target="_blank" className="hover:text-[#fef3c7]">GitHub</a>
+          </div>
+          <div>© 2024 Drafty • CC BY-NC 4.0 License</div>
+        </div>
+      </footer>
     </div>
   )
 }

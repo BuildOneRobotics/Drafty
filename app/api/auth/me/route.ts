@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       id: userData.id,
       email: userData.email,
+      name: userData.name,
     })
   } catch (error) {
     return NextResponse.json({ message: 'Invalid token' }, { status: 401 })
