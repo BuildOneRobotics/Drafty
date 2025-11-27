@@ -27,6 +27,9 @@ export default function Settings() {
   const [folders, setFolders] = useState([{id: '1', name: 'General', color: '#b8803d'}])
   const [exportSelected, setExportSelected] = useState<string[]>([])
   const [fadeOut, setFadeOut] = useState(false)
+  const [newFolderName, setNewFolderName] = useState('')
+  const [newFolderColor, setNewFolderColor] = useState('#b8803d')
+  const [showNewFolder, setShowNewFolder] = useState(false)
 
   const handleTabChange = (tab: 'account' | 'customize' | 'friends' | 'files' | 'privacy') => {
     if (tab !== activeTab) {
@@ -385,16 +388,59 @@ export default function Settings() {
             {activeTab === 'files' && (
               <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
                 <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Folder Management</h2>
-                <button 
-                  onClick={() => {
-                    const name = prompt('Folder name:')
-                    const color = prompt('Color (hex):', '#b8803d')
-                    if (name) setFolders([...folders, {id: Date.now().toString(), name, color: color || '#b8803d'}])
-                  }}
-                  className="w-full p-3 mb-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-xl hover:bg-[var(--accent-color)]/5"
-                >
-                  + New Folder
-                </button>
+                {!showNewFolder ? (
+                  <button 
+                    onClick={() => setShowNewFolder(true)}
+                    className="w-full p-3 mb-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-xl hover:bg-[var(--accent-color)]/5"
+                  >
+                    + New Folder
+                  </button>
+                ) : (
+                  <div className="mb-4 p-4 border-2 border-[var(--accent-color)]/30 rounded-xl space-y-3">
+                    <input 
+                      type="text"
+                      value={newFolderName}
+                      onChange={(e) => setNewFolderName(e.target.value)}
+                      placeholder="Folder name"
+                      className="w-full px-3 py-2 border border-[var(--accent-color)]/30 rounded-lg focus:outline-none focus:border-[var(--accent-color)]"
+                      autoFocus
+                    />
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="color"
+                        value={newFolderColor}
+                        onChange={(e) => setNewFolderColor(e.target.value)}
+                        className="w-12 h-10 rounded cursor-pointer"
+                      />
+                      <span className="text-sm text-[#8b6f47]">{newFolderColor}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => {
+                          if (newFolderName.trim()) {
+                            setFolders([...folders, {id: Date.now().toString(), name: newFolderName, color: newFolderColor}])
+                            setNewFolderName('')
+                            setNewFolderColor('#b8803d')
+                            setShowNewFolder(false)
+                          }
+                        }}
+                        className="flex-1 bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90"
+                      >
+                        Create
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setNewFolderName('')
+                          setNewFolderColor('#b8803d')
+                          setShowNewFolder(false)
+                        }}
+                        className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <div className="space-y-2">
                   {folders.map(folder => (
                     <div key={folder.id} className="flex items-center justify-between p-3 rounded-xl" style={{backgroundColor: folder.color + '20'}}>
