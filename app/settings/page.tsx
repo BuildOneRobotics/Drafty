@@ -6,10 +6,10 @@ import Navbar from '@/components/Navbar'
 import { applyTheme } from '@/lib/theme'
 
 const themes = [
-  { id: 'beige', name: 'Warm Beige', bg: '#faf8f5', accent: '#c17d4a' },
-  { id: 'ocean', name: 'Ocean Blue', bg: '#f0f9ff', accent: '#0284c7' },
-  { id: 'forest', name: 'Forest Green', bg: '#f0fdf4', accent: '#16a34a' },
-  { id: 'sunset', name: 'Sunset Purple', bg: '#faf5ff', accent: '#9333ea' },
+  { id: 'beige', name: 'Warm Beige', bg: '#faf8f5', accent: '#c8934d' },
+  { id: 'ocean', name: 'Ocean Blue', bg: '#e0f2fe', accent: '#38bdf8' },
+  { id: 'forest', name: 'Forest Green', bg: '#dcfce7', accent: '#4ade80' },
+  { id: 'sunset', name: 'Sunset Purple', bg: '#f3e8ff', accent: '#c084fc' },
 ]
 
 const fonts = [
@@ -111,7 +111,7 @@ export default function Settings() {
             <button
               onClick={() => handleTabChange('account')}
               className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
-                activeTab === 'account' ? 'bg-[#f5ebe1] text-[#c17d4a] font-semibold' : 'hover:bg-[#faf8f5]'
+                activeTab === 'account' ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
               }`}
             >
               <div className="flex items-center space-x-3">
@@ -125,7 +125,7 @@ export default function Settings() {
             <button
               onClick={() => handleTabChange('customize')}
               className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
-                activeTab === 'customize' ? 'bg-[#f5ebe1] text-[#c17d4a] font-semibold' : 'hover:bg-[#faf8f5]'
+                activeTab === 'customize' ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
               }`}
             >
               <div className="flex items-center space-x-3">
@@ -139,7 +139,7 @@ export default function Settings() {
             <button
               onClick={() => handleTabChange('friends')}
               className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
-                activeTab === 'friends' ? 'bg-[#f5ebe1] text-[#c17d4a] font-semibold' : 'hover:bg-[#faf8f5]'
+                activeTab === 'friends' ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
               }`}
             >
               <div className="flex items-center space-x-3">
@@ -153,7 +153,7 @@ export default function Settings() {
             <button
               onClick={() => handleTabChange('privacy')}
               className={`w-full text-left px-4 py-3 rounded-xl transition-all ${
-                activeTab === 'privacy' ? 'bg-[#f5ebe1] text-[#c17d4a] font-semibold' : 'hover:bg-[#faf8f5]'
+                activeTab === 'privacy' ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
               }`}
             >
               <div className="flex items-center space-x-3">
@@ -191,7 +191,7 @@ export default function Settings() {
                           applyTheme(theme.id, selectedFont)
                         }}
                         className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
-                          selectedTheme === theme.id ? 'border-[#c17d4a] shadow-lg' : 'border-[#e8d5c4]'
+                          selectedTheme === theme.id ? 'border-[var(--accent-color)]' : 'border-[var(--accent-color)]/30'
                         }`}
                         style={{ backgroundColor: theme.bg }}
                       >
@@ -218,7 +218,7 @@ export default function Settings() {
                           applyTheme(selectedTheme, font.id)
                         }}
                         className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
-                          selectedFont === font.id ? 'border-[#c17d4a] shadow-lg' : 'border-[#e8d5c4]'
+                          selectedFont === font.id ? 'border-[var(--accent-color)]' : 'border-[var(--accent-color)]/30'
                         }`}
                       >
                         <div className="font-semibold text-[#4a3f35] mb-2">{font.name}</div>
