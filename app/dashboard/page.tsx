@@ -27,6 +27,10 @@ export default function Dashboard() {
   }, [])
   const [activeTab, setActiveTab] = useState<'notes' | 'notebooks' | 'flashcards'>('notes')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [notebooks, setNotebooks] = useState<{id: string, name: string, folder: string}[]>([])
+  const [flashcards, setFlashcards] = useState<{id: string, name: string, cards: {front: string, back: string, flipped: boolean}[]}[]>([])
+  const [folders, setFolders] = useState<string[]>(['General'])
+  const [selectedFolder, setSelectedFolder] = useState('General')
 
   const loadNotes = async () => {
     try {
@@ -147,18 +151,68 @@ export default function Dashboard() {
             )}
             {activeTab === 'notebooks' && (
               <div className="p-4 space-y-3">
-                <button className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all">
+                <button 
+                  onClick={() => {
+                    const name = prompt('Notebook name:')
+                    if (name) setNotebooks([...notebooks, {id: Date.now().toString(), name, folder: selectedFolder}])
+                  }}
+                  className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all"
+                >
                   + Create Notebook
                 </button>
-                <p className="text-center text-[var(--text-color)]/70 text-sm py-8">No notebooks yet. Create one to get started!</p>
+                <select 
+                  value={selectedFolder} 
+                  onChange={(e) => setSelectedFolder(e.target.value)}
+                  className="w-full p-2 border border-[var(--accent-color)]/30 rounded-lg"
+                >
+                  {folders.map(f => <option key={f} value={f}>{f}</option>)}
+                </select>
+                <button 
+                  onClick={() => {
+                    const name = prompt('Folder name:')
+                    if (name && !folders.includes(name)) setFolders([...folders, name])
+                  }}
+                  className="w-full p-2 text-sm border border-[var(--accent-color)]/30 rounded-lg hover:bg-[var(--accent-color)]/5"
+                >
+                  + New Folder
+                </button>
+                {notebooks.filter(n => n.folder === selectedFolder).map(nb => (
+                  <div key={nb.id} className="p-3 bg-[var(--accent-color)]/10 rounded-xl">
+                    <span className="text-[var(--text-color)]">{nb.name}</span>
+                  </div>
+                ))}
               </div>
             )}
             {activeTab === 'flashcards' && (
               <div className="p-4 space-y-3">
-                <button className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all">
+                <button 
+                  onClick={() => {
+                    const name = prompt('Deck name:')
+                    if (name) setFlashcards([...flashcards, {id: Date.now().toString(), name, cards: [{front: 'Front', back: 'Back', flipped: false}]}])
+                  }}
+                  className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)] hover:bg-[var(--accent-color)]/5 transition-all"
+                >
                   + Create Flashcard Deck
                 </button>
-                <p className="text-center text-[var(--text-color)]/70 text-sm py-8">No flashcard decks yet. Create one to get started!</p>
+                {flashcards.map(deck => (
+                  <div key={deck.id} className="p-3 bg-[var(--accent-color)]/10 rounded-xl space-y-2">
+                    <div className="font-semibold text-[var(--text-color)]">{deck.name}</div>
+                    {deck.cards.map((card, i) => (
+                      <div 
+                        key={i}
+                        onClick={() => {
+                          const updated = [...flashcards]
+                          const deckIndex = updated.findIndex(d => d.id === deck.id)
+                          updated[deckIndex].cards[i].flipped = !updated[deckIndex].cards[i].flipped
+                          setFlashcards(updated)
+                        }}
+                        className="p-3 bg-white rounded-lg cursor-pointer hover:scale-105 transition-transform"
+                      >
+                        <p className="text-sm text-[var(--text-color)]">{card.flipped ? card.back : card.front}</p>
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
             )}
           </div>
