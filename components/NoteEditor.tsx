@@ -66,7 +66,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
           type="text"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
-          placeholder="🏷️ Add tags"
+          placeholder="Add tags"
           className="text-sm text-[#8b6f47] w-full outline-none placeholder-[#c4b5a0] bg-transparent mb-4"
         />
         
@@ -126,9 +126,9 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
           disabled={saving}
           className="bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white px-6 md:px-10 py-2 md:py-3 rounded-2xl hover:from-[#a86a3d] hover:to-[#c17d4a] disabled:opacity-50 font-semibold shadow-lg transition-all transform hover:scale-105"
         >
-          {saving ? '⏳ Saving...' : '💾 Save'}
+          {saving ? 'Saving...' : 'Save'}
         </button>
-        {lastSaved && <span className="text-xs text-green-600 ml-4">✓ Saved at {lastSaved}</span>}
+        {lastSaved && <span className="text-xs text-green-600 ml-4">Saved at {lastSaved}</span>}
       </div>
 
       <div

@@ -16,6 +16,13 @@ export default function Dashboard() {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleSync()
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [])
   const [activeTab, setActiveTab] = useState<'notes' | 'notebooks' | 'flashcards'>('notes')
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -44,6 +51,7 @@ export default function Dashboard() {
   }, [])
 
   const handleSync = async () => {
+    if (syncing) return
     setSyncing(true)
     try {
       await notesAPI.syncNotes()
@@ -71,7 +79,15 @@ export default function Dashboard() {
         onClick={() => setSidebarOpen(!sidebarOpen)}
         className="md:hidden fixed bottom-4 right-4 z-50 bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white p-4 rounded-full shadow-2xl"
       >
-        {sidebarOpen ? '✕' : '📝'}
+        {sidebarOpen ? (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        )}
       </button>
 
       <div className="flex flex-1 overflow-hidden relative">
@@ -89,7 +105,7 @@ export default function Dashboard() {
                   : 'text-[#8b6f47] hover:bg-white/50'
               }`}
             >
-              📝 Notes
+              Notes
             </button>
             <button
               onClick={() => setActiveTab('notebooks')}
@@ -99,7 +115,7 @@ export default function Dashboard() {
                   : 'text-[#8b6f47] hover:bg-white/50'
               }`}
             >
-              📚 Books
+              Books
             </button>
             <button
               onClick={() => setActiveTab('flashcards')}
@@ -109,7 +125,7 @@ export default function Dashboard() {
                   : 'text-[#8b6f47] hover:bg-white/50'
               }`}
             >
-              🎴 Cards
+              Cards
             </button>
           </div>
 
@@ -132,7 +148,9 @@ export default function Dashboard() {
                         <h3 className="font-bold text-[#4a3f35]">{subject}</h3>
                         <p className="text-xs text-[#8b6f47]">0 notes</p>
                       </div>
-                      <span className="text-2xl">📖</span>
+                      <svg className="w-8 h-8 text-[#c17d4a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
                     </div>
                   </div>
                 ))}
@@ -150,7 +168,9 @@ export default function Dashboard() {
                         <h3 className="font-bold text-[#4a3f35]">{deck}</h3>
                         <p className="text-xs text-[#8b6f47]">0 cards</p>
                       </div>
-                      <span className="text-2xl">🎴</span>
+                      <svg className="w-8 h-8 text-[#c17d4a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                      </svg>
                     </div>
                   </div>
                 ))}
@@ -158,14 +178,10 @@ export default function Dashboard() {
             )}
           </div>
 
-          <div className="p-4 border-t space-y-2 bg-[#f5ebe1]">
-            <button
-              onClick={handleSync}
-              disabled={syncing}
-              className="w-full bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white py-2.5 rounded-2xl hover:from-[#a86a3d] hover:to-[#c17d4a] disabled:opacity-50 font-medium shadow-lg transition-all transform hover:scale-105"
-            >
-              {syncing ? '♻️ Syncing...' : '🔄 Sync'}
-            </button>
+          <div className="p-4 border-t bg-[#f5ebe1]">
+            <div className="text-center text-xs text-[#8b6f47]">
+              {syncing ? 'Syncing...' : 'Auto-sync enabled'}
+            </div>
           </div>
         </div>
 
@@ -175,7 +191,9 @@ export default function Dashboard() {
           ) : (
             <div className="flex items-center justify-center h-full bg-white p-4">
               <div className="text-center animate-fade-in">
-                <div className="text-5xl md:text-7xl mb-6 animate-bounce">📝</div>
+                <svg className="w-20 h-20 md:w-28 md:h-28 mx-auto mb-6 text-[#c17d4a] animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
                 <p className="text-[#8b6f47] text-xl md:text-2xl mb-8">No notes yet</p>
                 <button
                   onClick={() => {
@@ -191,7 +209,7 @@ export default function Dashboard() {
                   }}
                   className="bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white px-8 md:px-10 py-3 md:py-4 rounded-2xl hover:from-[#a86a3d] hover:to-[#c17d4a] font-semibold shadow-xl transition-all transform hover:scale-110"
                 >
-                  ✨ Create First Note
+                  Create First Note
                 </button>
               </div>
             </div>

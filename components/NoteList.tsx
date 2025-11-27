@@ -44,7 +44,7 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
         onClick={handleNewNote}
         className="w-full bg-gradient-to-r from-[#c17d4a] to-[#d4956f] text-white py-3 rounded-2xl mb-4 hover:from-[#a86a3d] hover:to-[#c17d4a] font-semibold shadow-lg transition-all transform hover:scale-105"
       >
-        ✨ New Note
+        + New Note
       </button>
 
       <div className="space-y-3">
