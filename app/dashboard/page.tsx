@@ -24,7 +24,7 @@ export default function Dashboard() {
     }
 
     loadNotes()
-  }, [])
+  }, [router, loadNotes])
 
   const loadNotes = async () => {
     try {
