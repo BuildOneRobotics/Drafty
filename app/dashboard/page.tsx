@@ -131,28 +131,10 @@ export default function Dashboard() {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {activeTab === 'notes' && (
-              <NoteList notes={notes} selectedNote={selectedNote} onSelectNote={(note) => {
-                setSelectedNote(note)
-                setSidebarOpen(false)
-              }} />
-            )}
-            {activeTab === 'notebooks' && (
-              <div className="p-4 space-y-3">
-                <button className="w-full p-4 border-2 border-dashed border-[#e8d5c4] rounded-2xl text-[#8b6f47] hover:border-[#c17d4a] hover:bg-[#f5ebe1] transition-all">
-                  + Create Notebook
-                </button>
-                <p className="text-center text-[#8b6f47] text-sm py-8">No notebooks yet. Create one to get started!</p>
-              </div>
-            )}
-            {activeTab === 'flashcards' && (
-              <div className="p-4 space-y-3">
-                <button className="w-full p-4 border-2 border-dashed border-[#e8d5c4] rounded-2xl text-[#8b6f47] hover:border-[#c17d4a] hover:bg-[#f5ebe1] transition-all">
-                  + Create Flashcard Deck
-                </button>
-                <p className="text-center text-[#8b6f47] text-sm py-8">No flashcard decks yet. Create one to get started!</p>
-              </div>
-            )}
+            <NoteList notes={notes} selectedNote={selectedNote} onSelectNote={(note) => {
+              setSelectedNote(note)
+              setSidebarOpen(false)
+            }} />
           </div>
 
           <div className="p-4 border-t bg-[#f5ebe1]">

@@ -19,23 +19,7 @@ const fonts = [
   { id: 'system', name: 'System', family: '-apple-system, BlinkMacSystemFont, sans-serif' },
 ]
 
-const pastelColors = [
-  { name: 'Pink', value: '#ffc0cb' },
-  { name: 'Lavender', value: '#e6e6fa' },
-  { name: 'Mint', value: '#98fb98' },
-  { name: 'Peach', value: '#ffdab9' },
-  { name: 'Sky', value: '#87ceeb' },
-  { name: 'Lemon', value: '#fffacd' },
-]
 
-const normalColors = [
-  { name: 'Black', value: '#000000' },
-  { name: 'Red', value: '#ef4444' },
-  { name: 'Blue', value: '#3b82f6' },
-  { name: 'Green', value: '#10b981' },
-  { name: 'Purple', value: '#a855f7' },
-  { name: 'Orange', value: '#f97316' },
-]
 
 export default function Settings() {
   const router = useRouter()
@@ -68,7 +52,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-[#faf8f5]">
+    <div className="min-h-screen bg-[var(--bg-color,#faf8f5)] transition-colors duration-[2000ms]" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
       <Navbar />
       
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -198,41 +182,7 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
-                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Pastel Colors</h2>
-                  <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-                    {pastelColors.map((color) => (
-                      <button
-                        key={color.value}
-                        className="flex flex-col items-center space-y-2 p-3 rounded-xl hover:bg-[#f5ebe1] transition-all"
-                      >
-                        <div
-                          className="w-12 h-12 rounded-full border-2 border-[#e8d5c4]"
-                          style={{ backgroundColor: color.value }}
-                        ></div>
-                        <span className="text-xs text-[#8b6f47]">{color.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
 
-                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-[#e8d5c4]">
-                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Normal Colors</h2>
-                  <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-                    {normalColors.map((color) => (
-                      <button
-                        key={color.value}
-                        className="flex flex-col items-center space-y-2 p-3 rounded-xl hover:bg-[#f5ebe1] transition-all"
-                      >
-                        <div
-                          className="w-12 h-12 rounded-full border-2 border-[#e8d5c4]"
-                          style={{ backgroundColor: color.value }}
-                        ></div>
-                        <span className="text-xs text-[#8b6f47]">{color.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </div>
             )}
 
