@@ -43,9 +43,9 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
     <div className="p-4">
       <button
         onClick={handleNewNote}
-        className="w-full bg-indigo-600 text-white py-2 rounded mb-4 hover:bg-indigo-700"
+        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg mb-4 hover:from-indigo-700 hover:to-purple-700 font-medium shadow-md transition-all"
       >
-        + New Note
+        ➕ New Note
       </button>
 
       <div className="space-y-2">
@@ -53,10 +53,10 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
           <div
             key={note.id}
             onClick={() => onSelectNote(note)}
-            className={`p-3 rounded cursor-pointer transition ${
+            className={`p-3 rounded-lg cursor-pointer transition-all ${
               selectedNote?.id === note.id
-                ? 'bg-indigo-100 border-l-4 border-indigo-600'
-                : 'bg-gray-50 hover:bg-gray-100'
+                ? 'bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-600 shadow-sm'
+                : 'bg-gray-50 hover:bg-gray-100 hover:shadow-sm'
             }`}
           >
             <div className="flex justify-between items-start">

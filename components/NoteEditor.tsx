@@ -45,41 +45,41 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="bg-white border-b p-6 flex justify-between items-start">
+    <div className="flex flex-col h-full bg-white">
+      <div className="bg-white border-b shadow-sm p-6 flex justify-between items-start">
         <div className="flex-1">
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Note title"
-            className="text-3xl font-bold w-full outline-none mb-2"
+            placeholder="Untitled Note"
+            className="text-3xl font-bold w-full outline-none mb-3 text-gray-800 placeholder-gray-300"
           />
           <input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            placeholder="Tags (comma separated)"
-            className="text-sm text-gray-500 w-full outline-none"
+            placeholder="🏷️ Add tags (comma separated)"
+            className="text-sm text-gray-500 w-full outline-none placeholder-gray-400"
           />
         </div>
-        <div className="text-right">
+        <div className="text-right ml-4">
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 disabled:opacity-50"
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-2.5 rounded-lg hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 font-medium shadow-md transition-all"
           >
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? '⏳ Saving...' : '💾 Save'}
           </button>
-          {lastSaved && <p className="text-xs text-gray-500 mt-2">Saved at {lastSaved}</p>}
+          {lastSaved && <p className="text-xs text-green-600 mt-2">✓ Saved at {lastSaved}</p>}
         </div>
       </div>
 
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="Start typing your note..."
-        className="flex-1 p-6 outline-none resize-none"
+        placeholder="Start writing your ideas..."
+        className="flex-1 p-8 outline-none resize-none text-gray-700 text-lg leading-relaxed placeholder-gray-300"
       />
     </div>
   )

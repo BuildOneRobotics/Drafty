@@ -16,16 +16,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
 
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      router.push('/login')
-      return
-    }
-
-    loadNotes()
-  }, [router, loadNotes])
-
   const loadNotes = async () => {
     try {
       const response = await notesAPI.getNotes()
@@ -39,6 +29,16 @@ export default function Dashboard() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.push('/login')
+      return
+    }
+
+    loadNotes()
+  }, [])
 
   const handleSync = async () => {
     setSyncing(true)
@@ -62,30 +62,30 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="w-64 bg-white shadow-lg flex flex-col">
-        <div className="p-6 border-b">
-          <h1 className="text-2xl font-bold text-indigo-600">Drafty</h1>
-          <p className="text-sm text-gray-600 mt-2">{user?.email}</p>
+    <div className="flex h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="w-72 bg-white shadow-xl flex flex-col border-r border-gray-200">
+        <div className="p-6 border-b bg-gradient-to-r from-indigo-600 to-purple-600">
+          <h1 className="text-2xl font-bold text-white">📝 Drafty</h1>
+          <p className="text-sm text-indigo-100 mt-1">{user?.email}</p>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           <NoteList notes={notes} selectedNote={selectedNote} onSelectNote={setSelectedNote} />
         </div>
 
-        <div className="p-4 border-t space-y-2">
+        <div className="p-4 border-t space-y-2 bg-gray-50">
           <button
             onClick={handleSync}
             disabled={syncing}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2.5 rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 font-medium shadow-sm transition-all"
           >
-            {syncing ? 'Syncing...' : 'Sync'}
+            {syncing ? '♻️ Syncing...' : '🔄 Sync Notes'}
           </button>
           <button
             onClick={handleLogout}
-            className="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700"
+            className="w-full bg-gray-200 text-gray-700 py-2.5 rounded-lg hover:bg-gray-300 font-medium transition-all"
           >
-            Logout
+            🚪 Logout
           </button>
         </div>
       </div>
@@ -94,9 +94,10 @@ export default function Dashboard() {
         {selectedNote ? (
           <NoteEditor note={selectedNote} onSave={loadNotes} />
         ) : (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center h-full bg-white">
             <div className="text-center">
-              <p className="text-gray-500 text-lg mb-4">No notes yet</p>
+              <div className="text-6xl mb-4">📝</div>
+              <p className="text-gray-500 text-xl mb-6">No notes yet</p>
               <button
                 onClick={() => {
                   const newNote: Note = {
@@ -109,9 +110,9 @@ export default function Dashboard() {
                   }
                   setSelectedNote(newNote)
                 }}
-                className="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium shadow-lg transition-all"
               >
-                Create First Note
+                ✨ Create First Note
               </button>
             </div>
           </div>
