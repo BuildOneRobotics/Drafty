@@ -26,6 +26,12 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
     }
   }, [note])
 
+  const handleTitleClick = () => {
+    if (title === 'Untitled Note') {
+      setTitle('')
+    }
+  }
+
   const handleSave = async () => {
     setSaving(true)
     try {
@@ -59,6 +65,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          onClick={handleTitleClick}
           placeholder="Untitled Note"
           className="text-2xl md:text-4xl font-bold w-full outline-none mb-4 text-[#4a3f35] placeholder-[#d4c4b0] bg-transparent"
         />
