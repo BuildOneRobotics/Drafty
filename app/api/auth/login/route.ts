@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 })
     }
 
-    const token = Buffer.from(JSON.stringify({ id: user.id, email })).toString('base64')
+    const token = Buffer.from(JSON.stringify({ id: user.id, email, name: user.name })).toString('base64')
 
     return NextResponse.json({
       token,
