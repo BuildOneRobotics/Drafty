@@ -222,6 +222,9 @@ export default function Settings() {
               <div className="space-y-6">
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Theme</h2>
+                  {selectedTheme && (
+                    <div className="mb-4 h-20 rounded-xl border-2 border-[var(--accent-color)]/20" style={{backgroundColor: themes.find(t => t.id === selectedTheme)?.color || '#22c55e'}}></div>
+                  )}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {themes.map((theme) => (
                       <button
@@ -245,25 +248,20 @@ export default function Settings() {
 
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Brightness</h2>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={brightness}
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value)
-                          setBrightness(val)
-                          applyTheme(selectedTheme, selectedFont, val, darkMode)
-                        }}
-                        className="flex-1"
-                      />
-                      <span className="text-sm font-semibold text-[var(--text-color)] w-12">{brightness}%</span>
-                    </div>
-                    <div className="h-8 rounded-lg border-2 border-[var(--accent-color)]/20" style={{
-                      background: `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${brightness}%, rgba(0,0,0,0.05) ${brightness}%, rgba(0,0,0,0.05) 100%)`
-                    }}></div>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={brightness}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value)
+                        setBrightness(val)
+                        applyTheme(selectedTheme, selectedFont, val, darkMode)
+                      }}
+                      className="flex-1"
+                    />
+                    <span className="text-sm font-semibold text-[var(--text-color)] w-12">{brightness}%</span>
                   </div>
                 </div>
 
@@ -288,6 +286,13 @@ export default function Settings() {
 
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Fonts</h2>
+                  {selectedFont && (
+                    <div className="mb-4 p-4 rounded-xl border-2 border-[var(--accent-color)]/20" style={{backgroundColor: themes.find(t => t.id === selectedTheme)?.color + '20'}}>
+                      <p style={{fontFamily: fonts.find(f => f.id === selectedFont)?.family}} className="text-lg font-semibold text-[var(--text-color)]">
+                        {fonts.find(f => f.id === selectedFont)?.name} - The quick brown fox jumps over the lazy dog
+                      </p>
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {fonts.map((font) => (
                       <button
