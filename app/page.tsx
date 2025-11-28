@@ -8,11 +8,13 @@ import LoadingScreen from '@/components/LoadingScreen'
 export default function Home() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      router.push('/dashboard')
+      setIsLoggedIn(true)
+      setLoading(false)
     } else {
       setLoading(false)
     }
@@ -33,12 +35,20 @@ export default function Home() {
             <h1 className="text-2xl font-bold text-[var(--accent-color)]">Drafty</h1>
           </div>
           <div className="flex gap-3">
-            <Link href="/login" className="text-[var(--text-color)] hover:text-[var(--accent-color)] px-4 py-2 rounded-lg hover:bg-[var(--accent-color)]/10 transition-all font-medium">
-              Login
-            </Link>
-            <Link href="/signup" className="bg-[var(--accent-color)] text-white px-6 py-2 rounded-lg hover:opacity-90 font-medium transition-all">
-              Sign Up
-            </Link>
+            {isLoggedIn ? (
+              <Link href="/dashboard" className="bg-[var(--accent-color)] text-white px-6 py-2 rounded-lg hover:opacity-90 font-medium transition-all">
+                Continue
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="text-[var(--text-color)] hover:text-[var(--accent-color)] px-4 py-2 rounded-lg hover:bg-[var(--accent-color)]/10 transition-all font-medium">
+                  Login
+                </Link>
+                <Link href="/signup" className="bg-[var(--accent-color)] text-white px-6 py-2 rounded-lg hover:opacity-90 font-medium transition-all">
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -52,7 +62,7 @@ export default function Home() {
             <h2 className="text-5xl md:text-6xl font-bold text-[var(--text-color)] mb-6">
               Capture Your Ideas
             </h2>
-            <p className="text-xl md:text-2xl text-[var(--text-color)]/70 mb-10 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl text-[var(--text-color)] mb-10 max-w-3xl mx-auto">
               Create, organize, and manage your notes seamlessly. Simple, fast, and beautiful.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -71,7 +81,7 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
               <h3 className="text-2xl font-bold mb-4 text-[var(--text-color)] text-center">Create Ideas</h3>
-              <p className="text-[var(--text-color)]/70 leading-relaxed text-center">Quickly capture and organize your thoughts in a beautiful, distraction-free editor</p>
+              <p className="text-[var(--text-color)] leading-relaxed text-center">Quickly capture and organize your thoughts in a beautiful, distraction-free editor</p>
             </div>
 
             <div className="bg-white p-8 rounded-2xl border border-[var(--accent-color)]/20 transition-all hover:border-[var(--accent-color)]/40">
@@ -79,7 +89,7 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
               <h3 className="text-2xl font-bold mb-4 text-[var(--text-color)] text-center">Auto Sync</h3>
-              <p className="text-[var(--text-color)]/70 leading-relaxed text-center">Your notes sync automatically and securely across all your devices</p>
+              <p className="text-[var(--text-color)] leading-relaxed text-center">Your notes sync automatically and securely across all your devices</p>
             </div>
 
             <div className="bg-white p-8 rounded-2xl border border-[var(--accent-color)]/20 transition-all hover:border-[var(--accent-color)]/40">
@@ -87,7 +97,7 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
               <h3 className="text-2xl font-bold mb-4 text-[var(--text-color)] text-center">Lightning Fast</h3>
-              <p className="text-[var(--text-color)]/70 leading-relaxed text-center">Built for speed with instant search and seamless performance</p>
+              <p className="text-[var(--text-color)] leading-relaxed text-center">Built for speed with instant search and seamless performance</p>
             </div>
           </div>
         </div>
