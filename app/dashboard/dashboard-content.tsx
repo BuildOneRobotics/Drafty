@@ -32,7 +32,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
   const [showNewFlashcard, setShowNewFlashcard] = useState(false)
   const [searchUsername, setSearchUsername] = useState('')
   const [friends, setFriends] = useState<string[]>([])
-  const [allUsers, setAllUsers] = useState<string[]>(['alice', 'bob', 'charlie', 'david', 'emma'])
+  const allUsers = ['alice', 'bob', 'charlie', 'david', 'emma']
 
   useEffect(() => {
     loadWhiteboards()
