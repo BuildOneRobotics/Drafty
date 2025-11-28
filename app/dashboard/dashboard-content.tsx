@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Note, Notebook, Whiteboard as WhiteboardType, Flashcard, FlashcardFolder } from '@/lib/store'
+import { Note, Whiteboard as WhiteboardType, Flashcard, FlashcardFolder } from '@/lib/store'
 import FlashcardEditor from '@/components/FlashcardEditor'
 import { NoteIcon, NotebookIcon, FlashcardIcon, WhiteboardIcon, FilesIcon, FriendsIcon } from '@/components/Icons'
 import { whiteboardsAPI, flashcardsAPI } from '@/lib/api'
