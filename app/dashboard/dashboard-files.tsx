@@ -31,15 +31,25 @@ export default function FileManager({ user }: FileManagerProps) {
   const loadFiles = () => {
     const saved = localStorage.getItem(`files-${user?.id}`)
     if (saved) {
-      setFiles(JSON.parse(saved))
+      try {
+        setFiles(JSON.parse(saved))
+      } catch (error) {
+        console.error('Failed to parse files:', error)
+        setFiles([])
+      }
     }
   }
 
   const loadFriends = () => {
     const saved = localStorage.getItem('friends')
     if (saved) {
-      const allFriends = JSON.parse(saved)
-      setFriends(allFriends.filter((f: any) => f.canShare))
+      try {
+        const allFriends = JSON.parse(saved)
+        setFriends(allFriends.filter((f: any) => f.canShare))
+      } catch (error) {
+        console.error('Failed to parse friends:', error)
+        setFriends([])
+      }
     }
   }
 
