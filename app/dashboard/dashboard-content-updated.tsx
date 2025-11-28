@@ -22,7 +22,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
   const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(null)
   const [expandedFolder, setExpandedFolder] = useState<string | null>(null)
   const [showTemplateModal, setShowTemplateModal] = useState(false)
-  const [templateType, setTemplateType] = useState<'note' | 'whiteboard'>('note')
   const [notebookName, setNotebookName] = useState('')
   const [showNewNotebook, setShowNewNotebook] = useState(false)
   const [flashcardName, setFlashcardName] = useState('')
@@ -391,8 +390,8 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
       <TemplateModal
         isOpen={showTemplateModal}
         onClose={() => setShowTemplateModal(false)}
-        onSelect={templateType === 'note' ? handleCreateNote : handleCreateWhiteboard}
-        type={templateType}
+        onSelect={handleCreateNote}
+        type="note"
       />
     </div>
   )
