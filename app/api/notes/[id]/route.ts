@@ -21,7 +21,19 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
   try {
     const { title, content, tags } = await request.json()
-    const data = await loadFromGist(userId)
+    
+    let data
+    try {
+      data = await loadFromGist(userId)
+    } catch (gistError) {
+      console.error('Gist load error:', gistError)
+      return NextResponse.json({ message: 'Failed to load data' }, { status: 500 })
+    }
+
+    if (!data || !data.notes) {
+      return NextResponse.json({ message: 'Invalid data' }, { status: 500 })
+    }
+
     const userNotes = data.notes[userId] || []
     const noteIndex = userNotes.findIndex((n: any) => n.id === params.id)
 
@@ -38,10 +50,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
     
     data.notes[userId] = userNotes
-    await saveToGist(data, userId)
+    
+    try {
+      await saveToGist(data, userId)
+    } catch (saveError) {
+      console.error('Gist save error:', saveError)
+      return NextResponse.json({ message: 'Failed to save data' }, { status: 500 })
+    }
 
     return NextResponse.json(userNotes[noteIndex])
   } catch (error) {
+    console.error('Update note error:', error)
     return NextResponse.json({ message: 'Failed to update note' }, { status: 500 })
   }
 }
@@ -53,7 +72,18 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   }
 
   try {
-    const data = await loadFromGist(userId)
+    let data
+    try {
+      data = await loadFromGist(userId)
+    } catch (gistError) {
+      console.error('Gist load error:', gistError)
+      return NextResponse.json({ message: 'Failed to load data' }, { status: 500 })
+    }
+
+    if (!data || !data.notes) {
+      return NextResponse.json({ message: 'Invalid data' }, { status: 500 })
+    }
+
     const userNotes = data.notes[userId] || []
     const noteIndex = userNotes.findIndex((n: any) => n.id === params.id)
 
@@ -63,10 +93,17 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     userNotes.splice(noteIndex, 1)
     data.notes[userId] = userNotes
-    await saveToGist(data, userId)
+    
+    try {
+      await saveToGist(data, userId)
+    } catch (saveError) {
+      console.error('Gist save error:', saveError)
+      return NextResponse.json({ message: 'Failed to save data' }, { status: 500 })
+    }
     
     return NextResponse.json({ message: 'Note deleted' })
   } catch (error) {
+    console.error('Delete note error:', error)
     return NextResponse.json({ message: 'Failed to delete note' }, { status: 500 })
   }
 }

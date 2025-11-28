@@ -30,7 +30,12 @@ export default function Login() {
       }
     } catch (err: any) {
       console.error('Login error:', err)
-      const message = err.response?.data?.message || err.message || 'Login failed'
+      let message = 'Login failed'
+      if (err?.response?.data?.message && typeof err.response.data.message === 'string') {
+        message = err.response.data.message
+      } else if (err?.message && typeof err.message === 'string') {
+        message = err.message
+      }
       setError(message)
     } finally {
       setLoading(false)

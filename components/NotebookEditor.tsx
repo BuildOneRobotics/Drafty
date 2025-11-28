@@ -132,11 +132,12 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
             />
             <div
               contentEditable
-              onInput={(e) => handleUpdatePageContent((e.currentTarget as HTMLDivElement).innerHTML)}
+              onInput={(e) => handleUpdatePageContent((e.currentTarget as HTMLDivElement).textContent || '')}
               className="flex-1 p-4 bg-[var(--surface-color,white)] rounded-lg outline-none text-[var(--text-color)] overflow-y-auto"
               suppressContentEditableWarning
-              dangerouslySetInnerHTML={{__html: pageContent}}
-            />
+            >
+              {pageContent}
+            </div>
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-[var(--text-color)]/50">

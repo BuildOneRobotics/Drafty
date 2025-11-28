@@ -6,8 +6,10 @@ function getUserId(request: NextRequest): string | null {
   if (!authHeader) return null
   try {
     const token = authHeader.replace('Bearer ', '')
-    const userData = JSON.parse(Buffer.from(token, 'base64').toString())
-    return userData.id
+    if (!token) return null
+    const decoded = Buffer.from(token, 'base64').toString()
+    const userData = JSON.parse(decoded)
+    return userData?.id || null
   } catch {
     return null
   }
@@ -19,9 +21,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }
 
-  const data = await loadFromGist(userId)
-  const userNotes = data.notes[userId] || []
-  return NextResponse.json(userNotes)
+  try {
+    const data = await loadFromGist(userId)
+    if (!data || !data.notes) {
+      return NextResponse.json([])
+    }
+    const userNotes = data.notes[userId] || []
+    return NextResponse.json(userNotes)
+  } catch (error) {
+    console.error('Failed to load notes:', error)
+    return NextResponse.json({ message: 'Failed to load notes' }, { status: 500 })
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -31,8 +41,27 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { title, content, tags } = await request.json()
-    const data = await loadFromGist(userId)
+    let body
+    try {
+      body = await request.json()
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError)
+      return NextResponse.json({ message: 'Invalid JSON' }, { status: 400 })
+    }
+
+    const { title, content, tags } = body
+    
+    let data
+    try {
+      data = await loadFromGist(userId)
+    } catch (gistError) {
+      console.error('Gist load error:', gistError)
+      return NextResponse.json({ message: 'Failed to load data' }, { status: 500 })
+    }
+
+    if (!data || !data.notes) {
+      return NextResponse.json({ message: 'Invalid data' }, { status: 500 })
+    }
     
     const note = {
       id: Date.now().toString(),
@@ -47,10 +76,17 @@ export async function POST(request: NextRequest) {
       data.notes[userId] = []
     }
     data.notes[userId].push(note)
-    await saveToGist(data, userId)
+    
+    try {
+      await saveToGist(data, userId)
+    } catch (saveError) {
+      console.error('Gist save error:', saveError)
+      return NextResponse.json({ message: 'Failed to save data' }, { status: 500 })
+    }
 
     return NextResponse.json(note, { status: 201 })
   } catch (error) {
+    console.error('Create note error:', error)
     return NextResponse.json({ message: 'Failed to create note' }, { status: 500 })
   }
 }

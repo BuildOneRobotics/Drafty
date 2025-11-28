@@ -23,7 +23,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
     setContent(note.content)
     setTags(note.tags.join(', '))
     if (contentRef.current) {
-      contentRef.current.innerHTML = note.content
+      contentRef.current.textContent = note.content
     }
   }, [note])
 

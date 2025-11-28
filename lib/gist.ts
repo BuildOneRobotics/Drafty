@@ -6,6 +6,9 @@ function getFileName(userId: string) {
 }
 
 export async function saveToGist(data: any, userId?: string) {
+  if (!GIST_ID || typeof GIST_ID !== 'string' || !/^[a-f0-9]+$/.test(GIST_ID)) {
+    throw new Error('Invalid GIST_ID')
+  }
   const fileName = userId ? getFileName(userId) : 'drafty-data.json'
   const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
     method: 'PATCH',
@@ -25,6 +28,9 @@ export async function saveToGist(data: any, userId?: string) {
 }
 
 export async function loadFromGist(userId?: string) {
+  if (!GIST_ID || typeof GIST_ID !== 'string' || !/^[a-f0-9]+$/.test(GIST_ID)) {
+    throw new Error('Invalid GIST_ID')
+  }
   const fileName = userId ? getFileName(userId) : 'drafty-data.json'
   const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
     headers: {
@@ -37,6 +43,9 @@ export async function loadFromGist(userId?: string) {
 }
 
 export async function deleteFromGist(fileName: string) {
+  if (!GIST_ID || typeof GIST_ID !== 'string' || !/^[a-f0-9]+$/.test(GIST_ID)) {
+    throw new Error('Invalid GIST_ID')
+  }
   const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
     method: 'PATCH',
     headers: {
