@@ -267,7 +267,7 @@ export default function DashboardContent({ notes, user }: DashboardContentProps)
             <div className={`grid ${isPhone ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-6`}>
               {[
                 { id: 'notes', label: 'Notes', Icon: NoteIcon, count: notes.length },
-                { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon, count: notebooks.length },
+                { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon, count: 0 },
                 { id: 'flashcards', label: 'Flashcards', Icon: FlashcardIcon, count: flashcards.length },
                 { id: 'whiteboards', label: 'Whiteboards', Icon: WhiteboardIcon, count: whiteboards.length }
               ].map(item => (
