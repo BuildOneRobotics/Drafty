@@ -66,4 +66,4 @@ export async function deleteFromGist(fileName: string) {
     throw new Error(`GitHub API error: ${response.status}`)
   }
   return response.json()
-
+}
