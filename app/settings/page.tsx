@@ -89,11 +89,6 @@ export default function Settings() {
     }
   }
 
-  const handleAcceptRequest = (username: string) => {
-    setFriends([...friends, username])
-    setPendingRequests(pendingRequests.filter(u => u !== username))
-  }
-
   const handleRejectRequest = (username: string) => {
     setPendingRequests(pendingRequests.filter(u => u !== username))
   }

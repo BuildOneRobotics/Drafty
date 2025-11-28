@@ -63,22 +63,22 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-3">
       <button
         onClick={handleNewNote}
-        className="w-full bg-[var(--accent-color)] text-white py-3 rounded-2xl mb-4 hover:opacity-90 font-semibold transition-all transform hover:translate-y-[-2px]"
+        className="w-full bg-[var(--accent-color)] text-white py-3 rounded-2xl hover:opacity-90 font-semibold transition-all transform hover:translate-y-[-2px] shadow-md"
       >
         + New Note
       </button>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {notes.map((note) => (
           <div
             key={note.id}
             onClick={() => onSelectNote(note)}
-            className={`p-4 rounded-2xl cursor-pointer transition-all transform hover:translate-y-[-2px] relative ${ 
+            className={`p-4 rounded-2xl cursor-pointer transition-all transform hover:translate-y-[-2px] relative shadow-sm ${ 
               selectedNote?.id === note.id
-                ? 'bg-[var(--accent-color)]/10'
+                ? 'bg-[var(--accent-color)]/15 shadow-md'
                 : 'bg-[var(--bg-color)] hover:bg-[var(--accent-color)]/5'
             }`}
           >
@@ -91,18 +91,18 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
                   type="text"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="flex-1 px-2 py-1 border border-[var(--accent-color)]/30 rounded outline-none bg-[var(--surface-color,white)]"
+                  className="flex-1 px-3 py-2 border border-[var(--accent-color)]/30 rounded-xl outline-none bg-[var(--surface-color,white)] shadow-sm"
                   autoFocus
                 />
                 <button
                   onClick={() => saveRename(note.id)}
-                  className="text-green-600 hover:text-green-700 text-sm font-bold"
+                  className="text-green-600 hover:text-green-700 text-sm font-bold px-2"
                 >
                   ✓
                 </button>
                 <button
                   onClick={() => setRenaming(null)}
-                  className="text-red-500 hover:text-red-700 text-sm font-bold"
+                  className="text-red-500 hover:text-red-700 text-sm font-bold px-2"
                 >
                   ✕
                 </button>

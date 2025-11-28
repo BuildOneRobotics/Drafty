@@ -33,6 +33,11 @@
   }
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
 .loading-text {
   overflow: hidden;
   white-space: nowrap;
@@ -43,8 +48,22 @@
   animation: slideDown 0.3s ease-out;
 }
 
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
 body {
   font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Rounded corners and shadows for floaty UI */
+button, input, select, textarea {
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+button:hover, input:focus, select:focus, textarea:focus {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }

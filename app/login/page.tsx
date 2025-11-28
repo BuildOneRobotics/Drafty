@@ -20,7 +20,7 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const response = await authAPI.login(email, password)
+      const response = await authAPI.login(email.toLowerCase(), password)
       if (response.data?.token && response.data?.user) {
         localStorage.setItem('token', response.data.token)
         setUser(response.data.user)
@@ -39,7 +39,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-color,#faf8f5)] transition-colors duration-[2000ms] flex items-center justify-center p-4" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
-      <div className="bg-[var(--surface-color,white)] p-6 md:p-8 rounded-2xl border border-[var(--accent-color)]/30 w-full max-w-md relative transition-colors duration-[2000ms]">
+      <div className="bg-[var(--surface-color,white)] p-6 md:p-8 rounded-2xl border border-[var(--accent-color)]/30 w-full max-w-md relative transition-colors duration-[2000ms] shadow-lg">
         <Link href="/" className="absolute top-6 left-6 text-[var(--text-color)]/40 hover:text-[var(--text-color)]/60 transition-colors">
           ← Back
         </Link>
@@ -52,7 +52,7 @@ export default function Login() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4">
             {error}
           </div>
         )}
@@ -64,7 +64,7 @@ export default function Login() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-lg focus:outline-none focus:border-[var(--accent-color)] transition-all bg-[var(--bg-color,white)]"
+              className="w-full px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-xl focus:outline-none focus:border-[var(--accent-color)] transition-all bg-[var(--bg-color,white)] shadow-sm"
               required
               autoComplete="email"
             />
@@ -76,7 +76,7 @@ export default function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-lg focus:outline-none focus:border-[var(--accent-color)] transition-all bg-[var(--bg-color,white)]"
+              className="w-full px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-xl focus:outline-none focus:border-[var(--accent-color)] transition-all bg-[var(--bg-color,white)] shadow-sm"
               required
               autoComplete="current-password"
             />
@@ -85,7 +85,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[var(--accent-color)] text-white py-3 rounded-lg hover:opacity-90 disabled:opacity-50 font-semibold transition-all transform hover:scale-[1.02]"
+            className="w-full bg-[var(--accent-color)] text-white py-3 rounded-xl hover:opacity-90 disabled:opacity-50 font-semibold transition-all transform hover:scale-[1.02] shadow-md"
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
