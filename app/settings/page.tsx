@@ -101,6 +101,35 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-[var(--bg-color,#f0fdf4)]" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
       <Navbar />
+      <style>{`
+        input[type="range"] {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 100%;
+          height: 8px;
+          border-radius: 5px;
+          background: linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${brightness}%, rgba(0,0,0,0.1) ${brightness}%, rgba(0,0,0,0.1) 100%);
+          outline: none;
+          cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: var(--accent-color);
+          cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: var(--accent-color);
+          cursor: pointer;
+          border: none;
+        }
+      `}</style>
       
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-color)] mb-8">Settings</h1>
@@ -158,11 +187,6 @@ export default function Settings() {
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Brightness</h2>
                   <div className="flex items-center gap-4">
-                    <style>{`
-                      input[type="range"] {
-                        accent-color: var(--accent-color);
-                      }
-                    `}</style>
                     <input
                       type="range"
                       min="0"
@@ -173,8 +197,6 @@ export default function Settings() {
                         setBrightness(val)
                         applyTheme(selectedTheme, selectedFont, val, darkMode)
                       }}
-                      className="flex-1 h-2 rounded-lg appearance-none cursor-pointer"
-                      style={{background: `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${brightness}%, rgba(0,0,0,0.1) ${brightness}%, rgba(0,0,0,0.1) 100%)`}}
                     />
                     <span className="text-sm font-semibold text-[var(--text-color)] w-12">{brightness}%</span>
                   </div>
