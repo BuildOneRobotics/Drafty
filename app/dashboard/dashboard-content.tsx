@@ -10,11 +10,10 @@ import { useMobile } from '@/lib/useMobile'
 
 interface DashboardContentProps {
   notes: Note[]
-  onLoadNotes: () => void
   user: any
 }
 
-export default function DashboardContent({ notes, onLoadNotes, user }: DashboardContentProps) {
+export default function DashboardContent({ notes, user }: DashboardContentProps) {
   const { isPhone } = useMobile()
   const [view, setView] = useState<'home' | 'notes' | 'notebooks' | 'flashcards' | 'whiteboards' | 'files' | 'friends'>('home')
   const [notebooks, setNotebooks] = useState<Notebook[]>([])
