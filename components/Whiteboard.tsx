@@ -1,179 +1,125 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
-import { Whiteboard as WhiteboardType } from '@/lib/store'
+import { useState, useRef, useEffect } from 'react'
+import { Whiteboard } from '@/lib/store'
 
-interface WhiteboardProps {
-  whiteboard: WhiteboardType
+interface WhiteboardEditorProps {
+  whiteboard: Whiteboard
   onSave: (content: string) => void
 }
 
-export default function Whiteboard({ whiteboard, onSave }: WhiteboardProps) {
+export default function WhiteboardEditor({ whiteboard, onSave }: WhiteboardEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [isDrawing, setIsDrawing] = useState(false)
-  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null)
-  const [tool, setTool] = useState<'draw' | 'text' | 'rect' | 'circle'>('draw')
-  const [zoom, setZoom] = useState(1)
-  const [panX, setPanX] = useState(0)
-  const [panY, setPanY] = useState(0)
+  const [mode, setMode] = useState<'text' | 'spider' | 'draw'>('text')
   const [textInput, setTextInput] = useState('')
-  const [showTextInput, setShowTextInput] = useState(false)
-  const [textPos, setTextPos] = useState({ x: 0, y: 0 })
+  const [nodes, setNodes] = useState<{id: string, text: string, x: number, y: number}[]>([])
+  const [selectedNode, setSelectedNode] = useState<string | null>(null)
+  const [isDrawing, setIsDrawing] = useState(false)
 
   useEffect(() => {
+    if (mode === 'draw') drawSpider()
+  }, [nodes, mode])
+
+  const drawSpider = () => {
     const canvas = canvasRef.current
     if (!canvas) return
-
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    canvas.width = canvas.offsetWidth
-    canvas.height = canvas.offsetHeight
-
     ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    setContext(ctx)
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.strokeStyle = '#22c55e'
+    ctx.lineWidth = 2
 
-    if (whiteboard.content) {
-      const img = new Image()
-      img.onload = () => ctx.drawImage(img, 0, 0)
-      img.src = whiteboard.content
+    if (nodes.length > 0) {
+      const center = nodes[0]
+      nodes.slice(1).forEach(node => {
+        ctx.beginPath()
+        ctx.moveTo(center.x, center.y)
+        ctx.lineTo(node.x, node.y)
+        ctx.stroke()
+      })
     }
-  }, [])
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (tool === 'text') {
-      const rect = canvasRef.current!.getBoundingClientRect()
-      setTextPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
-      setShowTextInput(true)
-      return
-    }
-    if (!context) return
-    setIsDrawing(true)
-    const rect = canvasRef.current!.getBoundingClientRect()
-    context.beginPath()
-    context.moveTo(e.clientX - rect.left, e.clientY - rect.top)
+    nodes.forEach(node => {
+      ctx.fillStyle = '#22c55e'
+      ctx.beginPath()
+      ctx.arc(node.x, node.y, 25, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.fillStyle = '#ffffff'
+      ctx.font = '12px Arial'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(node.text.substring(0, 10), node.x, node.y)
+    })
   }
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || !context || tool !== 'draw') return
-    const rect = canvasRef.current!.getBoundingClientRect()
-    context.lineTo(e.clientX - rect.left, e.clientY - rect.top)
-    context.strokeStyle = '#000000'
-    context.lineWidth = 2
-    context.lineCap = 'round'
-    context.stroke()
-  }
-
-  const stopDrawing = () => {
-    if (!context) return
-    setIsDrawing(false)
-    context.closePath()
-    const canvas = canvasRef.current
-    if (canvas) {
-      onSave(canvas.toDataURL())
+  const addTextNode = () => {
+    if (!textInput.trim()) return
+    const newNode = {
+      id: Date.now().toString(),
+      text: textInput,
+      x: Math.random() * 400 + 100,
+      y: Math.random() * 300 + 100
     }
-  }
-
-  const addText = () => {
-    if (!context || !textInput.trim()) return
-    context.font = '16px Arial'
-    context.fillStyle = '#000000'
-    context.fillText(textInput, textPos.x, textPos.y)
+    setNodes([...nodes, newNode])
     setTextInput('')
-    setShowTextInput(false)
+  }
+
+  const deleteNode = (id: string) => {
+    setNodes(nodes.filter(n => n.id !== id))
+  }
+
+  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (mode !== 'spider') return
     const canvas = canvasRef.current
-    if (canvas) {
-      onSave(canvas.toDataURL())
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    const clicked = nodes.find(n => Math.hypot(n.x - x, n.y - y) < 25)
+    if (clicked) {
+      setSelectedNode(clicked.id)
     }
-  }
-
-  const clearCanvas = () => {
-    if (!context) return
-    context.clearRect(0, 0, context.canvas.width, context.canvas.height)
-    context.fillStyle = '#ffffff'
-    context.fillRect(0, 0, context.canvas.width, context.canvas.height)
-  }
-
-  const handleZoom = (direction: 'in' | 'out') => {
-    setZoom(prev => direction === 'in' ? Math.min(prev + 0.2, 3) : Math.max(prev - 0.2, 0.5))
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex gap-2 p-4 border-b border-[var(--accent-color)]/30 flex-wrap">
-        <button
-          onClick={() => setTool('draw')}
-          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-            tool === 'draw' ? 'bg-[var(--accent-color)] text-white' : 'bg-[var(--accent-color)]/20 text-[var(--text-color)]'
-          }`}
-        >
-          Draw
-        </button>
-        <button
-          onClick={() => setTool('text')}
-          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-            tool === 'text' ? 'bg-[var(--accent-color)] text-white' : 'bg-[var(--accent-color)]/20 text-[var(--text-color)]'
-          }`}
-        >
-          Text
-        </button>
-        <button
-          onClick={() => handleZoom('in')}
-          className="px-3 py-2 bg-[var(--accent-color)]/20 text-[var(--text-color)] rounded-lg text-sm font-medium"
-        >
-          +
-        </button>
-        <button
-          onClick={() => handleZoom('out')}
-          className="px-3 py-2 bg-[var(--accent-color)]/20 text-[var(--text-color)] rounded-lg text-sm font-medium"
-        >
-          -
-        </button>
-        <button
-          onClick={clearCanvas}
-          className="px-3 py-2 bg-red-500/20 text-red-600 rounded-lg text-sm font-medium ml-auto"
-        >
-          Clear
-        </button>
-        <div className="text-sm text-[var(--text-color)]/60">
-          {new Date().toLocaleDateString()}
-        </div>
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <button onClick={() => setMode('text')} className={`px-4 py-2 rounded-lg ${mode === 'text' ? 'bg-[var(--accent-color)] text-white' : 'bg-[var(--accent-color)]/20'}`}>Text</button>
+        <button onClick={() => setMode('spider')} className={`px-4 py-2 rounded-lg ${mode === 'spider' ? 'bg-[var(--accent-color)] text-white' : 'bg-[var(--accent-color)]/20'}`}>Spider Diagram</button>
       </div>
-      {showTextInput && (
-        <div className="p-4 bg-white border-b border-[var(--accent-color)]/30 flex gap-2">
-          <input
-            type="text"
-            value={textInput}
-            onChange={(e) => setTextInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && addText()}
-            placeholder="Enter text..."
-            className="flex-1 px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg outline-none text-[var(--text-color)]"
-            autoFocus
-          />
-          <button
-            onClick={addText}
-            className="px-4 py-2 bg-[var(--accent-color)] text-white rounded-lg text-sm font-medium"
-          >
-            Add
-          </button>
-          <button
-            onClick={() => setShowTextInput(false)}
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg text-sm font-medium"
-          >
-            Cancel
-          </button>
+
+      {mode === 'text' && (
+        <div className="space-y-3">
+          <div className="flex gap-2">
+            <input type="text" value={textInput} onChange={(e) => setTextInput(e.target.value)} placeholder="Add text..." className="flex-1 px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg text-[var(--text-color)]" />
+            <button onClick={addTextNode} className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg">Add</button>
+          </div>
+          <div className="space-y-2">
+            {nodes.map(node => (
+              <div key={node.id} className="p-3 bg-white rounded-lg border border-[var(--accent-color)]/20 flex justify-between items-center">
+                <p className="text-[var(--text-color)]">{node.text}</p>
+                <button onClick={() => deleteNode(node.id)} className="text-red-500 hover:text-red-700 text-sm">Delete</button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
-      <canvas
-        ref={canvasRef}
-        onMouseDown={startDrawing}
-        onMouseMove={draw}
-        onMouseUp={stopDrawing}
-        onMouseLeave={stopDrawing}
-        className="flex-1 cursor-crosshair bg-white rounded-3xl m-4"
-        style={{transform: `scale(${zoom})`, transformOrigin: 'top left'}}
-      />
+
+      {mode === 'spider' && (
+        <div className="space-y-3">
+          <canvas ref={canvasRef} width={600} height={400} onClick={handleCanvasClick} className="border-2 border-[var(--accent-color)]/20 rounded-lg bg-white cursor-pointer" />
+          <div className="flex gap-2">
+            <input type="text" value={textInput} onChange={(e) => setTextInput(e.target.value)} placeholder="Node text..." className="flex-1 px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg text-[var(--text-color)]" />
+            <button onClick={addTextNode} className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg">Add Node</button>
+          </div>
+          {selectedNode && (
+            <button onClick={() => deleteNode(selectedNode)} className="w-full text-red-500 hover:text-red-700 py-2">Delete Selected Node</button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

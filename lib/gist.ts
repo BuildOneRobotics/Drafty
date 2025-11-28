@@ -33,5 +33,21 @@ export async function loadFromGist(userId?: string) {
   })
   const gist = await response.json()
   const content = gist.files[fileName]?.content
-  return content ? JSON.parse(content) : { users: {}, notes: {}, whiteboards: {}, notebooks: {} }
+  return content ? JSON.parse(content) : { users: {}, notes: {}, whiteboards: {}, notebooks: {}, flashcardFolders: [], files: [] }
+}
+
+export async function deleteFromGist(fileName: string) {
+  const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `token ${GITHUB_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      files: {
+        [fileName]: null,
+      },
+    }),
+  })
+  return response.json()
 }
