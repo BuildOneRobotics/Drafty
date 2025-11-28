@@ -21,17 +21,21 @@ export default function Login() {
 
     try {
       const response = await authAPI.login(email, password)
-      localStorage.setItem('token', response.data.token)
-      setUser(response.data.user)
-      router.push('/dashboard')
+      if (response.data?.token && response.data?.user) {
+        localStorage.setItem('token', response.data.token)
+        setUser(response.data.user)
+        setTimeout(() => router.push('/dashboard'), 100)
+      } else {
+        setError('Invalid response from server')
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed')
+      console.error('Login error:', err)
+      const message = err.response?.data?.message || err.message || 'Login failed'
+      setError(message)
     } finally {
       setLoading(false)
     }
   }
-
-
 
   return (
     <div className="min-h-screen bg-[var(--bg-color,#faf8f5)] transition-colors duration-[2000ms] flex items-center justify-center p-4" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
