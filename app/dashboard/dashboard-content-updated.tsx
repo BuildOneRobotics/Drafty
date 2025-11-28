@@ -15,7 +15,6 @@ interface DashboardContentProps {
 
 export default function DashboardContent({ notes, onLoadNotes, user }: DashboardContentProps) {
   const [view, setView] = useState<'home' | 'notes' | 'notebooks' | 'flashcards' | 'whiteboards' | 'files' | 'friends'>('home')
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [notebooks, setNotebooks] = useState<Notebook[]>([])
   const [whiteboards, setWhiteboards] = useState<WhiteboardType[]>([])
   const [flashcards, setFlashcards] = useState<Flashcard[]>([])
@@ -70,7 +69,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
     try {
       const response = await notesAPI.createNote(`New Note ${new Date().toLocaleTimeString()}`, '', [])
       onLoadNotes()
-      setSelectedNote(response.data)
       setView('notes')
     } catch (error) {
       console.error('Failed to create note:', error)
@@ -81,7 +79,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
     try {
       const response = await whiteboardsAPI.createWhiteboard(`Whiteboard ${new Date().toLocaleTimeString()}`, template)
       setWhiteboards([response.data, ...whiteboards])
-      setSelectedWhiteboard(response.data)
       setView('whiteboards')
     } catch (error) {
       console.error('Failed to create whiteboard:', error)
