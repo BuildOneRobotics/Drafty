@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { Note, Notebook, Whiteboard as WhiteboardType } from '@/lib/store'
 import NoteEditor from '@/components/NoteEditor'
-import NoteList from '@/components/NoteList'
 import NotebookEditor from '@/components/NotebookEditor'
 import WhiteboardEditor from '@/components/Whiteboard'
 import TemplateModal from '@/components/TemplateModal'
