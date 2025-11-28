@@ -16,6 +16,15 @@ const fonts = [
   { id: 'arial', name: 'Arial', family: 'Arial, sans-serif' },
 ]
 
+const themes = [
+  { id: 'forest', name: 'Forest', color: '#22c55e' },
+  { id: 'phoenix', name: 'Phoenix', color: '#dc2626' },
+  { id: 'pink', name: 'Pink', color: '#ec4899' },
+  { id: 'ocean', name: 'Ocean', color: '#0ea5e9' },
+  { id: 'sunset', name: 'Sunset', color: '#f97316' },
+  { id: 'sunshine', name: 'Sunshine', color: '#eab308' },
+]
+
 export default function Settings() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'account' | 'customize' | 'friends' | 'files' | 'privacy'>('account')
@@ -33,8 +42,15 @@ export default function Settings() {
   const [brightness, setBrightness] = useState(50)
   const [darkMode, setDarkMode] = useState(false)
   const [searchUsername, setSearchUsername] = useState('')
-  const [friends, setFriends] = useState<string[]>([])
-  const [searchResults, setSearchResults] = useState<string[]>([])
+  const [friends, setFriends] = useState<{id: string, name: string, canShare: boolean}[]>([])
+  const [allUsers, setAllUsers] = useState<{id: string, name: string}[]>([
+    {id: '1', name: 'alex_dev'},
+    {id: '2', name: 'jordan_design'},
+    {id: '3', name: 'casey_writer'},
+    {id: '4', name: 'morgan_artist'},
+    {id: '5', name: 'taylor_coder'},
+  ])
+  const [searchResults, setSearchResults] = useState<{id: string, name: string}[]>([])
 
   const handleTabChange = (tab: 'account' | 'customize' | 'friends' | 'files' | 'privacy') => {
     if (tab !== activeTab) {
@@ -52,10 +68,14 @@ export default function Settings() {
       const font = localStorage.getItem('font') || 'inter'
       const br = parseInt(localStorage.getItem('brightness') || '50')
       const dm = localStorage.getItem('darkMode') === 'true'
+      const savedFriends = localStorage.getItem('friends')
       setSelectedTheme(theme)
       setSelectedFont(font)
       setBrightness(br)
       setDarkMode(dm)
+      if (savedFriends) {
+        setFriends(JSON.parse(savedFriends))
+      }
     }
   }, [])
 
@@ -64,26 +84,40 @@ export default function Settings() {
     router.push('/login')
   }
 
-  const handleSearch = () => {
-    if (searchUsername.length > 0) {
-      const mockUsers = ['alice', 'bob', 'charlie', 'david', 'emma']
-      const exactMatch = mockUsers.filter(u => u === searchUsername.toLowerCase())
-      setSearchResults(exactMatch)
+  const handleSearch = (value: string) => {
+    setSearchUsername(value)
+    if (value.length > 0) {
+      const results = allUsers.filter(u => 
+        u.name.toLowerCase().includes(value.toLowerCase()) &&
+        !friends.some(f => f.id === u.id)
+      )
+      setSearchResults(results)
     } else {
       setSearchResults([])
     }
   }
 
-  const handleSendRequest = (username: string) => {
-    if (!friends.includes(username)) {
-      setFriends([...friends, username])
-      setSearchUsername('')
-      setSearchResults([])
-    }
+  const handleAddFriend = (user: {id: string, name: string}) => {
+    const newFriend = { ...user, canShare: false }
+    const updated = [...friends, newFriend]
+    setFriends(updated)
+    localStorage.setItem('friends', JSON.stringify(updated))
+    setSearchUsername('')
+    setSearchResults([])
   }
 
-  const handleRemoveFriend = (username: string) => {
-    setFriends(friends.filter(f => f !== username))
+  const handleRemoveFriend = (userId: string) => {
+    const updated = friends.filter(f => f.id !== userId)
+    setFriends(updated)
+    localStorage.setItem('friends', JSON.stringify(updated))
+  }
+
+  const handleToggleShare = (userId: string) => {
+    const updated = friends.map(f => 
+      f.id === userId ? { ...f, canShare: !f.canShare } : f
+    )
+    setFriends(updated)
+    localStorage.setItem('friends', JSON.stringify(updated))
   }
 
   const exportAsCSV = () => {
@@ -106,8 +140,8 @@ export default function Settings() {
           -webkit-appearance: none;
           appearance: none;
           width: 100%;
-          height: 8px;
-          border-radius: 5px;
+          height: 6px;
+          border-radius: 3px;
           background: linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${brightness}%, rgba(0,0,0,0.1) ${brightness}%, rgba(0,0,0,0.1) 100%);
           outline: none;
           cursor: pointer;
@@ -115,18 +149,24 @@ export default function Settings() {
         input[type="range"]::-webkit-slider-thumb {
           -webkit-appearance: none;
           appearance: none;
-          width: 20px;
-          height: 20px;
+          width: 18px;
+          height: 18px;
           border-radius: 50%;
           background: var(--accent-color);
           cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         input[type="range"]::-moz-range-thumb {
-          width: 20px;
-          height: 20px;
+          width: 18px;
+          height: 18px;
           border-radius: 50%;
           background: var(--accent-color);
           cursor: pointer;
+          border: none;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input[type="range"]::-moz-range-track {
+          background: transparent;
           border: none;
         }
       `}</style>
@@ -166,19 +206,22 @@ export default function Settings() {
               <div className="space-y-6">
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Theme</h2>
-                  <div className="grid grid-cols-3 gap-4">
-                    {['forest', 'phoenix', 'pink'].map((theme) => (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {themes.map((theme) => (
                       <button
-                        key={theme}
+                        key={theme.id}
                         onClick={() => {
-                          setSelectedTheme(theme)
-                          applyTheme(theme, selectedFont, brightness, darkMode)
+                          setSelectedTheme(theme.id)
+                          applyTheme(theme.id, selectedFont, brightness, darkMode)
                         }}
-                        className={`p-4 rounded-xl border-2 transition-all capitalize font-medium text-[var(--text-color)] ${
-                          selectedTheme === theme ? 'border-[var(--accent-color)] bg-[var(--accent-color)]/20' : 'border-[var(--accent-color)]/20'
+                        className={`p-4 rounded-xl border-2 transition-all ${
+                          selectedTheme === theme.id ? 'border-[var(--accent-color)] bg-[var(--accent-color)]/20' : 'border-[var(--accent-color)]/20'
                         }`}
                       >
-                        {theme}
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-4 h-4 rounded-full" style={{backgroundColor: theme.color}}></div>
+                          <span className="font-medium text-[var(--text-color)]">{theme.name}</span>
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -186,19 +229,25 @@ export default function Settings() {
 
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Brightness</h2>
-                  <div className="flex items-center gap-4">
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={brightness}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value)
-                        setBrightness(val)
-                        applyTheme(selectedTheme, selectedFont, val, darkMode)
-                      }}
-                    />
-                    <span className="text-sm font-semibold text-[var(--text-color)] w-12">{brightness}%</span>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={brightness}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value)
+                          setBrightness(val)
+                          applyTheme(selectedTheme, selectedFont, val, darkMode)
+                        }}
+                        className="flex-1"
+                      />
+                      <span className="text-sm font-semibold text-[var(--text-color)] w-12">{brightness}%</span>
+                    </div>
+                    <div className="h-8 rounded-lg border-2 border-[var(--accent-color)]/20" style={{
+                      background: `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${brightness}%, rgba(0,0,0,0.05) ${brightness}%, rgba(0,0,0,0.05) 100%)`
+                    }}></div>
                   </div>
                 </div>
 
@@ -210,13 +259,14 @@ export default function Settings() {
                       setDarkMode(newDarkMode)
                       applyTheme(selectedTheme, selectedFont, brightness, newDarkMode)
                     }}
-                    className={`px-6 py-3 rounded-xl font-medium transition-all ${
+                    className={`px-6 py-3 rounded-xl font-medium transition-all border-2 flex items-center gap-2 ${
                       darkMode
-                        ? 'bg-[var(--accent-color)] text-white'
-                        : 'bg-[var(--accent-color)]/20 text-[var(--text-color)]'
+                        ? 'bg-[var(--accent-color)] text-white border-[var(--accent-color)]'
+                        : 'bg-white text-[var(--text-color)] border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40'
                     }`}
                   >
-                    {darkMode ? '🌙 Dark Mode On' : '☀️ Dark Mode Off'}
+                    <span>{darkMode ? '🌙' : '☀️'}</span>
+                    {darkMode ? 'Dark Mode On' : 'Dark Mode Off'}
                   </button>
                 </div>
 
@@ -248,44 +298,52 @@ export default function Settings() {
             {activeTab === 'friends' && (
               <div className="space-y-6">
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
-                  <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Search Users</h2>
+                  <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Find Users</h2>
                   <div className="flex gap-2 mb-4">
                     <input
                       type="text"
                       value={searchUsername}
-                      onChange={(e) => {
-                        setSearchUsername(e.target.value)
-                        handleSearch()
-                      }}
-                      placeholder="Type exact username..."
+                      onChange={(e) => handleSearch(e.target.value)}
+                      placeholder="Search username..."
                       className="flex-1 px-4 py-3 border-2 border-[var(--accent-color)]/20 rounded-xl focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]"
                     />
                   </div>
                   {searchResults.length > 0 && (
                     <div className="space-y-2 mb-6">
-                      {searchResults.map((username) => (
-                        <div key={username} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
-                          <span className="font-medium text-[var(--text-color)]">{username}</span>
+                      {searchResults.map((user) => (
+                        <div key={user.id} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
+                          <span className="font-medium text-[var(--text-color)]">{user.name}</span>
                           <button
-                            onClick={() => handleSendRequest(username)}
+                            onClick={() => handleAddFriend(user)}
                             className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 text-sm font-medium"
                           >
-                            Send Request
+                            Add
                           </button>
                         </div>
                       ))}
                     </div>
                   )}
-                  <h3 className="font-bold text-[var(--text-color)] mb-4 mt-6">Your Friends</h3>
+                  <h3 className="font-bold text-[var(--text-color)] mb-4 mt-6">Your Connections</h3>
                   <div className="space-y-2">
                     {friends.length === 0 ? (
-                      <p className="text-[var(--text-color)] text-sm">No friends yet</p>
+                      <p className="text-[var(--text-color)] text-sm">No connections yet</p>
                     ) : (
                       friends.map((friend) => (
-                        <div key={friend} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
-                          <span className="font-medium text-[var(--text-color)]">{friend}</span>
+                        <div key={friend.id} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
+                          <div className="flex-1">
+                            <p className="font-medium text-[var(--text-color)]">{friend.name}</p>
+                            <label className="flex items-center gap-2 mt-1 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={friend.canShare}
+                                onChange={() => handleToggleShare(friend.id)}
+                                className="w-4 h-4"
+                              />
+                              <span className="text-xs text-[var(--text-color)]/60">Can share files</span>
+                            </label>
+                          </div>
                           <button 
-                            onClick={() => handleRemoveFriend(friend)}
+                            onClick={() => handleRemoveFriend(friend.id)}
                             className="text-red-500 hover:text-red-700 text-sm font-medium"
                           >
                             Remove
