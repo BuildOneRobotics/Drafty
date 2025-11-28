@@ -8,12 +8,14 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const router = useRouter()
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     try {
       localStorage.removeItem('token')
-      router.push('/login')
+      setMenuOpen(false)
+      await router.push('/login')
     } catch (error) {
       console.error('Logout failed:', error)
+      setMenuOpen(false)
     }
   }
 
@@ -81,10 +83,7 @@ export default function Navbar() {
             </Link>
 
             <button
-              onClick={() => {
-                handleLogout()
-                setMenuOpen(false)
-              }}
+              onClick={handleLogout}
               className="flex items-center space-x-3 px-6 py-4 w-full text-left hover:bg-red-50 transition-colors"
             >
               <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
