@@ -9,9 +9,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Email and password required' }, { status: 400 })
     }
     
-    const data = await loadFromGist()
+    let data
+    try {
+      data = await loadFromGist()
+    } catch (gistError) {
+      console.error('Gist load error:', gistError)
+      return NextResponse.json({ message: 'Failed to load user data' }, { status: 500 })
+    }
 
-    if (!data.users) {
+    if (!data || !data.users) {
       return NextResponse.json({ message: 'No users found' }, { status: 500 })
     }
 
