@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { Note, Notebook, Whiteboard as WhiteboardType, Flashcard, FlashcardFolder } from '@/lib/store'
 import FlashcardEditor from '@/components/FlashcardEditor'
-import TemplateModal from '@/components/TemplateModal'
 import { NoteIcon, NotebookIcon, FlashcardIcon, WhiteboardIcon, FilesIcon, FriendsIcon } from '@/components/Icons'
 import { whiteboardsAPI, notesAPI, flashcardsAPI } from '@/lib/api'
 import { autoCommit } from '@/lib/git'
