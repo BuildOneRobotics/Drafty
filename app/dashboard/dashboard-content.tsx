@@ -10,6 +10,7 @@ import TemplateModal from '@/components/TemplateModal'
 import { NoteIcon, NotebookIcon, FlashcardIcon, WhiteboardIcon, FilesIcon, FriendsIcon } from '@/components/Icons'
 import { whiteboardsAPI, notesAPI, flashcardsAPI } from '@/lib/api'
 import { autoCommit } from '@/lib/git'
+import { useMobile } from '@/lib/useMobile'
 
 interface DashboardContentProps {
   notes: Note[]
@@ -18,6 +19,7 @@ interface DashboardContentProps {
 }
 
 export default function DashboardContent({ notes, onLoadNotes, user }: DashboardContentProps) {
+  const { isMobile, isPhone } = useMobile()
   const [view, setView] = useState<'home' | 'notes' | 'notebooks' | 'flashcards' | 'whiteboards' | 'files' | 'friends'>('home')
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [notebooks, setNotebooks] = useState<Notebook[]>([])
@@ -64,16 +66,14 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
     }
   }
 
-  const saveData = async () => {
-    const data = { flashcardFolders, files }
-    localStorage.setItem(`dashboardData-${user?.id}`, JSON.stringify(data))
-    await autoCommit(`Update dashboard data for ${user?.name}`)
-  }
-
   useEffect(() => {
-    const timer = setTimeout(saveData, 2000)
+    const timer = setTimeout(() => {
+      const data = { flashcardFolders, files }
+      localStorage.setItem(`dashboardData-${user?.id}`, JSON.stringify(data))
+      autoCommit(`Update dashboard data for ${user?.name}`)
+    }, 2000)
     return () => clearTimeout(timer)
-  }, [flashcardFolders, files])
+  }, [flashcardFolders, files, user?.id, user?.name])
 
   const loadWhiteboards = async () => {
     try {
@@ -191,51 +191,36 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
     setFriends(friends.filter(f => f !== username))
   }
 
+  const navItems = [
+    { id: 'notes', label: 'Notes', Icon: NoteIcon },
+    { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon },
+    { id: 'flashcards', label: 'Flashcards', Icon: FlashcardIcon },
+    { id: 'whiteboards', label: 'Whiteboards', Icon: WhiteboardIcon },
+    { id: 'files', label: 'Files', Icon: FilesIcon },
+    { id: 'friends', label: 'Friends', Icon: FriendsIcon }
+  ]
+
   const sidebar = (
-    <div className="w-full md:w-80 bg-white border-r border-[var(--accent-color)]/20 flex flex-col h-full">
-      <div className="p-6 bg-[var(--accent-color)] rounded-b-3xl">
-        <p className="text-sm text-white font-semibold">Hello, {user?.name || 'User'}</p>
-      </div>
-
-      <div className="p-6 space-y-3">
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { id: 'notes', label: 'Notes', Icon: NoteIcon },
-            { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon },
-            { id: 'flashcards', label: 'Flashcards', Icon: FlashcardIcon },
-            { id: 'whiteboards', label: 'Whiteboards', Icon: WhiteboardIcon }
-          ].map(item => (
-            <button
-              key={item.id}
-              onClick={() => setView(item.id as any)}
-              className={`p-4 rounded-2xl transition-all text-center hover:scale-105 transform duration-200 ${
-                view === item.id
-                  ? 'bg-[var(--accent-color)] text-white shadow-md'
-                  : 'bg-[var(--accent-color)]/10 text-[var(--text-color)] hover:bg-[var(--accent-color)]/20'
-              }`}
-            >
-              <div className="flex justify-center mb-2"><item.Icon /></div>
-              <div className="text-xs font-semibold">{item.label}</div>
-            </button>
-          ))}
+    <div className={`${isPhone ? 'w-full' : 'md:w-80'} bg-white ${isPhone ? 'border-b' : 'border-r'} border-[var(--accent-color)]/20 flex ${isPhone ? 'flex-row overflow-x-auto' : 'flex-col'} h-${isPhone ? 'auto' : 'full'}`}>
+      {!isPhone && (
+        <div className="p-6 bg-[var(--accent-color)] rounded-b-3xl w-full">
+          <p className="text-sm text-white font-semibold">Hello, {user?.name || 'User'}</p>
         </div>
-
-        <div className="border-t border-[var(--accent-color)]/20 pt-3 space-y-2">
-          {[
-            { id: 'files', label: 'Files', Icon: FilesIcon },
-            { id: 'friends', label: 'Friends', Icon: FriendsIcon }
-          ].map(item => (
+      )}
+      <div className={`${isPhone ? 'flex gap-2 p-3 overflow-x-auto' : 'p-6 space-y-3 w-full'}`}>
+        <div className={`${isPhone ? 'flex gap-2' : 'grid grid-cols-2 gap-3'}`}>
+          {navItems.map(item => (
             <button
               key={item.id}
               onClick={() => setView(item.id as any)}
-              className={`w-full p-3 rounded-xl transition-all text-left text-sm flex items-center gap-2 hover:scale-105 transform duration-200 ${
+              className={`${isPhone ? 'flex-shrink-0 p-3 rounded-xl' : 'p-4 rounded-2xl'} transition-all text-center hover:scale-105 transform duration-200 ${
                 view === item.id
                   ? 'bg-[var(--accent-color)] text-white shadow-md'
                   : 'bg-[var(--accent-color)]/10 text-[var(--text-color)] hover:bg-[var(--accent-color)]/20'
               }`}
             >
-              <item.Icon />
-              {item.label}
+              <div className="flex justify-center mb-1"><item.Icon /></div>
+              <div className={`${isPhone ? 'text-xs' : 'text-xs'} font-semibold whitespace-nowrap`}>{item.label}</div>
             </button>
           ))}
         </div>
@@ -244,17 +229,17 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
   )
 
   return (
-    <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
-      <div className="hidden md:flex md:flex-col">{sidebar}</div>
+    <div className={`flex ${isPhone ? 'flex-col' : 'flex-col md:flex-row'} flex-1 overflow-hidden`}>
+      {isPhone ? sidebar : <div className="hidden md:flex md:flex-col">{sidebar}</div>}
 
       <div className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-color,#f0fdf4)]">
         {view === 'flashcards' && (
-          <div className="flex-1 overflow-y-auto p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-[var(--text-color)]">Flashcards</h2>
-              <div className="flex gap-2">
-                <button onClick={() => setShowNewFolder(true)} className="bg-[var(--accent-color)]/20 text-[var(--accent-color)] px-4 py-2 rounded-lg hover:bg-[var(--accent-color)]/30 transition-all">+ New Folder</button>
-                <button onClick={() => setShowNewFlashcard(true)} className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all">+ New Flashcard Set</button>
+          <div className={`flex-1 overflow-y-auto ${isPhone ? 'p-4' : 'p-8'}`}>
+            <div className={`flex ${isPhone ? 'flex-col gap-3' : 'justify-between items-center'} mb-6`}>
+              <h2 className={`${isPhone ? 'text-xl' : 'text-2xl'} font-bold text-[var(--text-color)]`}>Flashcards</h2>
+              <div className={`flex ${isPhone ? 'flex-col w-full' : 'gap-2'} gap-2`}>
+                <button onClick={() => setShowNewFolder(true)} className={`${isPhone ? 'w-full' : ''} bg-[var(--accent-color)]/20 text-[var(--accent-color)] px-4 py-2 rounded-lg hover:bg-[var(--accent-color)]/30 transition-all text-sm`}>+ New Folder</button>
+                <button onClick={() => setShowNewFlashcard(true)} className={`${isPhone ? 'w-full' : ''} bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all text-sm`}>+ New Flashcard Set</button>
               </div>
             </div>
             {showNewFolder && (
@@ -327,8 +312,8 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
         )}
 
         {view === 'files' && (
-          <div className="flex-1 overflow-y-auto p-8">
-            <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Files</h2>
+          <div className={`flex-1 overflow-y-auto ${isPhone ? 'p-4' : 'p-8'}`}>
+            <h2 className={`${isPhone ? 'text-xl' : 'text-2xl'} font-bold text-[var(--text-color)] mb-6`}>Files</h2>
             <div className="space-y-3">
               {files.map(file => (
                 <div key={file.id} draggable onDragStart={() => setDraggedFile(file.id)} onDragEnd={() => setDraggedFile(null)} className={`p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 cursor-move transition-all ${draggedFile === file.id ? 'opacity-50' : 'hover:border-[var(--accent-color)]/40'}`}>
@@ -346,9 +331,9 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
         )}
 
         {view === 'home' && (
-          <div className="flex-1 overflow-y-auto p-8">
-            <h1 className="text-4xl font-bold text-[var(--text-color)] mb-8">Welcome, {user?.name || 'User'}</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className={`flex-1 overflow-y-auto ${isPhone ? 'p-4' : 'p-8'}`}>
+            <h1 className={`${isPhone ? 'text-2xl' : 'text-4xl'} font-bold text-[var(--text-color)] mb-8`}>Welcome, {user?.name || 'User'}</h1>
+            <div className={`grid ${isPhone ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-6`}>
               {[
                 { id: 'notes', label: 'Notes', Icon: NoteIcon, count: notes.length },
                 { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon, count: notebooks.length },

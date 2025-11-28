@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { Note, Notebook, Whiteboard as WhiteboardType, Flashcard, FlashcardFolder } from '@/lib/store'
-import NoteEditor from '@/components/NoteEditor'
 import NotebookEditor from '@/components/NotebookEditor'
 import WhiteboardEditor from '@/components/Whiteboard'
 import FlashcardEditor from '@/components/FlashcardEditor'

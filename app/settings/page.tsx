@@ -69,12 +69,16 @@ export default function Settings() {
       const br = parseInt(localStorage.getItem('brightness') || '50')
       const dm = localStorage.getItem('darkMode') === 'true'
       const savedFriends = localStorage.getItem('friends')
+      const savedFolders = localStorage.getItem('folders')
       setSelectedTheme(theme)
       setSelectedFont(font)
       setBrightness(br)
       setDarkMode(dm)
       if (savedFriends) {
         setFriends(JSON.parse(savedFriends))
+      }
+      if (savedFolders) {
+        setFolders(JSON.parse(savedFolders))
       }
     }
   }, [])
@@ -389,7 +393,9 @@ export default function Settings() {
                       <button 
                         onClick={() => {
                           if (newFolderName.trim()) {
-                            setFolders([...folders, {id: Date.now().toString(), name: newFolderName, color: newFolderColor}])
+                            const updated = [...folders, {id: Date.now().toString(), name: newFolderName, color: newFolderColor}]
+                            setFolders(updated)
+                            localStorage.setItem('folders', JSON.stringify(updated))
                             setNewFolderName('')
                             setNewFolderColor('#22c55e')
                             setShowNewFolder(false)
@@ -431,7 +437,7 @@ export default function Settings() {
                           <div className="absolute right-0 mt-1 bg-white border border-[var(--accent-color)]/20 rounded-lg z-10 w-40">
                             <button onClick={() => { setEditingFolder(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10 rounded-t-lg text-[var(--text-color)]">Rename</button>
                             <button onClick={() => { setColorPickerOpen(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10 text-[var(--text-color)]">Change Color</button>
-                            <button onClick={() => { setFolders(folders.filter(f => f.id !== folder.id)); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 rounded-b-lg">Delete</button>
+                            <button onClick={() => { const updated = folders.filter(f => f.id !== folder.id); setFolders(updated); localStorage.setItem('folders', JSON.stringify(updated)); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 rounded-b-lg">Delete</button>
                           </div>
                         )}
                         {colorPickerOpen === folder.id && (
@@ -439,7 +445,11 @@ export default function Settings() {
                             <input 
                               type="color"
                               value={folder.color}
-                              onChange={(e) => setFolders(folders.map(f => f.id === folder.id ? {...f, color: e.target.value} : f))}
+                              onChange={(e) => {
+                              const updated = folders.map(f => f.id === folder.id ? {...f, color: e.target.value} : f)
+                              setFolders(updated)
+                              localStorage.setItem('folders', JSON.stringify(updated))
+                            }}
                               className="w-20 h-10 rounded cursor-pointer"
                             />
                             <button onClick={() => setColorPickerOpen(null)} className="mt-2 w-full bg-[var(--accent-color)] text-white px-3 py-1 rounded text-sm">Done</button>
@@ -450,7 +460,11 @@ export default function Settings() {
                         <div className="absolute inset-0 bg-white rounded-lg p-3 flex items-center gap-2 border-2 border-[var(--accent-color)]">
                           <input 
                             value={folder.name}
-                            onChange={(e) => setFolders(folders.map(f => f.id === folder.id ? {...f, name: e.target.value} : f))}
+                            onChange={(e) => {
+                              const updated = folders.map(f => f.id === folder.id ? {...f, name: e.target.value} : f)
+                              setFolders(updated)
+                              localStorage.setItem('folders', JSON.stringify(updated))
+                            }}
                             onBlur={() => setEditingFolder(null)}
                             onKeyDown={(e) => e.key === 'Enter' && setEditingFolder(null)}
                             className="flex-1 px-2 py-1 border border-[var(--accent-color)]/20 rounded outline-none text-[var(--text-color)]"
