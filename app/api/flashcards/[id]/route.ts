@@ -21,7 +21,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
   try {
     const { title, cards } = await request.json()
-    const data = await loadFromGist(userId)
+    let data
+    try {
+      data = await loadFromGist(userId)
+    } catch (gistError) {
+      console.error('Gist load error:', gistError)
+      return NextResponse.json({ message: 'Failed to load data' }, { status: 500 })
+    }
+
+    if (!data) {
+      return NextResponse.json({ message: 'Invalid data' }, { status: 500 })
+    }
 
     const flashcards = data.flashcards?.[userId] || []
     const flashcard = flashcards.find((f: any) => f.id === params.id)

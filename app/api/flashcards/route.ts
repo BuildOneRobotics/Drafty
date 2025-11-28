@@ -19,9 +19,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }
 
-  const data = await loadFromGist(userId)
-  const userFlashcards = data.flashcards?.[userId] || []
-  return NextResponse.json(userFlashcards)
+  try {
+    const data = await loadFromGist(userId)
+    if (!data || !data.flashcards) {
+      return NextResponse.json([])
+    }
+    const userFlashcards = data.flashcards[userId] || []
+    return NextResponse.json(userFlashcards)
+  } catch (error) {
+    console.error('Failed to load flashcards:', error)
+    return NextResponse.json({ message: 'Failed to load flashcards' }, { status: 500 })
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -32,7 +40,22 @@ export async function POST(request: NextRequest) {
 
   try {
     const { title, cards } = await request.json()
-    const data = await loadFromGist(userId)
+    
+    if (!title) {
+      return NextResponse.json({ message: 'Title required' }, { status: 400 })
+    }
+
+    let data
+    try {
+      data = await loadFromGist(userId)
+    } catch (loadError) {
+      console.error('Failed to load gist:', loadError)
+      return NextResponse.json({ message: 'Failed to load data' }, { status: 500 })
+    }
+
+    if (!data) {
+      return NextResponse.json({ message: 'Invalid data' }, { status: 500 })
+    }
 
     const flashcard = {
       id: Date.now().toString(),
@@ -49,10 +72,17 @@ export async function POST(request: NextRequest) {
       data.flashcards[userId] = []
     }
     data.flashcards[userId].push(flashcard)
-    await saveToGist(data, userId)
+    
+    try {
+      await saveToGist(data, userId)
+    } catch (saveError) {
+      console.error('Failed to save gist:', saveError)
+      return NextResponse.json({ message: 'Failed to save flashcard' }, { status: 500 })
+    }
 
     return NextResponse.json(flashcard, { status: 201 })
   } catch (error) {
+    console.error('Create flashcard error:', error)
     return NextResponse.json({ message: 'Failed to create flashcard' }, { status: 500 })
   }
 }

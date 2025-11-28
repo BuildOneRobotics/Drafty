@@ -9,7 +9,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Email, password, and name required' }, { status: 400 })
     }
     
-    const data = await loadFromGist()
+    let data
+    try {
+      data = await loadFromGist()
+    } catch (gistError) {
+      console.error('Gist load error:', gistError)
+      return NextResponse.json({ message: 'Failed to load user data' }, { status: 500 })
+    }
+
+    if (!data || !data.users) {
+      return NextResponse.json({ message: 'Invalid user data' }, { status: 500 })
+    }
+
     const emailLower = email.toLowerCase()
 
     if (data.users[emailLower]) {
@@ -18,9 +29,20 @@ export async function POST(request: NextRequest) {
 
     const userId = Date.now().toString()
     data.users[emailLower] = { id: userId, email: emailLower, password, name }
-    await saveToGist(data)
+    try {
+      await saveToGist(data)
+    } catch (saveError) {
+      console.error('Gist save error:', saveError)
+      return NextResponse.json({ message: 'Failed to save user data' }, { status: 500 })
+    }
 
-    const token = Buffer.from(JSON.stringify({ id: userId, email: emailLower, name })).toString('base64')
+    let token
+    try {
+      token = Buffer.from(JSON.stringify({ id: userId, email: emailLower, name })).toString('base64')
+    } catch (tokenError) {
+      console.error('Token generation error:', tokenError)
+      return NextResponse.json({ message: 'Failed to generate token' }, { status: 500 })
+    }
 
     const response = NextResponse.json({
       token,

@@ -22,8 +22,12 @@ export async function POST(request: NextRequest) {
     }
 
     const user = data.users[email.toLowerCase()]
-    if (!user || user.password !== password) {
+    if (!user || !user.password || user.password !== password) {
       return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 })
+    }
+
+    if (!user.id || !user.name) {
+      return NextResponse.json({ message: 'Invalid user data' }, { status: 500 })
     }
 
     const token = Buffer.from(JSON.stringify({ id: user.id, email, name: user.name })).toString('base64')

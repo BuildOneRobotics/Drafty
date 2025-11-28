@@ -8,7 +8,17 @@ export async function GET(request: NextRequest) {
     }
 
     const token = authHeader.replace('Bearer ', '')
-    const userData = JSON.parse(Buffer.from(token, 'base64').toString())
+    let userData
+    try {
+      userData = JSON.parse(Buffer.from(token, 'base64').toString())
+    } catch (parseError) {
+      console.error('Token parse error:', parseError)
+      return NextResponse.json({ message: 'Invalid token' }, { status: 401 })
+    }
+
+    if (!userData.id || !userData.email || !userData.name) {
+      return NextResponse.json({ message: 'Invalid token data' }, { status: 401 })
+    }
 
     const response = NextResponse.json({
       id: userData.id,
