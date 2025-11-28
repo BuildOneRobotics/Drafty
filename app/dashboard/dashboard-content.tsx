@@ -79,26 +79,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
     }
   }
 
-  const handleCreateNote = async () => {
-    try {
-      await notesAPI.createNote(`New Note ${new Date().toLocaleTimeString()}`, '', [])
-      onLoadNotes()
-      setView('notes')
-    } catch (error) {
-      console.error('Failed to create note:', error)
-    }
-  }
-
-  const handleCreateWhiteboard = async (template: string) => {
-    try {
-      const response = await whiteboardsAPI.createWhiteboard(`Whiteboard ${new Date().toLocaleTimeString()}`, template)
-      setWhiteboards([response.data, ...whiteboards])
-      setView('whiteboards')
-    } catch (error) {
-      console.error('Failed to create whiteboard:', error)
-    }
-  }
-
   const handleAddFlashcard = async () => {
     if (!flashcardName.trim()) return
     try {
