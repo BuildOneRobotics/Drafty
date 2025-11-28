@@ -93,12 +93,7 @@ export default function FileManager({ user }: FileManagerProps) {
     saveFiles(updated)
   }
 
-  const handleMoveFile = (fileId: string, folder?: string) => {
-    const updated = files.map(f =>
-      f.id === fileId ? { ...f, folder } : f
-    )
-    saveFiles(updated)
-  }
+  
 
   const selectedFileData = files.find(f => f.id === selectedFile)
 
