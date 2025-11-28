@@ -43,13 +43,13 @@ export default function Settings() {
   const [darkMode, setDarkMode] = useState(false)
   const [searchUsername, setSearchUsername] = useState('')
   const [friends, setFriends] = useState<{id: string, name: string, canShare: boolean}[]>([])
-  const [allUsers, setAllUsers] = useState<{id: string, name: string}[]>([
+  const allUsers: {id: string, name: string}[] = [
     {id: '1', name: 'alex_dev'},
     {id: '2', name: 'jordan_design'},
     {id: '3', name: 'casey_writer'},
     {id: '4', name: 'morgan_artist'},
     {id: '5', name: 'taylor_coder'},
-  ])
+  ]
   const [searchResults, setSearchResults] = useState<{id: string, name: string}[]>([])
 
   const handleTabChange = (tab: 'account' | 'customize' | 'friends' | 'files' | 'privacy') => {
