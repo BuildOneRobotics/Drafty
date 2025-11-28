@@ -98,12 +98,12 @@ export default function Settings() {
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-color)] mb-8">Settings</h1>
 
         <div className="flex flex-col md:flex-row gap-6">
-          <div className="md:w-64 bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-4 border border-[var(--accent-color)]/30 h-fit">
+          <div className="md:w-64 bg-[var(--surface-color,white)] rounded-lg p-4 border border-[var(--accent-color)]/10 h-fit">
             {['account', 'customize', 'friends', 'files', 'privacy'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => handleTabChange(tab as any)}
-                className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
+                className={`w-full text-left px-4 py-3 rounded-lg mb-2 transition-all ${
                   activeTab === tab ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
                 }`}
               >
@@ -114,11 +114,11 @@ export default function Settings() {
 
           <div className="flex-1" style={{ opacity: fadeOut ? 0 : 1, transition: 'opacity 0.3s ease' }}>
             {activeTab === 'account' && (
-              <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+              <div className="bg-[var(--surface-color,white)] rounded-lg p-6 md:p-8 border border-[var(--accent-color)]/10">
                 <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Account Settings</h2>
                 <button
                   onClick={handleLogout}
-                  className="bg-red-500 text-white px-6 py-3 rounded-xl hover:bg-red-600 font-medium transition-all transform hover:scale-105"
+                  className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 font-medium transition-all transform hover:scale-105"
                 >
                   Logout
                 </button>
@@ -127,7 +127,7 @@ export default function Settings() {
 
             {activeTab === 'customize' && (
               <div className="space-y-6">
-                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+                <div className="bg-[var(--surface-color,white)] rounded-lg p-6 md:p-8 border border-[var(--accent-color)]/10">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Themes</h2>
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     {themes.map((theme) => (
@@ -137,8 +137,8 @@ export default function Settings() {
                           setSelectedTheme(theme.id)
                           applyTheme(theme.id, selectedFont, brightness, darkMode)
                         }}
-                        className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
-                          selectedTheme === theme.id ? 'border-[var(--accent-color)]' : 'border-[var(--accent-color)]/30'
+                        className={`p-4 rounded-lg border-2 transition-all transform hover:scale-105 ${
+                          selectedTheme === theme.id ? 'border-[var(--accent-color)]' : 'border-[var(--accent-color)]/20'
                         }`}
                         style={{ backgroundColor: theme.bg }}
                       >
@@ -154,7 +154,7 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+                <div className="bg-[var(--surface-color,white)] rounded-lg p-6 md:p-8 border border-[var(--accent-color)]/10">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Brightness</h2>
                   <div className="flex items-center gap-4">
                     <input
@@ -173,7 +173,7 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+                <div className="bg-[var(--surface-color,white)] rounded-lg p-6 md:p-8 border border-[var(--accent-color)]/10">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Dark Mode</h2>
                   <button
                     onClick={() => {
@@ -181,7 +181,7 @@ export default function Settings() {
                       setDarkMode(newDarkMode)
                       applyTheme(selectedTheme, selectedFont, brightness, newDarkMode)
                     }}
-                    className={`px-6 py-3 rounded-xl font-medium transition-all ${
+                    className={`px-6 py-3 rounded-lg font-medium transition-all ${
                       darkMode
                         ? 'bg-[var(--accent-color)] text-white'
                         : 'bg-[var(--accent-color)]/10 text-[var(--text-color)]'
@@ -191,7 +191,7 @@ export default function Settings() {
                   </button>
                 </div>
 
-                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+                <div className="bg-[var(--surface-color,white)] rounded-lg p-6 md:p-8 border border-[var(--accent-color)]/10">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Fonts</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {fonts.map((font) => (
@@ -201,8 +201,8 @@ export default function Settings() {
                           setSelectedFont(font.id)
                           applyTheme(selectedTheme, font.id, brightness, darkMode)
                         }}
-                        className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
-                          selectedFont === font.id ? 'border-[var(--accent-color)]' : 'border-[var(--accent-color)]/30'
+                        className={`p-4 rounded-lg border-2 transition-all transform hover:scale-105 ${
+                          selectedFont === font.id ? 'border-[var(--accent-color)]' : 'border-[var(--accent-color)]/20'
                         }`}
                       >
                         <div className="font-semibold text-[var(--text-color)] mb-2">{font.name}</div>
@@ -218,7 +218,7 @@ export default function Settings() {
 
             {activeTab === 'friends' && (
               <div className="space-y-6">
-                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+                <div className="bg-[var(--surface-color,white)] rounded-lg p-6 md:p-8 border border-[var(--accent-color)]/10">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Search Users</h2>
                   <div className="flex gap-2 mb-4">
                     <input
@@ -229,13 +229,13 @@ export default function Settings() {
                         handleSearch()
                       }}
                       placeholder="Type exact username..."
-                      className="flex-1 px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-xl focus:outline-none focus:border-[var(--accent-color)] transition-colors"
+                      className="flex-1 px-4 py-3 border-2 border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] transition-colors"
                     />
                   </div>
                   {searchResults.length > 0 && (
                     <div className="space-y-2 mb-6">
                       {searchResults.map((username) => (
-                        <div key={username} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
+                        <div key={username} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-lg">
                           <span className="font-medium text-[var(--text-color)]">{username}</span>
                           <button
                             onClick={() => handleSendRequest(username)}
@@ -253,7 +253,7 @@ export default function Settings() {
                       <p className="text-[var(--text-color)]/70 text-sm">No friends yet</p>
                     ) : (
                       friends.map((friend) => (
-                        <div key={friend} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
+                        <div key={friend} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-lg">
                           <span className="font-medium text-[var(--text-color)]">{friend}</span>
                           <button 
                             onClick={() => handleRemoveFriend(friend)}
@@ -270,23 +270,23 @@ export default function Settings() {
             )}
 
             {activeTab === 'files' && (
-              <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+              <div className="bg-[var(--surface-color,white)] rounded-lg p-6 md:p-8 border border-[var(--accent-color)]/10">
                 <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Folder Management</h2>
                 {!showNewFolder ? (
                   <button 
                     onClick={() => setShowNewFolder(true)}
-                    className="w-full p-3 mb-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-xl hover:bg-[var(--accent-color)]/5"
+                    className="w-full p-3 mb-4 border-2 border-dashed border-[var(--accent-color)]/20 rounded-lg hover:bg-[var(--accent-color)]/5"
                   >
                     + New Folder
                   </button>
                 ) : (
-                  <div className="mb-4 p-4 border-2 border-[var(--accent-color)]/30 rounded-xl space-y-3">
+                  <div className="mb-4 p-4 border-2 border-[var(--accent-color)]/20 rounded-lg space-y-3">
                     <input 
                       type="text"
                       value={newFolderName}
                       onChange={(e) => setNewFolderName(e.target.value)}
                       placeholder="Folder name"
-                      className="w-full px-3 py-2 border border-[var(--accent-color)]/30 rounded-lg focus:outline-none focus:border-[var(--accent-color)]"
+                      className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)]"
                       autoFocus
                     />
                     <div className="flex items-center gap-2">
@@ -327,7 +327,7 @@ export default function Settings() {
                 )}
                 <div className="space-y-2">
                   {folders.map(folder => (
-                    <div key={folder.id} className="flex items-center justify-between p-3 rounded-xl relative" style={{backgroundColor: folder.color + '20'}}>
+                    <div key={folder.id} className="flex items-center justify-between p-3 rounded-lg relative" style={{backgroundColor: folder.color + '20'}}>
                       <div className="flex items-center gap-3">
                         <div className="w-4 h-4 rounded-full" style={{backgroundColor: folder.color}}></div>
                         <span className="font-medium text-[var(--text-color)]">{folder.name}</span>
@@ -341,14 +341,14 @@ export default function Settings() {
                           </svg>
                         </button>
                         {menuOpen === folder.id && (
-                          <div className="absolute right-0 mt-1 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/30 rounded-lg shadow-lg z-10 w-40">
+                          <div className="absolute right-0 mt-1 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/20 rounded-lg z-10 w-40">
                             <button onClick={() => { setEditingFolder(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10 rounded-t-lg text-[var(--text-color)]">Rename</button>
                             <button onClick={() => { setColorPickerOpen(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10 text-[var(--text-color)]">Change Color</button>
                             <button onClick={() => { setFolders(folders.filter(f => f.id !== folder.id)); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 rounded-b-lg">Delete</button>
                           </div>
                         )}
                         {colorPickerOpen === folder.id && (
-                          <div className="absolute right-0 mt-1 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/30 rounded-lg shadow-lg z-10 p-3">
+                          <div className="absolute right-0 mt-1 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/20 rounded-lg z-10 p-3">
                             <input 
                               type="color"
                               value={folder.color}
@@ -360,13 +360,13 @@ export default function Settings() {
                         )}
                       </div>
                       {editingFolder === folder.id && (
-                        <div className="absolute inset-0 bg-[var(--surface-color,white)] rounded-xl p-3 flex items-center gap-2 border-2 border-[var(--accent-color)]">
+                        <div className="absolute inset-0 bg-[var(--surface-color,white)] rounded-lg p-3 flex items-center gap-2 border-2 border-[var(--accent-color)]">
                           <input 
                             value={folder.name}
                             onChange={(e) => setFolders(folders.map(f => f.id === folder.id ? {...f, name: e.target.value} : f))}
                             onBlur={() => setEditingFolder(null)}
                             onKeyDown={(e) => e.key === 'Enter' && setEditingFolder(null)}
-                            className="flex-1 px-2 py-1 border border-[var(--accent-color)]/30 rounded outline-none"
+                            className="flex-1 px-2 py-1 border border-[var(--accent-color)]/20 rounded outline-none"
                             autoFocus
                           />
                           <button onClick={() => setEditingFolder(null)} className="text-green-600 font-medium">✓</button>
@@ -379,11 +379,11 @@ export default function Settings() {
             )}
 
             {activeTab === 'privacy' && (
-              <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+              <div className="bg-[var(--surface-color,white)] rounded-lg p-6 md:p-8 border border-[var(--accent-color)]/10">
                 <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Export Data</h2>
                 <p className="text-[var(--text-color)]/70 mb-4">Select files to export</p>
                 <div className="space-y-2 mb-4">
-                  <label className="flex items-center space-x-3 p-3 bg-[var(--accent-color)]/5 rounded-xl cursor-pointer">
+                  <label className="flex items-center space-x-3 p-3 bg-[var(--accent-color)]/5 rounded-lg cursor-pointer">
                     <input type="checkbox" onChange={(e) => e.target.checked ? setExportSelected([...exportSelected, 'note1']) : setExportSelected(exportSelected.filter(id => id !== 'note1'))} />
                     <span className="text-[var(--text-color)]">My First Note</span>
                   </label>
@@ -399,7 +399,7 @@ export default function Settings() {
                     a.click()
                   }}
                   disabled={exportSelected.length === 0}
-                  className="bg-[var(--accent-color)] text-white px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50 font-medium"
+                  className="bg-[var(--accent-color)] text-white px-6 py-3 rounded-lg hover:opacity-90 disabled:opacity-50 font-medium"
                 >
                   Export Selected ({exportSelected.length})
                 </button>

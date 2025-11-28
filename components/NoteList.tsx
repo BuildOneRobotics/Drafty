@@ -66,7 +66,7 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
     <div className="p-4 space-y-3">
       <button
         onClick={handleNewNote}
-        className="w-full bg-[var(--accent-color)] text-white py-3 rounded-2xl hover:opacity-90 font-semibold transition-all transform hover:translate-y-[-2px] shadow-md"
+        className="w-full bg-[var(--accent-color)] text-white py-3 rounded-lg hover:opacity-90 font-semibold transition-all transform hover:translate-y-[-2px]"
       >
         + New Note
       </button>
@@ -76,14 +76,14 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
           <div
             key={note.id}
             onClick={() => onSelectNote(note)}
-            className={`p-4 rounded-2xl cursor-pointer transition-all transform hover:translate-y-[-2px] relative shadow-sm ${ 
+            className={`p-4 rounded-lg cursor-pointer transition-all transform hover:translate-y-[-2px] relative ${ 
               selectedNote?.id === note.id
-                ? 'bg-[var(--accent-color)]/15 shadow-md'
+                ? 'bg-[var(--accent-color)]/10'
                 : 'bg-[var(--bg-color)] hover:bg-[var(--accent-color)]/5'
             }`}
           >
             {selectedNote?.id === note.id && (
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[var(--accent-color)] rounded-l-2xl"></div>
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-[var(--accent-color)] rounded-l-lg"></div>
             )}
             {renaming === note.id ? (
               <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
@@ -91,7 +91,7 @@ export default function NoteList({ notes, selectedNote, onSelectNote }: NoteList
                   type="text"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-[var(--accent-color)]/30 rounded-xl outline-none bg-[var(--surface-color,white)] shadow-sm"
+                  className="flex-1 px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg outline-none bg-[var(--surface-color,white)]"
                   autoFocus
                 />
                 <button

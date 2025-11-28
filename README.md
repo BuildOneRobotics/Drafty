@@ -113,4 +113,6 @@ lib/
 
 ## License
 
-Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)
+
+© 2025 Drafty. All rights reserved. This work is licensed under CC BY-NC-ND 4.0. You may not remix, transform, or build upon this material without permission.

@@ -57,13 +57,3 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-/* Rounded corners and shadows for floaty UI */
-button, input, select, textarea {
-  border-radius: 0.75rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-button:hover, input:focus, select:focus, textarea:focus {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}

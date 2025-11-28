@@ -38,7 +38,7 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
 
   return (
     <div className="flex h-full gap-4 p-6 bg-[var(--surface-color,white)]">
-      <div className="w-32 flex flex-col gap-3 bg-[var(--bg-color,#faf8f5)] p-4 rounded-2xl shadow-md">
+      <div className="w-32 flex flex-col gap-3 bg-[var(--bg-color,#faf8f5)] p-4 rounded-lg">
         <h3 className="font-semibold text-[var(--text-color)] text-sm">{notebook.name}</h3>
         <div className="flex-1 overflow-y-auto space-y-2">
           {notebook.pages.map(page => (
@@ -50,7 +50,7 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
               }}
               className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
                 selectedPage?.id === page.id
-                  ? 'bg-[var(--accent-color)] text-white shadow-md'
+                  ? 'bg-[var(--accent-color)] text-white'
                   : 'bg-[var(--surface-color,white)] text-[var(--text-color)] hover:bg-[var(--accent-color)]/10'
               }`}
             >
@@ -61,7 +61,7 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
         {!showPageForm ? (
           <button
             onClick={() => setShowPageForm(true)}
-            className="w-full px-3 py-2 border-2 border-dashed border-[var(--accent-color)]/30 rounded-lg text-sm hover:border-[var(--accent-color)] transition-all"
+            className="w-full px-3 py-2 border-2 border-dashed border-[var(--accent-color)]/20 rounded-lg text-sm hover:border-[var(--accent-color)]/40 transition-all"
           >
             + Page
           </button>
@@ -83,7 +83,7 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
         )}
       </div>
 
-      <div className="flex-1 flex flex-col bg-[var(--bg-color,#faf8f5)] rounded-2xl shadow-md p-6">
+      <div className="flex-1 flex flex-col bg-[var(--bg-color,#faf8f5)] rounded-lg p-6">
         {selectedPage ? (
           <>
             <input
@@ -102,7 +102,7 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
             <textarea
               value={pageContent}
               onChange={(e) => handleUpdatePageContent(e.target.value)}
-              className="flex-1 p-4 bg-[var(--surface-color,white)] rounded-xl outline-none text-[var(--text-color)] resize-none shadow-sm"
+              className="flex-1 p-4 bg-[var(--surface-color,white)] rounded-lg outline-none text-[var(--text-color)] resize-none"
             />
           </>
         ) : (

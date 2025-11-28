@@ -74,7 +74,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
 
   return (
     <div className="flex flex-col h-full bg-[var(--surface-color,white)] transition-colors duration-[2000ms]">
-      <div className="bg-[var(--bg-color,#faf8f5)] border-b border-[var(--accent-color)]/20 shadow-md p-4 md:p-8 transition-colors duration-[2000ms] rounded-b-2xl">
+      <div className="bg-[var(--bg-color,#faf8f5)] border-b border-[var(--accent-color)]/10 p-4 md:p-8 transition-colors duration-[2000ms]">
         <input
           type="text"
           value={title}
@@ -94,7 +94,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
         <div className="flex flex-wrap gap-2 mb-4">
           <select
             onChange={(e) => formatText('fontSize', e.target.value)}
-            className="px-3 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/30 rounded-xl text-sm hover:border-[var(--accent-color)] transition-all duration-[2000ms] shadow-sm"
+            className="px-3 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/10 rounded-lg text-sm hover:border-[var(--accent-color)]/20 transition-all duration-[2000ms]"
             defaultValue="4"
           >
             <option value="3">Small</option>
@@ -106,13 +106,13 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
           <input
             type="color"
             onChange={(e) => formatText('foreColor', e.target.value)}
-            className="w-10 h-10 border border-[var(--accent-color)]/30 rounded-xl cursor-pointer shadow-sm"
+            className="w-10 h-10 border border-[var(--accent-color)]/10 rounded-lg cursor-pointer"
             title="Text Color"
           />
 
           <button
             onClick={() => formatText('bold')}
-            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/30 rounded-xl hover:bg-[var(--accent-color)]/10 transition-all font-bold duration-[2000ms] shadow-sm"
+            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/10 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all font-bold duration-[2000ms]"
             title="Bold"
           >
             B
@@ -120,7 +120,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
 
           <button
             onClick={() => formatText('italic')}
-            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/30 rounded-xl hover:bg-[var(--accent-color)]/10 transition-all italic duration-[2000ms] shadow-sm"
+            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/10 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all italic duration-[2000ms]"
             title="Italic"
           >
             I
@@ -128,7 +128,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
 
           <button
             onClick={() => formatText('underline')}
-            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/30 rounded-xl hover:bg-[var(--accent-color)]/10 transition-all underline duration-[2000ms] shadow-sm"
+            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/10 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all underline duration-[2000ms]"
             title="Underline"
           >
             U
@@ -136,7 +136,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
 
           <button
             onClick={() => formatText('insertUnorderedList')}
-            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/30 rounded-xl hover:bg-[var(--accent-color)]/10 transition-all duration-[2000ms] shadow-sm"
+            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/10 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all duration-[2000ms]"
             title="Bullet List"
           >
             • List
@@ -147,7 +147,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-[var(--accent-color)] text-white px-6 md:px-10 py-2 md:py-3 rounded-2xl hover:opacity-90 disabled:opacity-50 font-semibold shadow-lg transition-all transform hover:scale-105 duration-[2000ms]"
+            className="bg-[var(--accent-color)] text-white px-6 md:px-10 py-2 md:py-3 rounded-lg hover:opacity-90 disabled:opacity-50 font-semibold transition-all transform hover:scale-105 duration-[2000ms]"
           >
             {saving ? 'Saving...' : 'Save'}
           </button>
