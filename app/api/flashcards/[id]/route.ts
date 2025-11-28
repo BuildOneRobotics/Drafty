@@ -1,43 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { loadFromGist, saveToGist } from '@/lib/gist'
-import jwt from 'jsonwebtoken'
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+function getUserId(request: NextRequest): string | null {
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader) return null
   try {
-    const token = req.headers.get('authorization')?.split(' ')[1]
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const token = authHeader.replace('Bearer ', '')
+    const userData = JSON.parse(Buffer.from(token, 'base64').toString())
+    return userData.id
+  } catch {
+    return null
+  }
+}
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any
-    const { title, cards } = await req.json()
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const userId = getUserId(request)
+  if (!userId) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+  }
 
-    const data = await loadFromGist(decoded.userId)
-    const flashcard = data.flashcards?.find((f: any) => f.id === params.id)
-    if (!flashcard) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  try {
+    const { title, cards } = await request.json()
+    const data = await loadFromGist(userId)
+
+    const flashcards = data.flashcards?.[userId] || []
+    const flashcard = flashcards.find((f: any) => f.id === params.id)
+    if (!flashcard) {
+      return NextResponse.json({ message: 'Not found' }, { status: 404 })
+    }
 
     flashcard.title = title
     flashcard.cards = cards
     flashcard.updatedAt = new Date().toISOString()
 
-    await saveToGist(data, decoded.userId)
+    await saveToGist(data, userId)
     return NextResponse.json(flashcard)
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to update flashcard' }, { status: 500 })
+    return NextResponse.json({ message: 'Failed to update flashcard' }, { status: 500 })
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const userId = getUserId(request)
+  if (!userId) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
-    const token = req.headers.get('authorization')?.split(' ')[1]
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any
-    const data = await loadFromGist(decoded.userId)
-
-    data.flashcards = data.flashcards?.filter((f: any) => f.id !== params.id) || []
-    await saveToGist(data, decoded.userId)
+    const data = await loadFromGist(userId)
+    data.flashcards = data.flashcards || {}
+    data.flashcards[userId] = (data.flashcards[userId] || []).filter((f: any) => f.id !== params.id)
+    await saveToGist(data, userId)
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete flashcard' }, { status: 500 })
+    return NextResponse.json({ message: 'Failed to delete flashcard' }, { status: 500 })
   }
 }

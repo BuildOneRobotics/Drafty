@@ -1,30 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { loadFromGist, saveToGist } from '@/lib/gist'
-import jwt from 'jsonwebtoken'
 
-export async function GET(req: NextRequest) {
+function getUserId(request: NextRequest): string | null {
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader) return null
   try {
-    const token = req.headers.get('authorization')?.split(' ')[1]
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any
-    const data = await loadFromGist(decoded.userId)
-    return NextResponse.json(data.flashcards || [])
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to load flashcards' }, { status: 500 })
+    const token = authHeader.replace('Bearer ', '')
+    const userData = JSON.parse(Buffer.from(token, 'base64').toString())
+    return userData.id
+  } catch {
+    return null
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function GET(request: NextRequest) {
+  const userId = getUserId(request)
+  if (!userId) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+  }
+
+  const data = await loadFromGist(userId)
+  const userFlashcards = data.flashcards?.[userId] || []
+  return NextResponse.json(userFlashcards)
+}
+
+export async function POST(request: NextRequest) {
+  const userId = getUserId(request)
+  if (!userId) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
-    const token = req.headers.get('authorization')?.split(' ')[1]
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { title, cards } = await request.json()
+    const data = await loadFromGist(userId)
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any
-    const { title, cards } = await req.json()
-
-    const data = await loadFromGist(decoded.userId)
-    const newFlashcard = {
+    const flashcard = {
       id: Date.now().toString(),
       title,
       cards: cards || [],
@@ -32,12 +42,17 @@ export async function POST(req: NextRequest) {
       updatedAt: new Date().toISOString(),
     }
 
-    data.flashcards = data.flashcards || []
-    data.flashcards.push(newFlashcard)
-    await saveToGist(data, decoded.userId)
+    if (!data.flashcards) {
+      data.flashcards = {}
+    }
+    if (!data.flashcards[userId]) {
+      data.flashcards[userId] = []
+    }
+    data.flashcards[userId].push(flashcard)
+    await saveToGist(data, userId)
 
-    return NextResponse.json(newFlashcard)
+    return NextResponse.json(flashcard, { status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create flashcard' }, { status: 500 })
+    return NextResponse.json({ message: 'Failed to create flashcard' }, { status: 500 })
   }
 }
