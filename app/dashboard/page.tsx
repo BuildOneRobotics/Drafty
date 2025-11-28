@@ -23,9 +23,9 @@ export default function Dashboard() {
       handleSync()
     }, 30000)
     return () => clearInterval(interval)
-  }, [syncing, handleSync])
+  }, [syncing])
 
-  const loadNotes = async () => {
+  async function loadNotes() {
     try {
       const response = await notesAPI.getNotes()
       setNotes(response.data || [])
@@ -34,7 +34,7 @@ export default function Dashboard() {
     }
   }
 
-  const loadWhiteboards = async () => {
+  async function loadWhiteboards() {
     try {
       const response = await whiteboardsAPI.getWhiteboards()
       setWhiteboards(response.data || [])
@@ -80,7 +80,7 @@ export default function Dashboard() {
     }
   }, [])
 
-  const handleSync = async () => {
+  async function handleSync() {
     if (syncing) return
     setSyncing(true)
     try {
