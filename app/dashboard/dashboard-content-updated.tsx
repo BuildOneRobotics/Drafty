@@ -19,7 +19,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
   const [whiteboards, setWhiteboards] = useState<WhiteboardType[]>([])
   const [flashcards, setFlashcards] = useState<Flashcard[]>([])
   const [flashcardFolders, setFlashcardFolders] = useState<FlashcardFolder[]>([])
-  const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null)
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardType | null>(null)
   const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(null)
   const [expandedFolder, setExpandedFolder] = useState<string | null>(null)
@@ -136,7 +135,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
       pages: [{ id: '1', number: 1, title: 'Page 1', content: '' }]
     }
     setNotebooks([...notebooks, newNotebook])
-    setSelectedNotebook(newNotebook)
     setNotebookName('')
     setShowNewNotebook(false)
     setView('notebooks')
