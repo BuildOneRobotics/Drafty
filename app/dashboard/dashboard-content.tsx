@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Note, Notebook, Whiteboard } from '@/lib/store'
+import { Note, Notebook, Whiteboard as WhiteboardType } from '@/lib/store'
 import NoteEditor from '@/components/NoteEditor'
 import NoteList from '@/components/NoteList'
 import NotebookEditor from '@/components/NotebookEditor'
-import Whiteboard from '@/components/Whiteboard'
+import WhiteboardEditor from '@/components/Whiteboard'
 import TemplateModal from '@/components/TemplateModal'
 import { whiteboardsAPI, notesAPI } from '@/lib/api'
 
@@ -21,9 +21,9 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
   const [activeTab, setActiveTab] = useState<'notes' | 'notebooks' | 'flashcards' | 'whiteboards'>('notes')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [notebooks, setNotebooks] = useState<Notebook[]>([])
-  const [whiteboards, setWhiteboards] = useState<Whiteboard[]>([])
+  const [whiteboards, setWhiteboards] = useState<WhiteboardType[]>([])
   const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null)
-  const [selectedWhiteboard, setSelectedWhiteboard] = useState<Whiteboard | null>(null)
+  const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardType | null>(null)
   const [showNotebookForm, setShowNotebookForm] = useState(false)
   const [notebookName, setNotebookName] = useState('')
   const [folders] = useState<string[]>(['General'])
@@ -299,7 +299,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
             setSelectedNotebook(nb)
           }} />
         ) : selectedWhiteboard ? (
-          <Whiteboard whiteboard={selectedWhiteboard} onSave={(content) => {
+          <WhiteboardEditor whiteboard={selectedWhiteboard} onSave={(content) => {
             whiteboardsAPI.updateWhiteboard(selectedWhiteboard.id, selectedWhiteboard.title, content)
           }} />
         ) : selectedNote ? (
@@ -318,7 +318,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
                         key={item.id}
                         onClick={() => {
                           if (item.type === 'note') setSelectedNote(item as Note)
-                          else setSelectedWhiteboard(item as Whiteboard)
+                          else setSelectedWhiteboard(item as WhiteboardType)
                         }}
                         className="w-full p-3 text-left bg-white hover:bg-[var(--accent-color)]/10 rounded-lg text-[var(--text-color)] transition-all border border-[var(--accent-color)]/20"
                       >
