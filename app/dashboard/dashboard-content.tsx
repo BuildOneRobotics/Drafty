@@ -109,18 +109,18 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
   ].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 5)
 
   const sidebar = (
-    <div className="bg-[var(--accent-color)]/8 rounded-3xl border-2 border-[var(--accent-color)] flex flex-col h-full m-4 md:m-0 md:rounded-2xl">
-      <div className="p-6 rounded-t-3xl md:rounded-t-2xl bg-[var(--accent-color)]">
+    <div className="bg-white border-r border-[var(--accent-color)]/20 flex flex-col h-full">
+      <div className="p-6 bg-[var(--accent-color)]">
         <p className="text-sm text-white font-semibold">Hello, {user?.name || 'User'}</p>
       </div>
 
-      <div className="flex border-b border-[var(--accent-color)]/20 bg-[var(--accent-color)]/5">
+      <div className="flex border-b border-[var(--accent-color)]/20">
         {['notes', 'notebooks', 'flashcards', 'whiteboards'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab as any)}
             className={`flex-1 py-3 text-xs md:text-sm font-medium transition-all ${
-              activeTab === tab ? 'text-[var(--accent-color)] font-semibold' : 'text-[var(--text-color)]/70'
+              activeTab === tab ? 'text-[var(--accent-color)] border-b-2 border-[var(--accent-color)]' : 'text-[var(--text-color)]/70'
             }`}
           >
             <span className="capitalize">{tab}</span>
@@ -128,7 +128,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-transparent p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {activeTab === 'notes' && (
           <>
             <button 
@@ -136,7 +136,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
                 setTemplateType('note')
                 setShowTemplateModal(true)
               }}
-              className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)]/60 hover:bg-[var(--accent-color)]/10 transition-all"
+              className="w-full p-3 border-2 border-dashed border-[var(--accent-color)]/30 rounded-lg text-[var(--text-color)] hover:border-[var(--accent-color)]/60 hover:bg-[var(--accent-color)]/5 transition-all text-sm"
             >
               + New Note
             </button>
@@ -152,24 +152,24 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
             {!showNotebookForm ? (
               <button 
                 onClick={() => setShowNotebookForm(true)}
-                className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)]/60 hover:bg-[var(--accent-color)]/10 transition-all"
+                className="w-full p-3 border-2 border-dashed border-[var(--accent-color)]/30 rounded-lg text-[var(--text-color)] hover:border-[var(--accent-color)]/60 hover:bg-[var(--accent-color)]/5 transition-all text-sm"
               >
                 + Create Notebook
               </button>
             ) : (
-              <div className="p-3 border-2 border-[var(--accent-color)]/30 rounded-2xl space-y-2 bg-[var(--bg-color,#faf8f5)]">
+              <div className="p-3 border-2 border-[var(--accent-color)]/30 rounded-lg space-y-2 bg-white">
                 <input 
                   type="text"
                   value={notebookName}
                   onChange={(e) => setNotebookName(e.target.value)}
                   placeholder="Notebook name"
-                  className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-xl focus:outline-none focus:border-[var(--accent-color)] bg-[var(--surface-color,white)]"
+                  className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] bg-white text-sm"
                   autoFocus
                 />
                 <div className="flex gap-2">
                   <button 
                     onClick={handleAddNotebook}
-                    className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-xl hover:opacity-90 font-semibold"
+                    className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-lg hover:opacity-90 font-semibold text-sm"
                   >
                     Create
                   </button>
@@ -178,7 +178,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
                       setNotebookName('')
                       setShowNotebookForm(false)
                     }}
-                    className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-xl hover:bg-gray-400"
+                    className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-400 text-sm"
                   >
                     Cancel
                   </button>
@@ -188,7 +188,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
             <select 
               value={selectedFolder} 
               onChange={(e) => setSelectedFolder(e.target.value)}
-              className="w-full p-2 border border-[var(--accent-color)]/20 rounded-xl bg-[var(--surface-color,white)]"
+              className="w-full p-2 border border-[var(--accent-color)]/20 rounded-lg bg-white text-sm"
             >
               {folders.map(f => <option key={f} value={f}>{f}</option>)}
             </select>
@@ -199,7 +199,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
                     setSelectedNotebook(nb)
                     setSidebarOpen(false)
                   }}
-                  className={`flex-1 text-left p-3 rounded-xl transition-all ${
+                  className={`flex-1 text-left p-3 rounded-lg transition-all text-sm ${
                     selectedNotebook?.id === nb.id
                       ? 'bg-[var(--accent-color)] text-white'
                       : 'bg-[var(--accent-color)]/10 text-[var(--text-color)] hover:bg-[var(--accent-color)]/20'
@@ -225,7 +225,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
                 setTemplateType('whiteboard')
                 setShowTemplateModal(true)
               }}
-              className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)]/60 hover:bg-[var(--accent-color)]/10 transition-all"
+              className="w-full p-3 border-2 border-dashed border-[var(--accent-color)]/30 rounded-lg text-[var(--text-color)] hover:border-[var(--accent-color)]/60 hover:bg-[var(--accent-color)]/5 transition-all text-sm"
             >
               + New Whiteboard
             </button>
@@ -236,7 +236,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
                     setSelectedWhiteboard(wb)
                     setSidebarOpen(false)
                   }}
-                  className={`flex-1 text-left p-3 rounded-xl transition-all text-sm ${
+                  className={`flex-1 text-left p-3 rounded-lg transition-all text-sm ${
                     selectedWhiteboard?.id === wb.id
                       ? 'bg-[var(--accent-color)] text-white'
                       : 'bg-[var(--accent-color)]/10 text-[var(--text-color)] hover:bg-[var(--accent-color)]/20'
@@ -256,7 +256,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
         )}
       </div>
 
-      <div className="p-4 border-t border-[var(--accent-color)]/20 bg-transparent rounded-b-3xl md:rounded-b-2xl">
+      <div className="p-4 border-t border-[var(--accent-color)]/20 bg-white">
         <div className="text-center text-xs text-[var(--text-color)]/70">
           {syncing ? 'Syncing...' : 'Auto-sync enabled'}
         </div>
@@ -265,7 +265,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
   )
 
   return (
-    <div className="flex flex-col md:flex-row flex-1 overflow-hidden relative">
+    <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
       {/* Mobile sidebar at top */}
       <div className="md:hidden">
         {sidebarOpen && (
@@ -281,9 +281,9 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-color,#f0fdf4)]">
         {/* Mobile toggle button */}
-        <div className="md:hidden flex items-center justify-between p-4 border-b border-[var(--accent-color)]/10 bg-[var(--surface-color,white)]">
+        <div className="md:hidden flex items-center justify-between p-4 border-b border-[var(--accent-color)]/20 bg-white">
           <span className="text-sm font-semibold text-[var(--text-color)]">{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</span>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -300,13 +300,12 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
           }} />
         ) : selectedWhiteboard ? (
           <Whiteboard whiteboard={selectedWhiteboard} onSave={(content) => {
-            handleDeleteWhiteboard(selectedWhiteboard.id)
             whiteboardsAPI.updateWhiteboard(selectedWhiteboard.id, selectedWhiteboard.title, content)
           }} />
         ) : selectedNote ? (
           <NoteEditor note={selectedNote} onSave={onLoadNotes} />
         ) : (
-          <div className="flex flex-col items-center justify-center h-full bg-[var(--surface-color,white)] p-8">
+          <div className="flex flex-col items-center justify-center h-full p-8">
             <div className="text-center max-w-md">
               <h2 className="text-2xl font-bold text-[var(--text-color)] mb-4">Welcome to Drafty</h2>
               <p className="text-[var(--text-color)]/70 mb-6">Select an item from the sidebar or create a new one to get started</p>
@@ -321,7 +320,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
                           if (item.type === 'note') setSelectedNote(item as Note)
                           else setSelectedWhiteboard(item as Whiteboard)
                         }}
-                        className="w-full p-3 text-left bg-[var(--accent-color)]/10 hover:bg-[var(--accent-color)]/20 rounded-lg text-[var(--text-color)] transition-all"
+                        className="w-full p-3 text-left bg-white hover:bg-[var(--accent-color)]/10 rounded-lg text-[var(--text-color)] transition-all border border-[var(--accent-color)]/20"
                       >
                         <div className="font-medium">{item.title}</div>
                         <div className="text-xs text-[var(--text-color)]/60">{item.type}</div>

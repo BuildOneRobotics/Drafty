@@ -5,14 +5,6 @@ import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import { applyTheme } from '@/lib/theme'
 
-const themes = [
-  { id: 'beige', name: 'Warm Beige', bg: '#f5f0e8', accent: '#b8803d' },
-  { id: 'ocean', name: 'Ocean Blue', bg: '#d1ecfd', accent: '#0ea5e9' },
-  { id: 'forest', name: 'Forest Green', bg: '#c6f6d5', accent: '#22c55e' },
-  { id: 'sunset', name: 'Sunset Purple', bg: '#ead9ff', accent: '#a855f7' },
-  { id: 'sunshine', name: 'Sunshine', bg: '#fef3c7', accent: '#f59e0b' },
-]
-
 const fonts = [
   { id: 'inter', name: 'Inter', family: 'Inter, sans-serif' },
   { id: 'calibri', name: 'Calibri', family: 'Calibri, sans-serif' },
@@ -27,16 +19,15 @@ const fonts = [
 export default function Settings() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'account' | 'customize' | 'friends' | 'files' | 'privacy'>('account')
-  const [folders, setFolders] = useState([{id: '1', name: 'General', color: '#b8803d'}])
+  const [folders, setFolders] = useState([{id: '1', name: 'General', color: '#22c55e'}])
   const [exportSelected, setExportSelected] = useState<string[]>([])
   const [fadeOut, setFadeOut] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
-  const [newFolderColor, setNewFolderColor] = useState('#b8803d')
+  const [newFolderColor, setNewFolderColor] = useState('#22c55e')
   const [showNewFolder, setShowNewFolder] = useState(false)
   const [editingFolder, setEditingFolder] = useState<string | null>(null)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [colorPickerOpen, setColorPickerOpen] = useState<string | null>(null)
-  const [selectedTheme, setSelectedTheme] = useState('beige')
   const [selectedFont, setSelectedFont] = useState('inter')
   const [brightness, setBrightness] = useState(50)
   const [darkMode, setDarkMode] = useState(false)
@@ -56,11 +47,9 @@ export default function Settings() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const theme = localStorage.getItem('theme') || 'beige'
       const font = localStorage.getItem('font') || 'inter'
       const br = parseInt(localStorage.getItem('brightness') || '50')
       const dm = localStorage.getItem('darkMode') === 'true'
-      setSelectedTheme(theme)
       setSelectedFont(font)
       setBrightness(br)
       setDarkMode(dm)
@@ -95,14 +84,14 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color,#faf8f5)] transition-colors duration-[2000ms]" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
+    <div className="min-h-screen bg-[var(--bg-color,#f0fdf4)]" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
       <Navbar />
       
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-color)] mb-8">Settings</h1>
 
         <div className="flex flex-col md:flex-row gap-6">
-          <div className="md:w-64 bg-[var(--surface-color,white)] rounded-2xl p-4 border border-[var(--accent-color)]/10 h-fit">
+          <div className="md:w-64 bg-white rounded-2xl p-4 border border-[var(--accent-color)]/20 h-fit">
             {['account', 'customize', 'friends', 'files', 'privacy'].map((tab) => (
               <button
                 key={tab}
@@ -118,11 +107,11 @@ export default function Settings() {
 
           <div className="flex-1" style={{ opacity: fadeOut ? 0 : 1, transition: 'opacity 0.3s ease' }}>
             {activeTab === 'account' && (
-              <div className="bg-[var(--surface-color,white)] rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/10">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                 <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Account Settings</h2>
                 <button
                   onClick={handleLogout}
-                  className="bg-red-500 text-white px-6 py-3 rounded-xl hover:bg-red-600 font-medium transition-all transform hover:scale-105"
+                  className="bg-red-500 text-white px-6 py-3 rounded-xl hover:bg-red-600 font-medium transition-all"
                 >
                   Logout
                 </button>
@@ -131,34 +120,7 @@ export default function Settings() {
 
             {activeTab === 'customize' && (
               <div className="space-y-6">
-                <div className="bg-[var(--surface-color,white)] rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/10">
-                  <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Themes</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    {themes.map((theme) => (
-                      <button
-                        key={theme.id}
-                        onClick={() => {
-                          setSelectedTheme(theme.id)
-                          applyTheme(theme.id, selectedFont, brightness, darkMode)
-                        }}
-                        className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
-                          selectedTheme === theme.id ? 'border-[var(--accent-color)]' : 'border-[var(--accent-color)]/20'
-                        }`}
-                        style={{ backgroundColor: theme.bg }}
-                      >
-                        <div className="font-semibold text-sm mb-2" style={{ color: theme.accent }}>
-                          {theme.name}
-                        </div>
-                        <div className="flex gap-1">
-                          <div className="w-6 h-6 rounded-full" style={{ backgroundColor: theme.bg }}></div>
-                          <div className="w-6 h-6 rounded-full" style={{ backgroundColor: theme.accent }}></div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-[var(--surface-color,white)] rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/10">
+                <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Brightness</h2>
                   <div className="flex items-center gap-4">
                     <input
@@ -169,7 +131,7 @@ export default function Settings() {
                       onChange={(e) => {
                         const val = parseInt(e.target.value)
                         setBrightness(val)
-                        applyTheme(selectedTheme, selectedFont, val, darkMode)
+                        applyTheme(selectedFont, val, darkMode)
                       }}
                       className="flex-1 h-2 bg-[var(--accent-color)]/20 rounded-lg appearance-none cursor-pointer"
                     />
@@ -177,13 +139,13 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <div className="bg-[var(--surface-color,white)] rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/10">
+                <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Dark Mode</h2>
                   <button
                     onClick={() => {
                       const newDarkMode = !darkMode
                       setDarkMode(newDarkMode)
-                      applyTheme(selectedTheme, selectedFont, brightness, newDarkMode)
+                      applyTheme(selectedFont, brightness, newDarkMode)
                     }}
                     className={`px-6 py-3 rounded-xl font-medium transition-all ${
                       darkMode
@@ -195,7 +157,7 @@ export default function Settings() {
                   </button>
                 </div>
 
-                <div className="bg-[var(--surface-color,white)] rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/10">
+                <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Fonts</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {fonts.map((font) => (
@@ -203,9 +165,9 @@ export default function Settings() {
                         key={font.id}
                         onClick={() => {
                           setSelectedFont(font.id)
-                          applyTheme(selectedTheme, font.id, brightness, darkMode)
+                          applyTheme(font.id, brightness, darkMode)
                         }}
-                        className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
+                        className={`p-4 rounded-xl border-2 transition-all ${
                           selectedFont === font.id ? 'border-[var(--accent-color)]' : 'border-[var(--accent-color)]/20'
                         }`}
                       >
@@ -222,7 +184,7 @@ export default function Settings() {
 
             {activeTab === 'friends' && (
               <div className="space-y-6">
-                <div className="bg-[var(--surface-color,white)] rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/10">
+                <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Search Users</h2>
                   <div className="flex gap-2 mb-4">
                     <input
@@ -233,7 +195,7 @@ export default function Settings() {
                         handleSearch()
                       }}
                       placeholder="Type exact username..."
-                      className="flex-1 px-4 py-3 border-2 border-[var(--accent-color)]/20 rounded-xl focus:outline-none focus:border-[var(--accent-color)] transition-colors text-[var(--text-color)]"
+                      className="flex-1 px-4 py-3 border-2 border-[var(--accent-color)]/20 rounded-xl focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]"
                     />
                   </div>
                   {searchResults.length > 0 && (
@@ -274,7 +236,7 @@ export default function Settings() {
             )}
 
             {activeTab === 'files' && (
-              <div className="bg-[var(--surface-color,white)] rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/10">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                 <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Folder Management</h2>
                 {!showNewFolder ? (
                   <button 
@@ -308,7 +270,7 @@ export default function Settings() {
                           if (newFolderName.trim()) {
                             setFolders([...folders, {id: Date.now().toString(), name: newFolderName, color: newFolderColor}])
                             setNewFolderName('')
-                            setNewFolderColor('#b8803d')
+                            setNewFolderColor('#22c55e')
                             setShowNewFolder(false)
                           }
                         }}
@@ -319,7 +281,7 @@ export default function Settings() {
                       <button 
                         onClick={() => {
                           setNewFolderName('')
-                          setNewFolderColor('#b8803d')
+                          setNewFolderColor('#22c55e')
                           setShowNewFolder(false)
                         }}
                         className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
@@ -345,14 +307,14 @@ export default function Settings() {
                           </svg>
                         </button>
                         {menuOpen === folder.id && (
-                          <div className="absolute right-0 mt-1 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/20 rounded-lg z-10 w-40">
+                          <div className="absolute right-0 mt-1 bg-white border border-[var(--accent-color)]/20 rounded-lg z-10 w-40">
                             <button onClick={() => { setEditingFolder(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10 rounded-t-lg text-[var(--text-color)]">Rename</button>
                             <button onClick={() => { setColorPickerOpen(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10 text-[var(--text-color)]">Change Color</button>
                             <button onClick={() => { setFolders(folders.filter(f => f.id !== folder.id)); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 rounded-b-lg">Delete</button>
                           </div>
                         )}
                         {colorPickerOpen === folder.id && (
-                          <div className="absolute right-0 mt-1 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/20 rounded-lg z-10 p-3">
+                          <div className="absolute right-0 mt-1 bg-white border border-[var(--accent-color)]/20 rounded-lg z-10 p-3">
                             <input 
                               type="color"
                               value={folder.color}
@@ -364,7 +326,7 @@ export default function Settings() {
                         )}
                       </div>
                       {editingFolder === folder.id && (
-                        <div className="absolute inset-0 bg-[var(--surface-color,white)] rounded-lg p-3 flex items-center gap-2 border-2 border-[var(--accent-color)]">
+                        <div className="absolute inset-0 bg-white rounded-lg p-3 flex items-center gap-2 border-2 border-[var(--accent-color)]">
                           <input 
                             value={folder.name}
                             onChange={(e) => setFolders(folders.map(f => f.id === folder.id ? {...f, name: e.target.value} : f))}
@@ -383,7 +345,7 @@ export default function Settings() {
             )}
 
             {activeTab === 'privacy' && (
-              <div className="bg-[var(--surface-color,white)] rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/10">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                 <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Export Data</h2>
                 <p className="text-[var(--text-color)]/70 mb-4">Select files to export</p>
                 <div className="space-y-2 mb-4">

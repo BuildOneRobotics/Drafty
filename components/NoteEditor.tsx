@@ -73,96 +73,97 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[var(--surface-color,white)] transition-colors duration-[2000ms]">
-      <div className="bg-[var(--bg-color,#faf8f5)] border-b border-[var(--accent-color)]/10 p-4 md:p-8 transition-colors duration-[2000ms]">
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onClick={handleTitleClick}
-          placeholder="Untitled Note"
-          className="text-2xl md:text-4xl font-bold w-full outline-none mb-4 text-[var(--text-color,#4a3f35)] placeholder-[var(--accent-color)]/40 bg-transparent transition-colors duration-[2000ms]"
-        />
-        <input
-          type="text"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          placeholder="Add tags"
-          className="text-sm text-[var(--accent-color)]/70 w-full outline-none placeholder-[var(--accent-color)]/30 bg-transparent mb-4 transition-colors duration-[2000ms]"
-        />
-        
-        <div className="flex flex-wrap gap-2 mb-4">
-          <select
-            onChange={(e) => formatText('fontSize', e.target.value)}
-            className="px-3 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/10 rounded-lg text-sm hover:border-[var(--accent-color)]/20 transition-all duration-[2000ms]"
-            defaultValue="4"
-          >
-            <option value="3">Small</option>
-            <option value="4">Normal</option>
-            <option value="5">Large</option>
-            <option value="6">Huge</option>
-          </select>
-
-          <input
-            type="color"
-            onChange={(e) => formatText('foreColor', e.target.value)}
-            className="w-10 h-10 border border-[var(--accent-color)]/10 rounded-lg cursor-pointer"
-            title="Text Color"
-          />
-
-          <button
-            onClick={() => formatText('bold')}
-            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/10 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all font-bold duration-[2000ms]"
-            title="Bold"
-          >
-            B
-          </button>
-
-          <button
-            onClick={() => formatText('italic')}
-            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/10 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all italic duration-[2000ms]"
-            title="Italic"
-          >
-            I
-          </button>
-
-          <button
-            onClick={() => formatText('underline')}
-            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/10 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all underline duration-[2000ms]"
-            title="Underline"
-          >
-            U
-          </button>
-
-          <button
-            onClick={() => formatText('insertUnorderedList')}
-            className="px-4 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/10 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all duration-[2000ms]"
-            title="Bullet List"
-          >
-            • List
-          </button>
-        </div>
-
-        <div className="flex gap-3 items-center">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="bg-[var(--accent-color)] text-white px-6 md:px-10 py-2 md:py-3 rounded-lg hover:opacity-90 disabled:opacity-50 font-semibold transition-all transform hover:scale-105 duration-[2000ms]"
-          >
-            {saving ? 'Saving...' : 'Save'}
-          </button>
-          {lastSaved && <span className="text-xs text-green-600">Saved at {lastSaved}</span>}
-        </div>
+    <div className="flex flex-col h-full bg-[var(--bg-color,#f0fdf4)] p-4 md:p-8 gap-4 overflow-y-auto">
+      <div className="flex gap-3 items-center">
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-[var(--accent-color)] text-white px-6 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 font-semibold transition-all"
+        >
+          {saving ? 'Saving...' : 'Save'}
+        </button>
+        {lastSaved && <span className="text-xs text-green-600">Saved at {lastSaved}</span>}
       </div>
 
-      <div
-        ref={contentRef}
-        contentEditable
-        onInput={handleContentChange}
-        className="flex-1 p-6 md:p-10 outline-none text-[var(--text-color,#4a3f35)] text-base md:text-lg leading-relaxed bg-[var(--surface-color,white)] overflow-y-auto transition-colors duration-[2000ms]"
-        style={{ minHeight: '300px' }}
-        suppressContentEditableWarning
-      />
+      <div className="flex flex-wrap gap-2">
+        <select
+          onChange={(e) => formatText('fontSize', e.target.value)}
+          className="px-3 py-2 bg-white border border-[var(--accent-color)]/20 rounded-lg text-sm hover:border-[var(--accent-color)]/40 transition-all"
+          defaultValue="4"
+        >
+          <option value="3">Small</option>
+          <option value="4">Normal</option>
+          <option value="5">Large</option>
+          <option value="6">Huge</option>
+        </select>
+
+        <input
+          type="color"
+          onChange={(e) => formatText('foreColor', e.target.value)}
+          className="w-10 h-10 border border-[var(--accent-color)]/20 rounded-lg cursor-pointer"
+          title="Text Color"
+        />
+
+        <button
+          onClick={() => formatText('bold')}
+          className="px-4 py-2 bg-white border border-[var(--accent-color)]/20 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all font-bold"
+          title="Bold"
+        >
+          B
+        </button>
+
+        <button
+          onClick={() => formatText('italic')}
+          className="px-4 py-2 bg-white border border-[var(--accent-color)]/20 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all italic"
+          title="Italic"
+        >
+          I
+        </button>
+
+        <button
+          onClick={() => formatText('underline')}
+          className="px-4 py-2 bg-white border border-[var(--accent-color)]/20 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all underline"
+          title="Underline"
+        >
+          U
+        </button>
+
+        <button
+          onClick={() => formatText('insertUnorderedList')}
+          className="px-4 py-2 bg-white border border-[var(--accent-color)]/20 rounded-lg hover:bg-[var(--accent-color)]/5 transition-all"
+          title="Bullet List"
+        >
+          • List
+        </button>
+      </div>
+
+      <div className="flex justify-center">
+        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8 md:p-12">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onClick={handleTitleClick}
+            placeholder="Untitled Note"
+            className="text-3xl font-bold w-full outline-none mb-2 text-[var(--text-color)] placeholder-[var(--accent-color)]/40 bg-transparent"
+          />
+          <input
+            type="text"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            placeholder="Add tags"
+            className="text-sm text-[var(--accent-color)]/70 w-full outline-none placeholder-[var(--accent-color)]/30 bg-transparent mb-6 pb-4 border-b border-[var(--accent-color)]/20"
+          />
+          
+          <div
+            ref={contentRef}
+            contentEditable
+            onInput={handleContentChange}
+            className="outline-none text-[var(--text-color)] text-base leading-relaxed min-h-96"
+            suppressContentEditableWarning
+          />
+        </div>
+      </div>
     </div>
   )
 }

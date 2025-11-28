@@ -7,27 +7,24 @@ import LoadingScreen from '@/components/LoadingScreen'
 
 export default function Home() {
   const router = useRouter()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    setIsLoggedIn(!!token)
-    setLoading(false)
-  }, [])
+    if (token) {
+      router.push('/dashboard')
+    } else {
+      setLoading(false)
+    }
+  }, [router])
 
   if (loading) {
     return <LoadingScreen />
   }
 
-  if (isLoggedIn) {
-    router.push('/dashboard')
-    return null
-  }
-
   return (
-    <div className="min-h-screen bg-[var(--bg-color,#faf8f5)] transition-colors duration-[2000ms] flex flex-col" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
-      <nav className="bg-white border-b border-[var(--accent-color)]/30">
+    <div className="min-h-screen bg-[var(--bg-color,#f0fdf4)] flex flex-col">
+      <nav className="bg-white border-b border-[var(--accent-color)]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <svg className="w-8 h-8 text-[var(--accent-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,7 +66,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-8 rounded-3xl border border-[var(--accent-color)]/30 transition-all duration-300 transform hover:translate-y-[-4px]">
+            <div className="bg-white p-8 rounded-2xl border border-[var(--accent-color)]/20 transition-all hover:border-[var(--accent-color)]/40">
               <svg className="w-16 h-16 mx-auto mb-4 text-[var(--accent-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
@@ -77,7 +74,7 @@ export default function Home() {
               <p className="text-[var(--text-color)]/70 leading-relaxed text-center">Quickly capture and organize your thoughts in a beautiful, distraction-free editor</p>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl border border-[var(--accent-color)]/30 transition-all duration-300 transform hover:translate-y-[-4px]">
+            <div className="bg-white p-8 rounded-2xl border border-[var(--accent-color)]/20 transition-all hover:border-[var(--accent-color)]/40">
               <svg className="w-16 h-16 mx-auto mb-4 text-[var(--accent-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
@@ -85,7 +82,7 @@ export default function Home() {
               <p className="text-[var(--text-color)]/70 leading-relaxed text-center">Your notes sync automatically and securely across all your devices</p>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl border border-[var(--accent-color)]/30 transition-all duration-300 transform hover:translate-y-[-4px]">
+            <div className="bg-white p-8 rounded-2xl border border-[var(--accent-color)]/20 transition-all hover:border-[var(--accent-color)]/40">
               <svg className="w-16 h-16 mx-auto mb-4 text-[var(--accent-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
@@ -96,9 +93,9 @@ export default function Home() {
         </div>
       </div>
 
-      <footer className="bg-[var(--accent-color)]/20 border-t border-[var(--accent-color)]/30 py-8 mt-auto">
+      <footer className="bg-[var(--accent-color)]/10 border-t border-[var(--accent-color)]/20 py-8 mt-auto">
         <div className="max-w-7xl mx-auto px-4 text-center text-[var(--text-color)] text-sm">
-          © 2024 Drafty. All rights reserved.
+          © 2025 Drafty. All rights reserved.
         </div>
       </footer>
     </div>
