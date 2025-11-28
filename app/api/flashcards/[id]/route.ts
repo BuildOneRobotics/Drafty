@@ -43,9 +43,16 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     flashcard.cards = cards
     flashcard.updatedAt = new Date().toISOString()
 
-    await saveToGist(data, userId)
+    try {
+      await saveToGist(data, userId)
+    } catch (saveError) {
+      console.error('Gist save error:', saveError)
+      return NextResponse.json({ message: 'Failed to save data' }, { status: 500 })
+    }
+
     return NextResponse.json(flashcard)
   } catch (error) {
+    console.error('Update flashcard error:', error)
     return NextResponse.json({ message: 'Failed to update flashcard' }, { status: 500 })
   }
 }
@@ -57,13 +64,31 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   }
 
   try {
-    const data = await loadFromGist(userId)
+    let data
+    try {
+      data = await loadFromGist(userId)
+    } catch (gistError) {
+      console.error('Gist load error:', gistError)
+      return NextResponse.json({ message: 'Failed to load data' }, { status: 500 })
+    }
+
+    if (!data) {
+      return NextResponse.json({ message: 'Invalid data' }, { status: 500 })
+    }
+
     data.flashcards = data.flashcards || {}
     data.flashcards[userId] = (data.flashcards[userId] || []).filter((f: any) => f.id !== params.id)
-    await saveToGist(data, userId)
+    
+    try {
+      await saveToGist(data, userId)
+    } catch (saveError) {
+      console.error('Gist save error:', saveError)
+      return NextResponse.json({ message: 'Failed to save data' }, { status: 500 })
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {
+    console.error('Delete flashcard error:', error)
     return NextResponse.json({ message: 'Failed to delete flashcard' }, { status: 500 })
   }
 }
