@@ -9,30 +9,40 @@ const fonts: {[key: string]: string} = {
   arial: 'Arial, sans-serif',
 }
 
-export function applyTheme(fontId: string, brightness: number, darkMode: boolean) {
+const themes: {[key: string]: {accent: string, text: string, bg: string}} = {
+  forest: { accent: '#22c55e', text: '#15803d', bg: '#f0fdf4' },
+  phoenix: { accent: '#dc2626', text: '#991b1b', bg: '#fef2f2' },
+  pink: { accent: '#ec4899', text: '#be185d', bg: '#fdf2f8' },
+}
+
+export function applyTheme(themeId: string, fontId: string, brightness: number, darkMode: boolean) {
+  const theme = themes[themeId] || themes.forest
+  
   if (darkMode) {
     document.documentElement.style.setProperty('--bg-color', '#1a1a1a')
-    document.documentElement.style.setProperty('--accent-color', '#22c55e')
+    document.documentElement.style.setProperty('--accent-color', theme.accent)
     document.documentElement.style.setProperty('--text-color', '#ffffff')
     document.documentElement.style.setProperty('--surface-color', '#2d2d2d')
   } else {
-    document.documentElement.style.setProperty('--bg-color', '#f0fdf4')
-    document.documentElement.style.setProperty('--accent-color', '#22c55e')
-    document.documentElement.style.setProperty('--text-color', '#15803d')
+    document.documentElement.style.setProperty('--bg-color', theme.bg)
+    document.documentElement.style.setProperty('--accent-color', theme.accent)
+    document.documentElement.style.setProperty('--text-color', theme.text)
     document.documentElement.style.setProperty('--surface-color', '#ffffff')
   }
   
   const font = fonts[fontId] || fonts.inter
   document.documentElement.style.setProperty('--font-family', font)
   
+  localStorage.setItem('theme', themeId)
   localStorage.setItem('font', fontId)
   localStorage.setItem('brightness', brightness.toString())
   localStorage.setItem('darkMode', darkMode.toString())
 }
 
 export function loadTheme() {
+  const theme = localStorage.getItem('theme') || 'forest'
   const font = localStorage.getItem('font') || 'inter'
   const brightness = parseInt(localStorage.getItem('brightness') || '50')
   const darkMode = localStorage.getItem('darkMode') === 'true'
-  applyTheme(font, brightness, darkMode)
+  applyTheme(theme, font, brightness, darkMode)
 }

@@ -23,7 +23,8 @@ export default function Whiteboard({ whiteboard, onSave }: WhiteboardProps) {
     canvas.width = canvas.offsetWidth
     canvas.height = canvas.offsetHeight
 
-    drawTemplate(ctx, whiteboard.template)
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
     setContext(ctx)
 
     if (whiteboard.content) {
@@ -32,37 +33,6 @@ export default function Whiteboard({ whiteboard, onSave }: WhiteboardProps) {
       img.src = whiteboard.content
     }
   }, [whiteboard.template])
-
-  const drawTemplate = (ctx: CanvasRenderingContext2D, template: string) => {
-    ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    ctx.strokeStyle = '#e5e7eb'
-    ctx.lineWidth = 1
-
-    if (template === 'lined') {
-      const lineHeight = 24
-      for (let i = lineHeight; i < ctx.canvas.height; i += lineHeight) {
-        ctx.beginPath()
-        ctx.moveTo(0, i)
-        ctx.lineTo(ctx.canvas.width, i)
-        ctx.stroke()
-      }
-    } else if (template.startsWith('grid')) {
-      const gridSize = template === 'grid-small' ? 16 : template === 'grid-medium' ? 24 : 32
-      for (let x = gridSize; x < ctx.canvas.width; x += gridSize) {
-        ctx.beginPath()
-        ctx.moveTo(x, 0)
-        ctx.lineTo(x, ctx.canvas.height)
-        ctx.stroke()
-      }
-      for (let y = gridSize; y < ctx.canvas.height; y += gridSize) {
-        ctx.beginPath()
-        ctx.moveTo(0, y)
-        ctx.lineTo(ctx.canvas.width, y)
-        ctx.stroke()
-      }
-    }
-  }
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!context) return
@@ -95,7 +65,8 @@ export default function Whiteboard({ whiteboard, onSave }: WhiteboardProps) {
   const clearCanvas = () => {
     if (!context) return
     context.clearRect(0, 0, context.canvas.width, context.canvas.height)
-    drawTemplate(context, whiteboard.template)
+    context.fillStyle = '#ffffff'
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height)
   }
 
   return (
@@ -108,7 +79,7 @@ export default function Whiteboard({ whiteboard, onSave }: WhiteboardProps) {
           Clear
         </button>
         <div className="text-sm text-[var(--text-color)]/60 ml-auto">
-          Template: {whiteboard.template}
+          {whiteboard.template}
         </div>
       </div>
       <canvas

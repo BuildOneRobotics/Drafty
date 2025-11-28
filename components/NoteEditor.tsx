@@ -138,7 +138,7 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
       </div>
 
       <div className="flex justify-center">
-        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8 md:p-12">
+        <div className="w-full max-w-2xl bg-white rounded-2xl p-8 md:p-12" style={{aspectRatio: '210/297'}}>
           <input
             type="text"
             value={title}
@@ -159,7 +159,8 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
             ref={contentRef}
             contentEditable
             onInput={handleContentChange}
-            className="outline-none text-[var(--text-color)] text-base leading-relaxed min-h-96"
+            className="outline-none text-[var(--text-color)] text-base leading-relaxed overflow-y-auto"
+            style={{height: 'calc(100% - 120px)'}}
             suppressContentEditableWarning
           />
         </div>

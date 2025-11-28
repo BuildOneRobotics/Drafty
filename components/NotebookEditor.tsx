@@ -54,7 +54,8 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
                   : 'bg-[var(--surface-color,white)] text-[var(--text-color)] hover:bg-[var(--accent-color)]/10'
               }`}
             >
-              {page.number}
+              <div className="font-semibold">Page {page.number}</div>
+              <div className="text-xs opacity-70 truncate">{page.title}</div>
             </button>
           ))}
         </div>

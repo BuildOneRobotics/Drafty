@@ -29,6 +29,7 @@ export default function Settings() {
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [colorPickerOpen, setColorPickerOpen] = useState<string | null>(null)
   const [selectedFont, setSelectedFont] = useState('inter')
+  const [selectedTheme, setSelectedTheme] = useState('forest')
   const [brightness, setBrightness] = useState(50)
   const [darkMode, setDarkMode] = useState(false)
   const [searchUsername, setSearchUsername] = useState('')
@@ -47,9 +48,11 @@ export default function Settings() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      const theme = localStorage.getItem('theme') || 'forest'
       const font = localStorage.getItem('font') || 'inter'
       const br = parseInt(localStorage.getItem('brightness') || '50')
       const dm = localStorage.getItem('darkMode') === 'true'
+      setSelectedTheme(theme)
       setSelectedFont(font)
       setBrightness(br)
       setDarkMode(dm)
@@ -133,6 +136,26 @@ export default function Settings() {
             {activeTab === 'customize' && (
               <div className="space-y-6">
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
+                  <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Theme</h2>
+                  <div className="grid grid-cols-3 gap-4 mb-6">
+                    {['forest', 'phoenix', 'pink'].map((theme) => (
+                      <button
+                        key={theme}
+                        onClick={() => {
+                          setSelectedTheme(theme)
+                          applyTheme(theme, selectedFont, brightness, darkMode)
+                        }}
+                        className={`p-4 rounded-xl border-2 transition-all capitalize ${
+                          selectedTheme === theme ? 'border-[var(--accent-color)] bg-[var(--accent-color)]/20' : 'border-[var(--accent-color)]/20'
+                        }`}
+                      >
+                        {theme}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Brightness</h2>
                   <div className="flex items-center gap-4">
                     <input
@@ -143,7 +166,7 @@ export default function Settings() {
                       onChange={(e) => {
                         const val = parseInt(e.target.value)
                         setBrightness(val)
-                        applyTheme(selectedFont, val, darkMode)
+                        applyTheme(selectedTheme, selectedFont, val, darkMode)
                       }}
                       className="flex-1 h-2 bg-[var(--accent-color)]/20 rounded-lg appearance-none cursor-pointer"
                     />
@@ -157,7 +180,7 @@ export default function Settings() {
                     onClick={() => {
                       const newDarkMode = !darkMode
                       setDarkMode(newDarkMode)
-                      applyTheme(selectedFont, brightness, newDarkMode)
+                      applyTheme(selectedTheme, selectedFont, brightness, newDarkMode)
                     }}
                     className={`px-6 py-3 rounded-xl font-medium transition-all ${
                       darkMode
@@ -177,7 +200,7 @@ export default function Settings() {
                         key={font.id}
                         onClick={() => {
                           setSelectedFont(font.id)
-                          applyTheme(font.id, brightness, darkMode)
+                          applyTheme(selectedTheme, font.id, brightness, darkMode)
                         }}
                         className={`p-4 rounded-xl border-2 transition-all ${
                           selectedFont === font.id ? 'border-[var(--accent-color)] bg-[var(--accent-color)]/20' : 'border-[var(--accent-color)]/20'
