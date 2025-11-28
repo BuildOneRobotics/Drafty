@@ -19,7 +19,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
   const [whiteboards, setWhiteboards] = useState<WhiteboardType[]>([])
   const [flashcards, setFlashcards] = useState<Flashcard[]>([])
   const [flashcardFolders, setFlashcardFolders] = useState<FlashcardFolder[]>([])
-  const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardType | null>(null)
   const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(null)
   const [expandedFolder, setExpandedFolder] = useState<string | null>(null)
   const [showTemplateModal, setShowTemplateModal] = useState(false)
@@ -78,7 +77,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
     try {
       const response = await whiteboardsAPI.createWhiteboard(`Whiteboard ${new Date().toLocaleTimeString()}`, template)
       setWhiteboards([response.data, ...whiteboards])
-      setView('whiteboards')
     } catch (error) {
       console.error('Failed to create whiteboard:', error)
     }
