@@ -13,10 +13,9 @@ interface DashboardContentProps {
   notes: Note[]
   onLoadNotes: () => void
   user: any
-  syncing: boolean
 }
 
-export default function DashboardContent({ notes, onLoadNotes, user, syncing }: DashboardContentProps) {
+export default function DashboardContent({ notes, onLoadNotes, user }: DashboardContentProps) {
   const [view, setView] = useState<'home' | 'notes' | 'notebooks' | 'flashcards' | 'whiteboards' | 'files' | 'friends'>('home')
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [notebooks, setNotebooks] = useState<Notebook[]>([])
