@@ -56,18 +56,28 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Failed to load theme:', error)
     }
-    loadNotes()
-    loadWhiteboards()
     
-    authAPI.getMe().then(response => {
-      if (response.data) {
-        setUser(response.data)
-      }
-    }).catch(() => {
-      router.push('/login')
-    }).finally(() => {
+    try {
+      loadNotes()
+      loadWhiteboards()
+    } catch (error) {
+      console.error('Failed to load data:', error)
+    }
+    
+    try {
+      authAPI.getMe().then(response => {
+        if (response.data) {
+          setUser(response.data)
+        }
+      }).catch(() => {
+        router.push('/login')
+      }).finally(() => {
+        setLoading(false)
+      })
+    } catch (error) {
+      console.error('Failed to get user:', error)
       setLoading(false)
-    })
+    }
   }, [])
 
   const handleSync = async () => {
