@@ -58,7 +58,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
     setShowNotebookForm(false)
   }
 
-  const handleCreateNote = async (template: string) => {
+  const handleCreateNote = async () => {
     try {
       const response = await notesAPI.createNote(`New Note ${new Date().toLocaleTimeString()}`, '', [])
       onLoadNotes()
