@@ -11,10 +11,13 @@ import { useMobile } from '@/lib/useMobile'
 interface DashboardContentProps {
   notes: Note[]
   user: any
+  onLoadNotes?: () => Promise<void>
 }
 
-export default function DashboardContent({ notes, user }: DashboardContentProps) {
+export default function DashboardContent({ notes, user, onLoadNotes }: DashboardContentProps) {
   const { isPhone } = useMobile()
+  // reference the prop so it's considered used by TypeScript (some strict configs flag unused params)
+  void onLoadNotes
   const [view, setView] = useState<'home' | 'notes' | 'notebooks' | 'flashcards' | 'whiteboards' | 'files' | 'friends'>('home')
   const [whiteboards, setWhiteboards] = useState<WhiteboardType[]>([])
   const [flashcards, setFlashcards] = useState<Flashcard[]>([])
