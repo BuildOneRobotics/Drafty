@@ -83,6 +83,18 @@ export default function Settings() {
     setFriends(friends.filter(f => f !== username))
   }
 
+  const exportAsCSV = () => {
+    const csv = ['Title,Content,Created'].concat(
+      exportSelected.map(id => `Note ${id},"Sample content",${new Date().toISOString()}`)
+    ).join('\n')
+    const blob = new Blob([csv], {type: 'text/csv'})
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `drafty-export-${new Date().getTime()}.csv`
+    a.click()
+  }
+
   return (
     <div className="min-h-screen bg-[var(--bg-color,#f0fdf4)]" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
       <Navbar />
@@ -347,7 +359,7 @@ export default function Settings() {
             {activeTab === 'privacy' && (
               <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                 <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Export Data</h2>
-                <p className="text-[var(--text-color)]/70 mb-4">Select files to export</p>
+                <p className="text-[var(--text-color)]/70 mb-4">Your data is private and stored securely. Export as CSV.</p>
                 <div className="space-y-2 mb-4">
                   <label className="flex items-center space-x-3 p-3 bg-[var(--accent-color)]/5 rounded-xl cursor-pointer">
                     <input type="checkbox" onChange={(e) => e.target.checked ? setExportSelected([...exportSelected, 'note1']) : setExportSelected(exportSelected.filter(id => id !== 'note1'))} />
@@ -355,19 +367,11 @@ export default function Settings() {
                   </label>
                 </div>
                 <button 
-                  onClick={() => {
-                    const data = JSON.stringify({files: exportSelected}, null, 2)
-                    const blob = new Blob([data], {type: 'application/json'})
-                    const url = URL.createObjectURL(blob)
-                    const a = document.createElement('a')
-                    a.href = url
-                    a.download = 'drafty-export.json'
-                    a.click()
-                  }}
+                  onClick={exportAsCSV}
                   disabled={exportSelected.length === 0}
                   className="bg-[var(--accent-color)] text-white px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50 font-medium"
                 >
-                  Export Selected ({exportSelected.length})
+                  Export as CSV ({exportSelected.length})
                 </button>
               </div>
             )}
