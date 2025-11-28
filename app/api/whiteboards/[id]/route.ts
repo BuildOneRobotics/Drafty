@@ -21,7 +21,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
   try {
     const { title, content } = await request.json()
-    const data = await loadFromGist(userId)
+    const data = await loadFromGist()
     
     if (!data.whiteboards?.[userId]) {
       return NextResponse.json({ message: 'Not found' }, { status: 404 })
@@ -39,7 +39,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       updatedAt: new Date().toISOString(),
     }
 
-    await saveToGist(data, userId)
+    await saveToGist(data)
     return NextResponse.json(data.whiteboards[userId][index])
   } catch (error) {
     return NextResponse.json({ message: 'Failed to update whiteboard' }, { status: 500 })
@@ -53,14 +53,14 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   }
 
   try {
-    const data = await loadFromGist(userId)
+    const data = await loadFromGist()
     
     if (!data.whiteboards?.[userId]) {
       return NextResponse.json({ message: 'Not found' }, { status: 404 })
     }
 
     data.whiteboards[userId] = data.whiteboards[userId].filter((w: any) => w.id !== params.id)
-    await saveToGist(data, userId)
+    await saveToGist(data)
 
     return NextResponse.json({ message: 'Deleted' })
   } catch (error) {

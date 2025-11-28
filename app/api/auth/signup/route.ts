@@ -17,6 +17,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Failed to load user data' }, { status: 500 })
     }
 
+    if (!data) {
+      data = { users: {} }
+    }
+
     if (!data || !data.users) {
       return NextResponse.json({ message: 'Invalid user data' }, { status: 500 })
     }

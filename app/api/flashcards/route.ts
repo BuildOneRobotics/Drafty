@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const data = await loadFromGist(userId)
+    const data = await loadFromGist()
     if (!data || !data.flashcards) {
       return NextResponse.json([])
     }
@@ -47,14 +47,14 @@ export async function POST(request: NextRequest) {
 
     let data
     try {
-      data = await loadFromGist(userId)
+      data = await loadFromGist()
     } catch (loadError) {
       console.error('Failed to load gist:', loadError)
       return NextResponse.json({ message: 'Failed to load data' }, { status: 500 })
     }
 
     if (!data) {
-      return NextResponse.json({ message: 'Invalid data' }, { status: 500 })
+      data = { flashcards: {} }
     }
 
     const flashcard = {
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     data.flashcards[userId].push(flashcard)
     
     try {
-      await saveToGist(data, userId)
+      await saveToGist(data)
     } catch (saveError) {
       console.error('Failed to save gist:', saveError)
       return NextResponse.json({ message: 'Failed to save flashcard' }, { status: 500 })

@@ -23,7 +23,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const { title, cards } = await request.json()
     let data
     try {
-      data = await loadFromGist(userId)
+      data = await loadFromGist()
     } catch (gistError) {
       console.error('Gist load error:', gistError)
       return NextResponse.json({ message: 'Failed to load data' }, { status: 500 })
@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     flashcard.updatedAt = new Date().toISOString()
 
     try {
-      await saveToGist(data, userId)
+      await saveToGist(data)
     } catch (saveError) {
       console.error('Gist save error:', saveError)
       return NextResponse.json({ message: 'Failed to save data' }, { status: 500 })
@@ -66,7 +66,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   try {
     let data
     try {
-      data = await loadFromGist(userId)
+      data = await loadFromGist()
     } catch (gistError) {
       console.error('Gist load error:', gistError)
       return NextResponse.json({ message: 'Failed to load data' }, { status: 500 })
@@ -80,7 +80,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     data.flashcards[userId] = (data.flashcards[userId] || []).filter((f: any) => f.id !== params.id)
     
     try {
-      await saveToGist(data, userId)
+      await saveToGist(data)
     } catch (saveError) {
       console.error('Gist save error:', saveError)
       return NextResponse.json({ message: 'Failed to save data' }, { status: 500 })

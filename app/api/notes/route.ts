@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const data = await loadFromGist(userId)
+    const data = await loadFromGist()
     if (!data || !data.notes) {
       return NextResponse.json([])
     }
@@ -53,14 +53,17 @@ export async function POST(request: NextRequest) {
     
     let data
     try {
-      data = await loadFromGist(userId)
+      data = await loadFromGist()
     } catch (gistError) {
       console.error('Gist load error:', gistError)
       return NextResponse.json({ message: 'Failed to load data' }, { status: 500 })
     }
 
-    if (!data || !data.notes) {
-      return NextResponse.json({ message: 'Invalid data' }, { status: 500 })
+    if (!data) {
+      data = { notes: {} }
+    }
+    if (!data.notes) {
+      data.notes = {}
     }
     
     const note = {
@@ -78,7 +81,7 @@ export async function POST(request: NextRequest) {
     data.notes[userId].push(note)
     
     try {
-      await saveToGist(data, userId)
+      await saveToGist(data)
     } catch (saveError) {
       console.error('Gist save error:', saveError)
       return NextResponse.json({ message: 'Failed to save data' }, { status: 500 })
