@@ -7,6 +7,7 @@ import { notesAPI, authAPI, whiteboardsAPI } from '@/lib/api'
 import Navbar from '@/components/Navbar'
 import LoadingScreen from '@/components/LoadingScreen'
 import DashboardContent from './dashboard-content'
+import FileManager from './dashboard-files'
 
 export default function Dashboard() {
   const router = useRouter()
