@@ -81,7 +81,7 @@ export default function Dashboard() {
             <a href="/settings" className="hover:text-[var(--accent-color)]">Settings</a>
             <a href="https://github.com/BuildOneRobotics/Drafty" target="_blank" className="hover:text-[var(--accent-color)]">GitHub</a>
           </div>
-          <div>© 2024 Drafty • CC BY-NC 4.0 License</div>
+          <div>© 2025 Drafty • CC BY-NC-ND 4.0 License</div>
         </div>
       </footer>
     </div>
