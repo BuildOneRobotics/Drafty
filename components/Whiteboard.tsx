@@ -9,6 +9,9 @@ interface WhiteboardEditorProps {
 }
 
 export default function WhiteboardEditor({ whiteboard, onSave }: WhiteboardEditorProps) {
+  // Reference props to satisfy strict TypeScript rules
+  void whiteboard
+  void onSave
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [mode, setMode] = useState<'text' | 'spider' | 'draw'>('text')
   const [textInput, setTextInput] = useState('')
