@@ -39,29 +39,26 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
   }
 
   const sidebar = (
-    <div className="bg-[var(--surface-color,white)] flex flex-col border-b md:border-r border-[var(--accent-color)]/10 h-full">
-      <div className="p-6 border-b border-[var(--accent-color)]/10 bg-[var(--accent-color)]">
-        <p className="text-sm text-white font-semibold">Hello, {user?.name}</p>
+    <div className="bg-[var(--accent-color)]/8 rounded-3xl border-2 border-[var(--accent-color)] flex flex-col h-full m-4 md:m-0 md:rounded-2xl">
+      <div className="p-6 rounded-t-3xl md:rounded-t-2xl bg-[var(--accent-color)]">
+        <p className="text-sm text-white font-semibold">Hello, {user?.name || 'User'}</p>
       </div>
 
-      <div className="flex border-b border-[var(--accent-color)]/10 bg-[var(--accent-color)]/5">
+      <div className="flex border-b border-[var(--accent-color)]/20 bg-[var(--accent-color)]/5">
         {['notes', 'notebooks', 'flashcards', 'whiteboards'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab as any)}
-            className={`flex-1 py-3 text-xs md:text-sm font-medium relative group transition-all ${
+            className={`flex-1 py-3 text-xs md:text-sm font-medium transition-all ${
               activeTab === tab ? 'text-[var(--accent-color)] font-semibold' : 'text-[var(--text-color)]/70'
             }`}
           >
-            <div className={`absolute inset-1 rounded-lg transition-opacity duration-300 ${
-              activeTab === tab ? 'bg-[var(--accent-color)]/15 opacity-100' : 'opacity-0'
-            }`}></div>
-            <span className="relative z-10 capitalize">{tab}</span>
+            <span className="capitalize">{tab}</span>
           </button>
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-[var(--surface-color,white)] p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto bg-transparent p-4 space-y-3">
         {activeTab === 'notes' && <NoteList notes={notes} selectedNote={selectedNote} onSelectNote={(note) => {
           setSelectedNote(note)
           setSidebarOpen(false)
@@ -72,24 +69,24 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
             {!showNotebookForm ? (
               <button 
                 onClick={() => setShowNotebookForm(true)}
-                className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/20 rounded-lg text-[var(--text-color)] hover:border-[var(--accent-color)]/40 hover:bg-[var(--accent-color)]/5 transition-all"
+                className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)]/60 hover:bg-[var(--accent-color)]/10 transition-all"
               >
                 + Create Notebook
               </button>
             ) : (
-              <div className="p-3 border-2 border-[var(--accent-color)]/20 rounded-lg space-y-2 bg-[var(--bg-color,#faf8f5)]">
+              <div className="p-3 border-2 border-[var(--accent-color)]/30 rounded-2xl space-y-2 bg-[var(--bg-color,#faf8f5)]">
                 <input 
                   type="text"
                   value={notebookName}
                   onChange={(e) => setNotebookName(e.target.value)}
                   placeholder="Notebook name"
-                  className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] bg-[var(--surface-color,white)]"
+                  className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-xl focus:outline-none focus:border-[var(--accent-color)] bg-[var(--surface-color,white)]"
                   autoFocus
                 />
                 <div className="flex gap-2">
                   <button 
                     onClick={handleAddNotebook}
-                    className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-lg hover:opacity-90 font-semibold"
+                    className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-xl hover:opacity-90 font-semibold"
                   >
                     Create
                   </button>
@@ -98,7 +95,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
                       setNotebookName('')
                       setShowNotebookForm(false)
                     }}
-                    className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-400"
+                    className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-xl hover:bg-gray-400"
                   >
                     Cancel
                   </button>
@@ -108,7 +105,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
             <select 
               value={selectedFolder} 
               onChange={(e) => setSelectedFolder(e.target.value)}
-              className="w-full p-2 border border-[var(--accent-color)]/20 rounded-lg bg-[var(--surface-color,white)]"
+              className="w-full p-2 border border-[var(--accent-color)]/20 rounded-xl bg-[var(--surface-color,white)]"
             >
               {folders.map(f => <option key={f} value={f}>{f}</option>)}
             </select>
@@ -119,7 +116,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
                   setSelectedNotebook(nb)
                   setSidebarOpen(false)
                 }}
-                className={`w-full text-left p-3 rounded-lg transition-all ${
+                className={`w-full text-left p-3 rounded-xl transition-all ${
                   selectedNotebook?.id === nb.id
                     ? 'bg-[var(--accent-color)] text-white'
                     : 'bg-[var(--accent-color)]/10 text-[var(--text-color)] hover:bg-[var(--accent-color)]/20'
@@ -132,7 +129,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
         )}
       </div>
 
-      <div className="p-4 border-t border-[var(--accent-color)]/10 bg-[var(--accent-color)]/5">
+      <div className="p-4 border-t border-[var(--accent-color)]/20 bg-transparent rounded-b-3xl md:rounded-b-2xl">
         <div className="text-center text-xs text-[var(--text-color)]/70">
           {syncing ? 'Syncing...' : 'Auto-sync enabled'}
         </div>
