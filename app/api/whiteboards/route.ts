@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }
 
-  const data = await loadFromGist()
+  const data = await loadFromGist(userId)
   const userWhiteboards = data.whiteboards?.[userId] || []
   return NextResponse.json(userWhiteboards)
 }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const { title, template } = await request.json()
-    const data = await loadFromGist()
+    const data = await loadFromGist(userId)
     
     const whiteboard = {
       id: Date.now().toString(),
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       data.whiteboards[userId] = []
     }
     data.whiteboards[userId].push(whiteboard)
-    await saveToGist(data)
+    await saveToGist(data, userId)
 
     return NextResponse.json(whiteboard, { status: 201 })
   } catch (error) {

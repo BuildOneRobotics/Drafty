@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }
 
-  const data = await loadFromGist()
+  const data = await loadFromGist(userId)
   const userNotes = data.notes[userId] || []
   return NextResponse.json(userNotes)
 }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const { title, content, tags } = await request.json()
-    const data = await loadFromGist()
+    const data = await loadFromGist(userId)
     
     const note = {
       id: Date.now().toString(),
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       data.notes[userId] = []
     }
     data.notes[userId].push(note)
-    await saveToGist(data)
+    await saveToGist(data, userId)
 
     return NextResponse.json(note, { status: 201 })
   } catch (error) {

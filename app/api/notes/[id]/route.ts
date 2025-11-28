@@ -21,7 +21,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
   try {
     const { title, content, tags } = await request.json()
-    const data = await loadFromGist()
+    const data = await loadFromGist(userId)
     const userNotes = data.notes[userId] || []
     const noteIndex = userNotes.findIndex((n: any) => n.id === params.id)
 
@@ -38,7 +38,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
     
     data.notes[userId] = userNotes
-    await saveToGist(data)
+    await saveToGist(data, userId)
 
     return NextResponse.json(userNotes[noteIndex])
   } catch (error) {
@@ -53,7 +53,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   }
 
   try {
-    const data = await loadFromGist()
+    const data = await loadFromGist(userId)
     const userNotes = data.notes[userId] || []
     const noteIndex = userNotes.findIndex((n: any) => n.id === params.id)
 
@@ -63,7 +63,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     userNotes.splice(noteIndex, 1)
     data.notes[userId] = userNotes
-    await saveToGist(data)
+    await saveToGist(data, userId)
     
     return NextResponse.json({ message: 'Note deleted' })
   } catch (error) {
