@@ -85,7 +85,7 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col h-screen bg-[var(--bg-color,#faf8f5)] transition-colors duration-[2000ms]" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
       <Navbar />
-      <DashboardContent notes={notes} onLoadNotes={loadNotes} user={user} syncing={syncing} />
+      <DashboardContent notes={notes} onLoadNotes={loadNotes} user={user} />
       <footer className="bg-[var(--accent-color)]/20 border-t border-[var(--accent-color)]/30 py-6 px-4">
         <div className="flex flex-col md:flex-row justify-between items-center text-xs text-[var(--text-color)] space-y-2 md:space-y-0">
           <div className="flex gap-4">
