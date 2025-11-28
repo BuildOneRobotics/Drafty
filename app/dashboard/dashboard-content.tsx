@@ -7,6 +7,7 @@ import NotebookEditor from '@/components/NotebookEditor'
 import WhiteboardEditor from '@/components/Whiteboard'
 import FlashcardEditor from '@/components/FlashcardEditor'
 import TemplateModal from '@/components/TemplateModal'
+import { NoteIcon, NotebookIcon, FlashcardIcon, WhiteboardIcon, FilesIcon, FriendsIcon } from '@/components/Icons'
 import { whiteboardsAPI, notesAPI, flashcardsAPI } from '@/lib/api'
 
 interface DashboardContentProps {
@@ -131,28 +132,28 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
 
   const sidebar = (
     <div className="w-full md:w-80 bg-white border-r border-[var(--accent-color)]/20 flex flex-col h-full">
-      <div className="p-6 bg-[var(--accent-color)]">
+      <div className="p-6 bg-gradient-to-r from-[var(--accent-color)] to-[var(--accent-color)]/80 rounded-b-3xl shadow-sm">
         <p className="text-sm text-white font-semibold">Hello, {user?.name || 'User'}</p>
       </div>
 
       <div className="p-6 space-y-3">
         <div className="grid grid-cols-2 gap-3">
           {[
-            { id: 'notes', label: 'Notes', icon: '📝' },
-            { id: 'notebooks', label: 'Notebooks', icon: '📓' },
-            { id: 'flashcards', label: 'Flashcards', icon: '🎴' },
-            { id: 'whiteboards', label: 'Whiteboards', icon: '🎨' }
+            { id: 'notes', label: 'Notes', Icon: NoteIcon },
+            { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon },
+            { id: 'flashcards', label: 'Flashcards', Icon: FlashcardIcon },
+            { id: 'whiteboards', label: 'Whiteboards', Icon: WhiteboardIcon }
           ].map(item => (
             <button
               key={item.id}
               onClick={() => setView(item.id as any)}
-              className={`p-4 rounded-2xl transition-all text-center ${
+              className={`p-4 rounded-2xl transition-all text-center hover:scale-105 transform duration-200 ${
                 view === item.id
-                  ? 'bg-[var(--accent-color)] text-white'
+                  ? 'bg-[var(--accent-color)] text-white shadow-md'
                   : 'bg-[var(--accent-color)]/10 text-[var(--text-color)] hover:bg-[var(--accent-color)]/20'
               }`}
             >
-              <div className="text-2xl mb-1">{item.icon}</div>
+              <div className="flex justify-center mb-2"><item.Icon /></div>
               <div className="text-xs font-semibold">{item.label}</div>
             </button>
           ))}
@@ -160,18 +161,19 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
 
         <div className="border-t border-[var(--accent-color)]/20 pt-3 space-y-2">
           {[
-            { id: 'files', label: 'Files' },
-            { id: 'friends', label: 'Friends' }
+            { id: 'files', label: 'Files', Icon: FilesIcon },
+            { id: 'friends', label: 'Friends', Icon: FriendsIcon }
           ].map(item => (
             <button
               key={item.id}
               onClick={() => setView(item.id as any)}
-              className={`w-full p-3 rounded-xl transition-all text-left text-sm ${
+              className={`w-full p-3 rounded-xl transition-all text-left text-sm flex items-center gap-2 hover:scale-105 transform duration-200 ${
                 view === item.id
-                  ? 'bg-[var(--accent-color)] text-white'
+                  ? 'bg-[var(--accent-color)] text-white shadow-md'
                   : 'bg-[var(--accent-color)]/10 text-[var(--text-color)] hover:bg-[var(--accent-color)]/20'
               }`}
             >
+              <item.Icon />
               {item.label}
             </button>
           ))}
@@ -190,19 +192,19 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
             <h1 className="text-4xl font-bold text-[var(--text-color)] mb-8">Welcome, {user?.name || 'User'}</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
-                { id: 'notes', label: 'Notes', icon: '📝', count: notes.length },
-                { id: 'notebooks', label: 'Notebooks', icon: '📓', count: notebooks.length },
-                { id: 'flashcards', label: 'Flashcards', icon: '🎴', count: flashcards.length },
-                { id: 'whiteboards', label: 'Whiteboards', icon: '🎨', count: whiteboards.length }
+                { id: 'notes', label: 'Notes', Icon: NoteIcon, count: notes.length },
+                { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon, count: notebooks.length },
+                { id: 'flashcards', label: 'Flashcards', Icon: FlashcardIcon, count: flashcards.length },
+                { id: 'whiteboards', label: 'Whiteboards', Icon: WhiteboardIcon, count: whiteboards.length }
               ].map(item => (
                 <button
                   key={item.id}
                   onClick={() => setView(item.id as any)}
-                  className="p-6 bg-white rounded-3xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 transition-all text-left"
+                  className="p-6 bg-white rounded-3xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 hover:shadow-lg transition-all text-left hover:scale-105 transform duration-200"
                 >
-                  <div className="text-4xl mb-3">{item.icon}</div>
-                  <h3 className="text-xl font-bold text-[var(--text-color)] mb-1">{item.label}</h3>
-                  <p className="text-sm text-[var(--text-color)]/60">{item.count} items</p>
+                  <div className="flex justify-center mb-4 text-[var(--accent-color)]"><item.Icon /></div>
+                  <h3 className="text-xl font-bold text-[var(--text-color)] mb-1 text-center">{item.label}</h3>
+                  <p className="text-sm text-[var(--text-color)]/60 text-center">{item.count} items</p>
                 </button>
               ))}
             </div>
@@ -218,7 +220,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
                   setTemplateType('note')
                   setShowTemplateModal(true)
                 }}
-                className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90"
+                className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all"
               >
                 + New Note
               </button>
@@ -231,7 +233,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
                   <div
                     key={note.id}
                     onClick={() => setSelectedNote(note)}
-                    className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 cursor-pointer transition-all"
+                    className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 cursor-pointer transition-all hover:shadow-md"
                   >
                     <h3 className="font-bold text-[var(--text-color)]">{note.title}</h3>
                     <p className="text-sm text-[var(--text-color)]/60">{note.content.substring(0, 50)}</p>
@@ -248,7 +250,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
               <h2 className="text-2xl font-bold text-[var(--text-color)]">Notebooks</h2>
               <button
                 onClick={() => setShowNewNotebook(true)}
-                className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90"
+                className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all"
               >
                 + New Notebook
               </button>
@@ -287,7 +289,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
                   <div
                     key={nb.id}
                     onClick={() => setSelectedNotebook(nb)}
-                    className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 cursor-pointer transition-all"
+                    className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 cursor-pointer transition-all hover:shadow-md"
                   >
                     <h3 className="font-bold text-[var(--text-color)]">{nb.name}</h3>
                     <p className="text-sm text-[var(--text-color)]/60">{nb.pages.length} pages</p>
@@ -304,7 +306,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
               <h2 className="text-2xl font-bold text-[var(--text-color)]">Flashcards</h2>
               <button
                 onClick={() => setShowNewFlashcard(true)}
-                className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90"
+                className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all"
               >
                 + New Flashcard Set
               </button>
@@ -342,7 +344,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
                 {flashcards.map(fc => (
                   <div
                     key={fc.id}
-                    className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 transition-all"
+                    className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 transition-all hover:shadow-md"
                   >
                     <div
                       onClick={() => setSelectedFlashcard(fc)}
@@ -373,7 +375,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
                   setTemplateType('whiteboard')
                   setShowTemplateModal(true)
                 }}
-                className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90"
+                className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all"
               >
                 + New Whiteboard
               </button>
@@ -388,7 +390,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
                   <div
                     key={wb.id}
                     onClick={() => setSelectedWhiteboard(wb)}
-                    className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 cursor-pointer transition-all"
+                    className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 cursor-pointer transition-all hover:shadow-md"
                   >
                     <h3 className="font-bold text-[var(--text-color)]">{wb.title}</h3>
                     <p className="text-sm text-[var(--text-color)]/60">{wb.template}</p>
