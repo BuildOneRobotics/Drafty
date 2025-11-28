@@ -18,17 +18,12 @@ interface DashboardContentProps {
 export default function DashboardContent({ notes, onLoadNotes, user }: DashboardContentProps) {
   const { isMobile, isPhone } = useMobile()
   const [view, setView] = useState<'home' | 'notes' | 'notebooks' | 'flashcards' | 'whiteboards' | 'files' | 'friends'>('home')
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [notebooks, setNotebooks] = useState<Notebook[]>([])
   const [whiteboards, setWhiteboards] = useState<WhiteboardType[]>([])
   const [flashcards, setFlashcards] = useState<Flashcard[]>([])
   const [flashcardFolders, setFlashcardFolders] = useState<FlashcardFolder[]>([])
-  const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null)
-  const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardType | null>(null)
   const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(null)
   const [expandedFolder, setExpandedFolder] = useState<string | null>(null)
-  const [showTemplateModal, setShowTemplateModal] = useState(false)
-  const [templateType, setTemplateType] = useState<'note' | 'whiteboard'>('note')
   const [notebookName, setNotebookName] = useState('')
   const [showNewNotebook, setShowNewNotebook] = useState(false)
   const [flashcardName, setFlashcardName] = useState('')
@@ -36,8 +31,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
   const [showNewFolder, setShowNewFolder] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
   const [newFolderColor, setNewFolderColor] = useState('#22c55e')
-  const [searchUsername, setSearchUsername] = useState('')
-  const [friends, setFriends] = useState<string[]>([])
   const [files, setFiles] = useState<{id: string, name: string, folder?: string}[]>([
     {id: '1', name: 'Document.pdf'},
     {id: '2', name: 'Image.png'},
@@ -46,7 +39,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
   const [draggedFile, setDraggedFile] = useState<string | null>(null)
   const [draggedFlashcard, setDraggedFlashcard] = useState<string | null>(null)
   const [dragOverFolder, setDragOverFolder] = useState<string | null>(null)
-  const allUsers = ['alice', 'bob', 'charlie', 'david', 'emma']
 
   useEffect(() => {
     loadWhiteboards()
@@ -92,9 +84,8 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
 
   const handleCreateNote = async () => {
     try {
-      const response = await notesAPI.createNote(`New Note ${new Date().toLocaleTimeString()}`, '', [])
+      await notesAPI.createNote(`New Note ${new Date().toLocaleTimeString()}`, '', [])
       onLoadNotes()
-      setSelectedNote(response.data)
       setView('notes')
     } catch (error) {
       console.error('Failed to create note:', error)
@@ -105,8 +96,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
     try {
       const response = await whiteboardsAPI.createWhiteboard(`Whiteboard ${new Date().toLocaleTimeString()}`, template)
       setWhiteboards([response.data, ...whiteboards])
-      setSelectedWhiteboard(response.data)
-      setView('whiteboards')
     } catch (error) {
       console.error('Failed to create whiteboard:', error)
     }
@@ -158,9 +147,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
     setFlashcards(flashcards.map(fc => fc.id === flashcardId ? { ...fc, folderId } : fc))
   }
 
-  const handleMoveFile = (fileId: string, targetFolder?: string) => {
-    setFiles(files.map(f => f.id === fileId ? { ...f, folder: targetFolder } : f))
-  }
+
 
   const handleAddNotebook = () => {
     if (!notebookName.trim()) return
@@ -171,21 +158,9 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
       pages: [{ id: '1', number: 1, title: 'Page 1', content: '' }]
     }
     setNotebooks([...notebooks, newNotebook])
-    setSelectedNotebook(newNotebook)
     setNotebookName('')
     setShowNewNotebook(false)
     setView('notebooks')
-  }
-
-  const handleAddFriend = (username: string) => {
-    if (!friends.includes(username)) {
-      setFriends([...friends, username])
-      setSearchUsername('')
-    }
-  }
-
-  const handleRemoveFriend = (username: string) => {
-    setFriends(friends.filter(f => f !== username))
   }
 
   const navItems = [
@@ -348,7 +323,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
         )}
       </div>
 
-      <TemplateModal isOpen={showTemplateModal} onClose={() => setShowTemplateModal(false)} onSelect={templateType === 'note' ? handleCreateNote : handleCreateWhiteboard} type={templateType} />
+      <TemplateModal isOpen={showTemplateModal} onClose={() => setShowTemplateModal(false)} onSelect={handleCreateNote} type="note" />
     </div>
   )
 }
