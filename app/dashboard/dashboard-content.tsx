@@ -21,7 +21,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
   const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null)
   const [showNotebookForm, setShowNotebookForm] = useState(false)
   const [notebookName, setNotebookName] = useState('')
-  const [folders, setFolders] = useState<string[]>(['General'])
+  const [folders] = useState<string[]>(['General'])
   const [selectedFolder, setSelectedFolder] = useState('General')
 
   const handleAddNotebook = () => {
