@@ -13,21 +13,6 @@ interface DashboardContentProps {
   syncing: boolean
 }
 
-interface WhiteboardItem {
-  id: string
-  type: 'note' | 'circle' | 'square' | 'triangle'
-  x: number
-  y: number
-  text: string
-  color: string
-}
-
-interface Whiteboard {
-  id: string
-  name: string
-  items: WhiteboardItem[]
-}
-
 export default function DashboardContent({ notes, onLoadNotes, user, syncing }: DashboardContentProps) {
   const [selectedNote, setSelectedNote] = useState<Note | null>(notes[0] || null)
   const [activeTab, setActiveTab] = useState<'notes' | 'notebooks' | 'flashcards' | 'whiteboards'>('notes')
