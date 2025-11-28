@@ -103,26 +103,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
     }
   }
 
-  const handleDeleteNote = async (id: string) => {
-    try {
-      await notesAPI.deleteNote(id)
-      onLoadNotes()
-      setSelectedNote(null)
-    } catch (error) {
-      console.error('Failed to delete note:', error)
-    }
-  }
-
-  const handleDeleteWhiteboard = async (id: string) => {
-    try {
-      await whiteboardsAPI.deleteWhiteboard(id)
-      setWhiteboards(whiteboards.filter(w => w.id !== id))
-      setSelectedWhiteboard(null)
-    } catch (error) {
-      console.error('Failed to delete whiteboard:', error)
-    }
-  }
-
   const handleAddNotebook = () => {
     if (!notebookName.trim()) return
     const newNotebook: Notebook = {
