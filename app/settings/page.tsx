@@ -97,7 +97,7 @@ export default function Settings() {
                 key={tab}
                 onClick={() => handleTabChange(tab as any)}
                 className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
-                  activeTab === tab ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
+                  activeTab === tab ? 'bg-[var(--accent-color)]/20 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
                 }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -150,7 +150,7 @@ export default function Settings() {
                     className={`px-6 py-3 rounded-xl font-medium transition-all ${
                       darkMode
                         ? 'bg-[var(--accent-color)] text-white'
-                        : 'bg-[var(--accent-color)]/10 text-[var(--text-color)]'
+                        : 'bg-[var(--accent-color)]/20 text-[var(--text-color)]'
                     }`}
                   >
                     {darkMode ? '🌙 Dark Mode On' : '☀️ Dark Mode Off'}
@@ -168,7 +168,7 @@ export default function Settings() {
                           applyTheme(font.id, brightness, darkMode)
                         }}
                         className={`p-4 rounded-xl border-2 transition-all ${
-                          selectedFont === font.id ? 'border-[var(--accent-color)]' : 'border-[var(--accent-color)]/20'
+                          selectedFont === font.id ? 'border-[var(--accent-color)] bg-[var(--accent-color)]/20' : 'border-[var(--accent-color)]/20'
                         }`}
                       >
                         <div className="font-semibold text-[var(--text-color)] mb-2">{font.name}</div>
