@@ -150,6 +150,11 @@ export default function Dashboard() {
       '#dcfce7': 'bg-green-100'
     }
     
+    const handleContextMenu = (e: React.MouseEvent) => {
+      e.preventDefault()
+      deleteItem(item.id)
+    }
+    
     if (item.type === 'note') {
       return (
         <div
@@ -157,13 +162,13 @@ export default function Dashboard() {
           style={{left: `${item.x}px`, top: `${item.y}px`}}
           className={`${baseClass} ${colors[item.color] || 'bg-yellow-100'} w-32 h-32 shadow-lg`}
           onMouseDown={(e) => setDraggedItem({id: item.id, startX: e.clientX - item.x, startY: e.clientY - item.y})}
+          onContextMenu={handleContextMenu}
         >
           <textarea
             value={item.text}
             onChange={(e) => updateItemText(item.id, e.target.value)}
             className="w-full h-full bg-transparent outline-none text-sm resize-none"
           />
-          <button onClick={() => deleteItem(item.id)} className="absolute top-1 right-1 text-red-500 text-xs">×</button>
         </div>
       )
     }
@@ -172,11 +177,10 @@ export default function Dashboard() {
         <div
           key={item.id}
           style={{left: `${item.x}px`, top: `${item.y}px`}}
-          className={`${baseClass} w-20 h-20 rounded-full ${colors[item.color] || 'bg-blue-100'} shadow-lg flex items-center justify-center`}
+          className={`${baseClass} w-20 h-20 rounded-full ${colors[item.color] || 'bg-blue-100'} shadow-lg`}
           onMouseDown={(e) => setDraggedItem({id: item.id, startX: e.clientX - item.x, startY: e.clientY - item.y})}
-        >
-          <button onClick={() => deleteItem(item.id)} className="text-red-500 text-xs">×</button>
-        </div>
+          onContextMenu={handleContextMenu}
+        />
       )
     }
     if (item.type === 'square') {
@@ -184,11 +188,10 @@ export default function Dashboard() {
         <div
           key={item.id}
           style={{left: `${item.x}px`, top: `${item.y}px`}}
-          className={`${baseClass} w-20 h-20 ${colors[item.color] || 'bg-green-100'} shadow-lg flex items-center justify-center`}
+          className={`${baseClass} w-20 h-20 ${colors[item.color] || 'bg-green-100'} shadow-lg`}
           onMouseDown={(e) => setDraggedItem({id: item.id, startX: e.clientX - item.x, startY: e.clientY - item.y})}
-        >
-          <button onClick={() => deleteItem(item.id)} className="text-red-500 text-xs">×</button>
-        </div>
+          onContextMenu={handleContextMenu}
+        />
       )
     }
     if (item.type === 'triangle') {
@@ -198,6 +201,7 @@ export default function Dashboard() {
           style={{left: `${item.x}px`, top: `${item.y}px`, width: 0, height: 0, borderLeft: '20px solid transparent', borderRight: '20px solid transparent', borderBottom: '40px solid #fca5a5'}}
           className="absolute cursor-move"
           onMouseDown={(e) => setDraggedItem({id: item.id, startX: e.clientX - item.x, startY: e.clientY - item.y})}
+          onContextMenu={handleContextMenu}
         />
       )
     }

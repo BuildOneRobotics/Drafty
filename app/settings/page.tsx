@@ -10,6 +10,7 @@ const themes = [
   { id: 'ocean', name: 'Ocean Blue', bg: '#d1ecfd', accent: '#0ea5e9' },
   { id: 'forest', name: 'Forest Green', bg: '#c6f6d5', accent: '#22c55e' },
   { id: 'sunset', name: 'Sunset Purple', bg: '#ead9ff', accent: '#a855f7' },
+  { id: 'sunshine', name: 'Sunshine', bg: '#fef3c7', accent: '#f59e0b' },
 ]
 
 const fonts = [
@@ -18,8 +19,6 @@ const fonts = [
   { id: 'mono', name: 'Mono', family: 'Courier New, monospace' },
   { id: 'system', name: 'System', family: '-apple-system, BlinkMacSystemFont, sans-serif' },
 ]
-
-
 
 export default function Settings() {
   const router = useRouter()
@@ -33,6 +32,16 @@ export default function Settings() {
   const [editingFolder, setEditingFolder] = useState<string | null>(null)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [colorPickerOpen, setColorPickerOpen] = useState<string | null>(null)
+  const [selectedTheme, setSelectedTheme] = useState('beige')
+  const [selectedFont, setSelectedFont] = useState('inter')
+  const [brightness, setBrightness] = useState(50)
+  const [darkMode, setDarkMode] = useState(false)
+  const [searchUsername, setSearchUsername] = useState('')
+  const [friends, setFriends] = useState<string[]>([])
+  const [pendingRequests, setPendingRequests] = useState<string[]>([])
+  const [sentRequests, setSentRequests] = useState<string[]>([])
+  const [searchResults, setSearchResults] = useState<string[]>([])
+  const [selectedNotes, setSelectedNotes] = useState<string[]>([])
 
   const handleTabChange = (tab: 'account' | 'customize' | 'friends' | 'files' | 'privacy') => {
     if (tab !== activeTab) {
@@ -43,24 +52,19 @@ export default function Settings() {
       }, 300)
     }
   }
-  const [selectedTheme, setSelectedTheme] = useState('beige')
-  const [selectedFont, setSelectedFont] = useState('inter')
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const theme = localStorage.getItem('theme') || 'beige'
       const font = localStorage.getItem('font') || 'inter'
+      const br = parseInt(localStorage.getItem('brightness') || '50')
+      const dm = localStorage.getItem('darkMode') === 'true'
       setSelectedTheme(theme)
       setSelectedFont(font)
+      setBrightness(br)
+      setDarkMode(dm)
     }
   }, [])
-  const [searchUsername, setSearchUsername] = useState('')
-  const [friends, setFriends] = useState<string[]>([])
-  const [pendingRequests, setPendingRequests] = useState<string[]>([])
-  const [sentRequests, setSentRequests] = useState<string[]>([])
-  const [searchResults, setSearchResults] = useState<string[]>([])
-  const [selectedNotes, setSelectedNotes] = useState<string[]>([])
-
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -69,7 +73,6 @@ export default function Settings() {
 
   const handleSearch = () => {
     if (searchUsername.length > 0) {
-      // Mock user database - in real app this would be an API call
       const mockUsers = ['alice', 'bob', 'charlie', 'david', 'emma']
       const exactMatch = mockUsers.filter(u => u === searchUsername.toLowerCase())
       setSearchResults(exactMatch)
@@ -112,88 +115,27 @@ export default function Settings() {
       <Navbar />
       
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-[#4a3f35] mb-8">Settings</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-color)] mb-8">Settings</h1>
 
         <div className="flex flex-col md:flex-row gap-6">
           <div className="md:w-64 bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-4 border border-[var(--accent-color)]/30 h-fit">
-            <button
-              onClick={() => handleTabChange('account')}
-              className="w-full text-left px-4 py-3 rounded-xl mb-2 relative group"
-            >
-              <div className={`absolute inset-1 rounded-lg transition-opacity duration-300 ${
-                activeTab === 'account' ? 'bg-[var(--accent-color)]/15 opacity-100' : 'bg-[var(--accent-color)]/10 opacity-0 group-hover:opacity-100'
-              }`}></div>
-              <div className={`flex items-center space-x-3 relative z-10 ${
-                activeTab === 'account' ? 'text-[var(--accent-color)] font-semibold' : ''
-              }`}>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span>Account</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleTabChange('customize')}
-              className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
-                activeTab === 'customize' ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                </svg>
-                <span>Customize</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleTabChange('friends')}
-              className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
-                activeTab === 'friends' ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <span>Friends</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleTabChange('files')}
-              className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
-                activeTab === 'files' ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg>
-                <span>Files</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleTabChange('privacy')}
-              className={`w-full text-left px-4 py-3 rounded-xl transition-all ${
-                activeTab === 'privacy' ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <span>Privacy</span>
-              </div>
-            </button>
+            {['account', 'customize', 'friends', 'files', 'privacy'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => handleTabChange(tab as any)}
+                className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
+                  activeTab === tab ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
           </div>
 
           <div className="flex-1" style={{ opacity: fadeOut ? 0 : 1, transition: 'opacity 0.3s ease' }}>
             {activeTab === 'account' && (
               <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
-                <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Account Settings</h2>
+                <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Account Settings</h2>
                 <button
                   onClick={handleLogout}
                   className="bg-red-500 text-white px-6 py-3 rounded-xl hover:bg-red-600 font-medium transition-all transform hover:scale-105"
@@ -206,14 +148,14 @@ export default function Settings() {
             {activeTab === 'customize' && (
               <div className="space-y-6">
                 <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
-                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Themes</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Themes</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     {themes.map((theme) => (
                       <button
                         key={theme.id}
                         onClick={() => {
                           setSelectedTheme(theme.id)
-                          applyTheme(theme.id, selectedFont)
+                          applyTheme(theme.id, selectedFont, brightness, darkMode)
                         }}
                         className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
                           selectedTheme === theme.id ? 'border-[var(--accent-color)]' : 'border-[var(--accent-color)]/30'
@@ -233,36 +175,71 @@ export default function Settings() {
                 </div>
 
                 <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
-                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Fonts</h2>
+                  <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Brightness</h2>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={brightness}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value)
+                        setBrightness(val)
+                        applyTheme(selectedTheme, selectedFont, val, darkMode)
+                      }}
+                      className="flex-1 h-2 bg-[var(--accent-color)]/20 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <span className="text-sm font-semibold text-[var(--text-color)] w-12">{brightness}%</span>
+                  </div>
+                </div>
+
+                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+                  <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Dark Mode</h2>
+                  <button
+                    onClick={() => {
+                      const newDarkMode = !darkMode
+                      setDarkMode(newDarkMode)
+                      applyTheme(selectedTheme, selectedFont, brightness, newDarkMode)
+                    }}
+                    className={`px-6 py-3 rounded-xl font-medium transition-all ${
+                      darkMode
+                        ? 'bg-[var(--accent-color)] text-white'
+                        : 'bg-[var(--accent-color)]/10 text-[var(--text-color)]'
+                    }`}
+                  >
+                    {darkMode ? '🌙 Dark Mode On' : '☀️ Dark Mode Off'}
+                  </button>
+                </div>
+
+                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+                  <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Fonts</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {fonts.map((font) => (
                       <button
                         key={font.id}
                         onClick={() => {
                           setSelectedFont(font.id)
-                          applyTheme(selectedTheme, font.id)
+                          applyTheme(selectedTheme, font.id, brightness, darkMode)
                         }}
                         className={`p-4 rounded-xl border-2 transition-all transform hover:scale-105 ${
                           selectedFont === font.id ? 'border-[var(--accent-color)]' : 'border-[var(--accent-color)]/30'
                         }`}
                       >
-                        <div className="font-semibold text-[#4a3f35] mb-2">{font.name}</div>
-                        <p style={{ fontFamily: font.family }} className="text-sm text-[#8b6f47]">
+                        <div className="font-semibold text-[var(--text-color)] mb-2">{font.name}</div>
+                        <p style={{ fontFamily: font.family }} className="text-sm text-[var(--text-color)]/70">
                           The quick brown fox
                         </p>
                       </button>
                     ))}
                   </div>
                 </div>
-
-
               </div>
             )}
 
             {activeTab === 'friends' && (
               <div className="space-y-6">
                 <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
-                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Search Users</h2>
+                  <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Search Users</h2>
                   <div className="flex gap-2 mb-4">
                     <input
                       type="text"
@@ -272,14 +249,14 @@ export default function Settings() {
                         handleSearch()
                       }}
                       placeholder="Type exact username..."
-                      className="flex-1 px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-xl focus:outline-none focus:border-[#c17d4a] transition-colors"
+                      className="flex-1 px-4 py-3 border-2 border-[var(--accent-color)]/30 rounded-xl focus:outline-none focus:border-[var(--accent-color)] transition-colors"
                     />
                   </div>
                   {searchResults.length > 0 && (
                     <div className="space-y-2 mb-6">
                       {searchResults.map((username) => (
-                        <div key={username} className="flex items-center justify-between p-3 bg-[#f5ebe1] rounded-xl">
-                          <span className="font-medium text-[#4a3f35]">{username}</span>
+                        <div key={username} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
+                          <span className="font-medium text-[var(--text-color)]">{username}</span>
                           <button
                             onClick={() => handleSendRequest(username)}
                             className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 text-sm font-medium"
@@ -290,56 +267,14 @@ export default function Settings() {
                       ))}
                     </div>
                   )}
-
-                  {pendingRequests.length > 0 && (
-                    <>
-                      <h3 className="font-bold text-[#4a3f35] mb-4 mt-6">Pending Requests</h3>
-                      <div className="space-y-2 mb-6">
-                        {pendingRequests.map((username) => (
-                          <div key={username} className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl border border-yellow-200">
-                            <span className="font-medium text-[#4a3f35]">{username}</span>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleAcceptRequest(username)}
-                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 text-sm font-medium"
-                              >
-                                Accept
-                              </button>
-                              <button
-                                onClick={() => handleRejectRequest(username)}
-                                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 text-sm font-medium"
-                              >
-                                Reject
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
-
-                  {sentRequests.length > 0 && (
-                    <>
-                      <h3 className="font-bold text-[#4a3f35] mb-4 mt-6">Sent Requests</h3>
-                      <div className="space-y-2 mb-6">
-                        {sentRequests.map((username) => (
-                          <div key={username} className="flex items-center justify-between p-3 bg-blue-50 rounded-xl border border-blue-200">
-                            <span className="font-medium text-[#4a3f35]">{username}</span>
-                            <span className="text-sm text-blue-600">Pending...</span>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
-
-                  <h3 className="font-bold text-[#4a3f35] mb-4 mt-6">Your Friends</h3>
+                  <h3 className="font-bold text-[var(--text-color)] mb-4 mt-6">Your Friends</h3>
                   <div className="space-y-2">
                     {friends.length === 0 ? (
-                      <p className="text-[#8b6f47] text-sm">No friends yet. Search and send friend requests!</p>
+                      <p className="text-[var(--text-color)]/70 text-sm">No friends yet</p>
                     ) : (
                       friends.map((friend) => (
-                        <div key={friend} className="flex items-center justify-between p-3 bg-[#f5ebe1] rounded-xl">
-                          <span className="font-medium text-[#4a3f35]">{friend}</span>
+                        <div key={friend} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
+                          <span className="font-medium text-[var(--text-color)]">{friend}</span>
                           <button 
                             onClick={() => handleRemoveFriend(friend)}
                             className="text-red-500 hover:text-red-700 text-sm font-medium"
@@ -351,46 +286,12 @@ export default function Settings() {
                     )}
                   </div>
                 </div>
-
-                {friends.length > 0 && (
-                  <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
-                    <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Share Notes with Friends</h2>
-                    <p className="text-[#8b6f47] mb-4">Select notes to share with your friends</p>
-                    <div className="space-y-2">
-                      <label className="flex items-center space-x-3 p-3 bg-[#f5ebe1] rounded-xl cursor-pointer hover:bg-[#f0e5d5] transition-colors">
-                        <input 
-                          type="checkbox" 
-                          className="w-5 h-5 text-[#c17d4a] rounded"
-                          onChange={() => handleToggleNote('note1')}
-                          checked={selectedNotes.includes('note1')}
-                        />
-                        <span className="text-[#4a3f35]">My First Note</span>
-                      </label>
-                      <label className="flex items-center space-x-3 p-3 bg-[#f5ebe1] rounded-xl cursor-pointer hover:bg-[#f0e5d5] transition-colors">
-                        <input 
-                          type="checkbox" 
-                          className="w-5 h-5 text-[#c17d4a] rounded"
-                          onChange={() => handleToggleNote('note2')}
-                          checked={selectedNotes.includes('note2')}
-                        />
-                        <span className="text-[#4a3f35]">Math Notebook</span>
-                      </label>
-                    </div>
-                    {selectedNotes.length > 0 && (
-                      <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-xl">
-                        <p className="text-sm text-green-700">
-                          {selectedNotes.length} note(s) shared with {friends.length} friend(s)
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             )}
 
             {activeTab === 'files' && (
               <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
-                <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Folder Management</h2>
+                <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Folder Management</h2>
                 {!showNewFolder ? (
                   <button 
                     onClick={() => setShowNewFolder(true)}
@@ -415,7 +316,7 @@ export default function Settings() {
                         onChange={(e) => setNewFolderColor(e.target.value)}
                         className="w-12 h-10 rounded cursor-pointer"
                       />
-                      <span className="text-sm text-[#8b6f47]">{newFolderColor}</span>
+                      <span className="text-sm text-[var(--text-color)]/70">{newFolderColor}</span>
                     </div>
                     <div className="flex gap-2">
                       <button 
@@ -449,7 +350,7 @@ export default function Settings() {
                     <div key={folder.id} className="flex items-center justify-between p-3 rounded-xl relative" style={{backgroundColor: folder.color + '20'}}>
                       <div className="flex items-center gap-3">
                         <div className="w-4 h-4 rounded-full" style={{backgroundColor: folder.color}}></div>
-                        <span className="font-medium">{folder.name}</span>
+                        <span className="font-medium text-[var(--text-color)]">{folder.name}</span>
                       </div>
                       <div className="relative">
                         <button onClick={() => setMenuOpen(menuOpen === folder.id ? null : folder.id)} className="p-1 hover:bg-black/10 rounded">
@@ -460,14 +361,14 @@ export default function Settings() {
                           </svg>
                         </button>
                         {menuOpen === folder.id && (
-                          <div className="absolute right-0 mt-1 bg-white border border-[var(--accent-color)]/30 rounded-lg shadow-lg z-10 w-40">
-                            <button onClick={() => { setEditingFolder(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10 rounded-t-lg">Rename</button>
-                            <button onClick={() => { setColorPickerOpen(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10">Change Color</button>
+                          <div className="absolute right-0 mt-1 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/30 rounded-lg shadow-lg z-10 w-40">
+                            <button onClick={() => { setEditingFolder(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10 rounded-t-lg text-[var(--text-color)]">Rename</button>
+                            <button onClick={() => { setColorPickerOpen(folder.id); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-[var(--accent-color)]/10 text-[var(--text-color)]">Change Color</button>
                             <button onClick={() => { setFolders(folders.filter(f => f.id !== folder.id)); setMenuOpen(null) }} className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 rounded-b-lg">Delete</button>
                           </div>
                         )}
                         {colorPickerOpen === folder.id && (
-                          <div className="absolute right-0 mt-1 bg-white border border-[var(--accent-color)]/30 rounded-lg shadow-lg z-10 p-3">
+                          <div className="absolute right-0 mt-1 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/30 rounded-lg shadow-lg z-10 p-3">
                             <input 
                               type="color"
                               value={folder.color}
@@ -479,7 +380,7 @@ export default function Settings() {
                         )}
                       </div>
                       {editingFolder === folder.id && (
-                        <div className="absolute inset-0 bg-white rounded-xl p-3 flex items-center gap-2 border-2 border-[var(--accent-color)]">
+                        <div className="absolute inset-0 bg-[var(--surface-color,white)] rounded-xl p-3 flex items-center gap-2 border-2 border-[var(--accent-color)]">
                           <input 
                             value={folder.name}
                             onChange={(e) => setFolders(folders.map(f => f.id === folder.id ? {...f, name: e.target.value} : f))}
@@ -498,40 +399,30 @@ export default function Settings() {
             )}
 
             {activeTab === 'privacy' && (
-              <div className="space-y-6">
-                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
-                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Privacy Settings</h2>
-                  <p className="text-[#8b6f47] mb-4">Your data is encrypted and stored securely in GitHub Gist</p>
+              <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
+                <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Export Data</h2>
+                <p className="text-[var(--text-color)]/70 mb-4">Select files to export</p>
+                <div className="space-y-2 mb-4">
+                  <label className="flex items-center space-x-3 p-3 bg-[var(--accent-color)]/5 rounded-xl cursor-pointer">
+                    <input type="checkbox" onChange={(e) => e.target.checked ? setExportSelected([...exportSelected, 'note1']) : setExportSelected(exportSelected.filter(id => id !== 'note1'))} />
+                    <span className="text-[var(--text-color)]">My First Note</span>
+                  </label>
                 </div>
-                <div className="bg-[var(--surface-color,white)] rounded-2xl shadow-lg p-6 md:p-8 border border-[var(--accent-color)]/30">
-                  <h2 className="text-2xl font-bold text-[#4a3f35] mb-6">Export Data</h2>
-                  <p className="text-[#8b6f47] mb-4">Select files to export</p>
-                  <div className="space-y-2 mb-4">
-                    <label className="flex items-center space-x-3 p-3 bg-[var(--accent-color)]/5 rounded-xl cursor-pointer">
-                      <input type="checkbox" onChange={(e) => e.target.checked ? setExportSelected([...exportSelected, 'note1']) : setExportSelected(exportSelected.filter(id => id !== 'note1'))} />
-                      <span>My First Note</span>
-                    </label>
-                    <label className="flex items-center space-x-3 p-3 bg-[var(--accent-color)]/5 rounded-xl cursor-pointer">
-                      <input type="checkbox" onChange={(e) => e.target.checked ? setExportSelected([...exportSelected, 'note2']) : setExportSelected(exportSelected.filter(id => id !== 'note2'))} />
-                      <span>Math Notebook</span>
-                    </label>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      const data = JSON.stringify({files: exportSelected}, null, 2)
-                      const blob = new Blob([data], {type: 'application/json'})
-                      const url = URL.createObjectURL(blob)
-                      const a = document.createElement('a')
-                      a.href = url
-                      a.download = 'drafty-export.json'
-                      a.click()
-                    }}
-                    disabled={exportSelected.length === 0}
-                    className="bg-[var(--accent-color)] text-white px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50 font-medium"
-                  >
-                    Export Selected ({exportSelected.length})
-                  </button>
-                </div>
+                <button 
+                  onClick={() => {
+                    const data = JSON.stringify({files: exportSelected}, null, 2)
+                    const blob = new Blob([data], {type: 'application/json'})
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = 'drafty-export.json'
+                    a.click()
+                  }}
+                  disabled={exportSelected.length === 0}
+                  className="bg-[var(--accent-color)] text-white px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50 font-medium"
+                >
+                  Export Selected ({exportSelected.length})
+                </button>
               </div>
             )}
           </div>
@@ -540,5 +431,3 @@ export default function Settings() {
     </div>
   )
 }
-
-
