@@ -16,7 +16,7 @@ interface DashboardContentProps {
 export default function DashboardContent({ notes, user }: DashboardContentProps) {
   const { isPhone } = useMobile()
   const [view, setView] = useState<'home' | 'notes' | 'notebooks' | 'flashcards' | 'whiteboards' | 'files' | 'friends'>('home')
-  const [notebooks, setNotebooks] = useState<Notebook[]>([])
+  const [notebooks] = useState<Notebook[]>([])
   const [whiteboards, setWhiteboards] = useState<WhiteboardType[]>([])
   const [flashcards, setFlashcards] = useState<Flashcard[]>([])
   const [flashcardFolders, setFlashcardFolders] = useState<FlashcardFolder[]>([])
