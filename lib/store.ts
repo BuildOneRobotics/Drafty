@@ -34,6 +34,20 @@ export interface Whiteboard {
   updatedAt: string
 }
 
+export interface Card {
+  id: string
+  question: string
+  answer: string
+}
+
+export interface Flashcard {
+  id: string
+  title: string
+  cards: Card[]
+  createdAt: string
+  updatedAt: string
+}
+
 export interface User {
   id: string
   email: string
@@ -46,10 +60,12 @@ interface Store {
   notes: Note[]
   notebooks: Notebook[]
   whiteboards: Whiteboard[]
+  flashcards: Flashcard[]
   setUser: (user: User | null) => void
   setNotes: (notes: Note[]) => void
   setNotebooks: (notebooks: Notebook[]) => void
   setWhiteboards: (whiteboards: Whiteboard[]) => void
+  setFlashcards: (flashcards: Flashcard[]) => void
   addNote: (note: Note) => void
   updateNote: (id: string, note: Partial<Note>) => void
   deleteNote: (id: string) => void
@@ -59,6 +75,9 @@ interface Store {
   addWhiteboard: (whiteboard: Whiteboard) => void
   updateWhiteboard: (id: string, whiteboard: Partial<Whiteboard>) => void
   deleteWhiteboard: (id: string) => void
+  addFlashcard: (flashcard: Flashcard) => void
+  updateFlashcard: (id: string, flashcard: Partial<Flashcard>) => void
+  deleteFlashcard: (id: string) => void
 }
 
 export const useStore = create<Store>((set) => ({
@@ -66,10 +85,12 @@ export const useStore = create<Store>((set) => ({
   notes: [],
   notebooks: [],
   whiteboards: [],
+  flashcards: [],
   setUser: (user) => set({ user }),
   setNotes: (notes) => set({ notes }),
   setNotebooks: (notebooks) => set({ notebooks }),
   setWhiteboards: (whiteboards) => set({ whiteboards }),
+  setFlashcards: (flashcards) => set({ flashcards }),
   addNote: (note) => set((state) => ({ notes: [note, ...state.notes] })),
   updateNote: (id, updates) =>
     set((state) => ({
@@ -102,5 +123,16 @@ export const useStore = create<Store>((set) => ({
   deleteWhiteboard: (id) =>
     set((state) => ({
       whiteboards: state.whiteboards.filter((wb) => wb.id !== id),
+    })),
+  addFlashcard: (flashcard) => set((state) => ({ flashcards: [flashcard, ...state.flashcards] })),
+  updateFlashcard: (id, updates) =>
+    set((state) => ({
+      flashcards: state.flashcards.map((fc) =>
+        fc.id === id ? { ...fc, ...updates, updatedAt: new Date().toISOString() } : fc
+      ),
+    })),
+  deleteFlashcard: (id) =>
+    set((state) => ({
+      flashcards: state.flashcards.filter((fc) => fc.id !== id),
     })),
 }))

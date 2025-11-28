@@ -43,4 +43,13 @@ export const whiteboardsAPI = {
   deleteWhiteboard: (id: string) => api.delete(`/whiteboards/${id}`),
 }
 
+export const flashcardsAPI = {
+  getFlashcards: () => api.get('/flashcards'),
+  createFlashcard: (title: string) =>
+    api.post('/flashcards', { title, cards: [] }),
+  updateFlashcard: (id: string, title: string, cards: any[]) =>
+    api.put(`/flashcards/${id}`, { title, cards }),
+  deleteFlashcard: (id: string) => api.delete(`/flashcards/${id}`),
+}
+
 export default api

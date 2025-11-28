@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Note, Notebook, Whiteboard as WhiteboardType } from '@/lib/store'
+import { Note, Notebook, Whiteboard as WhiteboardType, Flashcard } from '@/lib/store'
 import NoteEditor from '@/components/NoteEditor'
 import NotebookEditor from '@/components/NotebookEditor'
 import WhiteboardEditor from '@/components/Whiteboard'
+import FlashcardEditor from '@/components/FlashcardEditor'
 import TemplateModal from '@/components/TemplateModal'
-import { whiteboardsAPI, notesAPI } from '@/lib/api'
+import { whiteboardsAPI, notesAPI, flashcardsAPI } from '@/lib/api'
 
 interface DashboardContentProps {
   notes: Note[]
@@ -20,18 +21,23 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [notebooks, setNotebooks] = useState<Notebook[]>([])
   const [whiteboards, setWhiteboards] = useState<WhiteboardType[]>([])
+  const [flashcards, setFlashcards] = useState<Flashcard[]>([])
   const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null)
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardType | null>(null)
+  const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(null)
   const [showTemplateModal, setShowTemplateModal] = useState(false)
   const [templateType, setTemplateType] = useState<'note' | 'whiteboard'>('note')
   const [notebookName, setNotebookName] = useState('')
   const [showNewNotebook, setShowNewNotebook] = useState(false)
+  const [flashcardName, setFlashcardName] = useState('')
+  const [showNewFlashcard, setShowNewFlashcard] = useState(false)
   const [searchUsername, setSearchUsername] = useState('')
   const [friends, setFriends] = useState<string[]>([])
   const [allUsers, setAllUsers] = useState<string[]>(['alice', 'bob', 'charlie', 'david', 'emma'])
 
   useEffect(() => {
     loadWhiteboards()
+    loadFlashcards()
   }, [])
 
   const loadWhiteboards = async () => {
@@ -40,6 +46,15 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
       setWhiteboards(response.data)
     } catch (error) {
       console.error('Failed to load whiteboards:', error)
+    }
+  }
+
+  const loadFlashcards = async () => {
+    try {
+      const response = await flashcardsAPI.getFlashcards()
+      setFlashcards(response.data)
+    } catch (error) {
+      console.error('Failed to load flashcards:', error)
     }
   }
 
@@ -62,6 +77,30 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
       setView('whiteboards')
     } catch (error) {
       console.error('Failed to create whiteboard:', error)
+    }
+  }
+
+  const handleAddFlashcard = async () => {
+    if (!flashcardName.trim()) return
+    try {
+      const response = await flashcardsAPI.createFlashcard(flashcardName)
+      setFlashcards([response.data, ...flashcards])
+      setSelectedFlashcard(response.data)
+      setFlashcardName('')
+      setShowNewFlashcard(false)
+      setView('flashcards')
+    } catch (error) {
+      console.error('Failed to create flashcard:', error)
+    }
+  }
+
+  const handleDeleteFlashcard = async (id: string) => {
+    try {
+      await flashcardsAPI.deleteFlashcard(id)
+      setFlashcards(flashcards.filter(f => f.id !== id))
+      setSelectedFlashcard(null)
+    } catch (error) {
+      console.error('Failed to delete flashcard:', error)
     }
   }
 
@@ -174,7 +213,7 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
               {[
                 { id: 'notes', label: 'Notes', icon: '📝', count: notes.length },
                 { id: 'notebooks', label: 'Notebooks', icon: '📓', count: notebooks.length },
-                { id: 'flashcards', label: 'Flashcards', icon: '🎴', count: 0 },
+                { id: 'flashcards', label: 'Flashcards', icon: '🎴', count: flashcards.length },
                 { id: 'whiteboards', label: 'Whiteboards', icon: '🎨', count: whiteboards.length }
               ].map(item => (
                 <button
@@ -282,11 +321,67 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
 
         {view === 'flashcards' && (
           <div className="flex-1 overflow-y-auto p-8">
-            <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Flashcards</h2>
-            <button className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90">
-              + New Flashcard Set
-            </button>
-            <p className="text-[var(--text-color)]/60 mt-4">Flashcard feature coming soon</p>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[var(--text-color)]">Flashcards</h2>
+              <button
+                onClick={() => setShowNewFlashcard(true)}
+                className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90"
+              >
+                + New Flashcard Set
+              </button>
+            </div>
+            {showNewFlashcard && (
+              <div className="mb-6 p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 space-y-3">
+                <input
+                  type="text"
+                  value={flashcardName}
+                  onChange={(e) => setFlashcardName(e.target.value)}
+                  placeholder="Flashcard set name"
+                  className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)]"
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleAddFlashcard}
+                    className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-lg hover:opacity-90"
+                  >
+                    Create
+                  </button>
+                  <button
+                    onClick={() => setShowNewFlashcard(false)}
+                    className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+            {selectedFlashcard ? (
+              <FlashcardEditor flashcard={selectedFlashcard} onSave={loadFlashcards} />
+            ) : (
+              <div className="space-y-2">
+                {flashcards.map(fc => (
+                  <div
+                    key={fc.id}
+                    className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 transition-all"
+                  >
+                    <div
+                      onClick={() => setSelectedFlashcard(fc)}
+                      className="cursor-pointer"
+                    >
+                      <h3 className="font-bold text-[var(--text-color)]">{fc.title}</h3>
+                      <p className="text-sm text-[var(--text-color)]/60">{fc.cards.length} cards</p>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteFlashcard(fc.id)}
+                      className="mt-2 text-red-500 hover:text-red-700 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
