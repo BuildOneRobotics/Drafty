@@ -23,12 +23,12 @@ export default function Dashboard() {
       handleSync()
     }, 30000)
     return () => clearInterval(interval)
-  }, [])
+  }, [syncing])
 
   const loadNotes = async () => {
     try {
       const response = await notesAPI.getNotes()
-      setNotes(response.data)
+      setNotes(response.data || [])
     } catch (error) {
       console.error('Failed to load notes:', error)
     }
@@ -37,7 +37,7 @@ export default function Dashboard() {
   const loadWhiteboards = async () => {
     try {
       const response = await whiteboardsAPI.getWhiteboards()
-      setWhiteboards(response.data)
+      setWhiteboards(response.data || [])
     } catch (error) {
       console.error('Failed to load whiteboards:', error)
     }
@@ -56,7 +56,9 @@ export default function Dashboard() {
     loadWhiteboards()
     
     authAPI.getMe().then(response => {
-      setUser(response.data)
+      if (response.data) {
+        setUser(response.data)
+      }
     }).catch(() => {
       router.push('/login')
     }).finally(() => {
