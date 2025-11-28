@@ -96,6 +96,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
     try {
       const response = await whiteboardsAPI.createWhiteboard(`Whiteboard ${new Date().toLocaleTimeString()}`, template)
       setWhiteboards([response.data, ...whiteboards])
+      setView('whiteboards')
     } catch (error) {
       console.error('Failed to create whiteboard:', error)
     }
@@ -146,8 +147,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
   const handleMoveFlashcard = (flashcardId: string, folderId?: string) => {
     setFlashcards(flashcards.map(fc => fc.id === flashcardId ? { ...fc, folderId } : fc))
   }
-
-
 
   const handleAddNotebook = () => {
     if (!notebookName.trim()) return
