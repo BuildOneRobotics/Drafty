@@ -14,7 +14,6 @@ export default function Dashboard() {
   const setUser = useStore((state) => state.setUser)
   const notes = useStore((state) => state.notes)
   const setNotes = useStore((state) => state.setNotes)
-  const whiteboards = useStore((state) => state.whiteboards)
   const setWhiteboards = useStore((state) => state.setWhiteboards)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
