@@ -10,13 +10,13 @@ interface FlashcardEditorProps {
 }
 
 export default function FlashcardEditor({ flashcard, onSave }: FlashcardEditorProps) {
-  const [cards, setCards] = useState<Card[]>(flashcard.cards)
+  const [cards, setCards] = useState(flashcard.cards as Card[])
   const [newQuestion, setNewQuestion] = useState('')
   const [newAnswer, setNewAnswer] = useState('')
-  const [currentCardIndex, setCurrentCardIndex] = useState<number | null>(null)
+  const [currentCardIndex, setCurrentCardIndex] = useState(null as number | null)
   const [showAnswer, setShowAnswer] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState(null as string | null)
+  const [confirmDelete, setConfirmDelete] = useState(null as string | null)
 
   const handleAddCard = () => {
     if (!newQuestion.trim() || !newAnswer.trim()) return
@@ -33,7 +33,7 @@ export default function FlashcardEditor({ flashcard, onSave }: FlashcardEditorPr
   }
 
   const handleDeleteCard = (id: string) => {
-    const updatedCards = cards.filter(c => c.id !== id)
+    const updatedCards = cards.filter((c: Card) => c.id !== id)
     setCards(updatedCards)
     setCurrentCardIndex(null)
     setShowAnswer(false)
@@ -42,7 +42,7 @@ export default function FlashcardEditor({ flashcard, onSave }: FlashcardEditorPr
   }
 
   const handleEditCard = (id: string, question: string, answer: string) => {
-    const updatedCards = cards.map(c => c.id === id ? { ...c, question, answer } : c)
+    const updatedCards = cards.map((c: Card) => c.id === id ? { ...c, question, answer } : c)
     setCards(updatedCards)
     setEditingId(null)
     saveFlashcard(updatedCards)
@@ -200,7 +200,7 @@ export default function FlashcardEditor({ flashcard, onSave }: FlashcardEditorPr
               </label>
               <textarea
                 value={newQuestion}
-                onChange={(e) => setNewQuestion(e.target.value)}
+                onChange={(e: any) => setNewQuestion(e.target.value)}
                 placeholder="Enter question..."
                 className="w-full px-4 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] resize-none text-[var(--text-color)]"
                 rows={3}
@@ -212,7 +212,7 @@ export default function FlashcardEditor({ flashcard, onSave }: FlashcardEditorPr
               </label>
               <textarea
                 value={newAnswer}
-                onChange={(e) => setNewAnswer(e.target.value)}
+                onChange={(e: any) => setNewAnswer(e.target.value)}
                 placeholder="Enter answer..."
                 className="w-full px-4 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] resize-none text-[var(--text-color)]"
                 rows={3}
@@ -230,7 +230,7 @@ export default function FlashcardEditor({ flashcard, onSave }: FlashcardEditorPr
             <div>
               <h3 className="font-semibold text-[var(--text-color)] mb-3">Cards ({cards.length})</h3>
               <div className="space-y-2">
-                {cards.map((card, idx) => (
+                {cards.map((card: Card, idx: number) => (
                   <div
                     key={card.id}
                     onClick={() => {
