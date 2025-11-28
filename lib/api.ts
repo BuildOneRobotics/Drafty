@@ -34,4 +34,13 @@ export const notesAPI = {
   syncNotes: () => api.post('/notes/sync'),
 }
 
+export const whiteboardsAPI = {
+  getWhiteboards: () => api.get('/whiteboards'),
+  createWhiteboard: (title: string, template: string) =>
+    api.post('/whiteboards', { title, template }),
+  updateWhiteboard: (id: string, title: string, content: string) =>
+    api.put(`/whiteboards/${id}`, { title, content }),
+  deleteWhiteboard: (id: string) => api.delete(`/whiteboards/${id}`),
+}
+
 export default api

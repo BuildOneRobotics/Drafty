@@ -25,6 +25,15 @@ export interface Notebook {
   pages: Page[]
 }
 
+export interface Whiteboard {
+  id: string
+  title: string
+  template: 'plain' | 'lined' | 'grid-small' | 'grid-medium' | 'grid-large'
+  content: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface User {
   id: string
   email: string
@@ -36,24 +45,31 @@ interface Store {
   user: User | null
   notes: Note[]
   notebooks: Notebook[]
+  whiteboards: Whiteboard[]
   setUser: (user: User | null) => void
   setNotes: (notes: Note[]) => void
   setNotebooks: (notebooks: Notebook[]) => void
+  setWhiteboards: (whiteboards: Whiteboard[]) => void
   addNote: (note: Note) => void
   updateNote: (id: string, note: Partial<Note>) => void
   deleteNote: (id: string) => void
   addNotebook: (notebook: Notebook) => void
   updateNotebook: (id: string, notebook: Partial<Notebook>) => void
   deleteNotebook: (id: string) => void
+  addWhiteboard: (whiteboard: Whiteboard) => void
+  updateWhiteboard: (id: string, whiteboard: Partial<Whiteboard>) => void
+  deleteWhiteboard: (id: string) => void
 }
 
 export const useStore = create<Store>((set) => ({
   user: null,
   notes: [],
   notebooks: [],
+  whiteboards: [],
   setUser: (user) => set({ user }),
   setNotes: (notes) => set({ notes }),
   setNotebooks: (notebooks) => set({ notebooks }),
+  setWhiteboards: (whiteboards) => set({ whiteboards }),
   addNote: (note) => set((state) => ({ notes: [note, ...state.notes] })),
   updateNote: (id, updates) =>
     set((state) => ({
@@ -75,5 +91,16 @@ export const useStore = create<Store>((set) => ({
   deleteNotebook: (id) =>
     set((state) => ({
       notebooks: state.notebooks.filter((nb) => nb.id !== id),
+    })),
+  addWhiteboard: (whiteboard) => set((state) => ({ whiteboards: [whiteboard, ...state.whiteboards] })),
+  updateWhiteboard: (id, updates) =>
+    set((state) => ({
+      whiteboards: state.whiteboards.map((wb) =>
+        wb.id === id ? { ...wb, ...updates, updatedAt: new Date().toISOString() } : wb
+      ),
+    })),
+  deleteWhiteboard: (id) =>
+    set((state) => ({
+      whiteboards: state.whiteboards.filter((wb) => wb.id !== id),
     })),
 }))

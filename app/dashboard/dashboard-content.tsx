@@ -1,10 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { Note, Notebook } from '@/lib/store'
+import { useState, useEffect } from 'react'
+import { Note, Notebook, Whiteboard } from '@/lib/store'
 import NoteEditor from '@/components/NoteEditor'
 import NoteList from '@/components/NoteList'
 import NotebookEditor from '@/components/NotebookEditor'
+import Whiteboard from '@/components/Whiteboard'
+import TemplateModal from '@/components/TemplateModal'
+import { whiteboardsAPI, notesAPI } from '@/lib/api'
 
 interface DashboardContentProps {
   notes: Note[]
@@ -18,11 +21,28 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
   const [activeTab, setActiveTab] = useState<'notes' | 'notebooks' | 'flashcards' | 'whiteboards'>('notes')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [notebooks, setNotebooks] = useState<Notebook[]>([])
+  const [whiteboards, setWhiteboards] = useState<Whiteboard[]>([])
   const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null)
+  const [selectedWhiteboard, setSelectedWhiteboard] = useState<Whiteboard | null>(null)
   const [showNotebookForm, setShowNotebookForm] = useState(false)
   const [notebookName, setNotebookName] = useState('')
   const [folders] = useState<string[]>(['General'])
   const [selectedFolder, setSelectedFolder] = useState('General')
+  const [showTemplateModal, setShowTemplateModal] = useState(false)
+  const [templateType, setTemplateType] = useState<'note' | 'whiteboard'>('note')
+
+  useEffect(() => {
+    loadWhiteboards()
+  }, [])
+
+  const loadWhiteboards = async () => {
+    try {
+      const response = await whiteboardsAPI.getWhiteboards()
+      setWhiteboards(response.data)
+    } catch (error) {
+      console.error('Failed to load whiteboards:', error)
+    }
+  }
 
   const handleAddNotebook = () => {
     if (!notebookName.trim()) return
@@ -37,6 +57,56 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
     setNotebookName('')
     setShowNotebookForm(false)
   }
+
+  const handleCreateNote = async (template: string) => {
+    try {
+      const response = await notesAPI.createNote(`New Note ${new Date().toLocaleTimeString()}`, '', [])
+      onLoadNotes()
+      setSelectedNote(response.data)
+    } catch (error) {
+      console.error('Failed to create note:', error)
+    }
+  }
+
+  const handleCreateWhiteboard = async (template: string) => {
+    try {
+      const response = await whiteboardsAPI.createWhiteboard(`Whiteboard ${new Date().toLocaleTimeString()}`, template)
+      setWhiteboards([response.data, ...whiteboards])
+      setSelectedWhiteboard(response.data)
+    } catch (error) {
+      console.error('Failed to create whiteboard:', error)
+    }
+  }
+
+  const handleDeleteNote = async (id: string) => {
+    try {
+      await notesAPI.deleteNote(id)
+      onLoadNotes()
+      setSelectedNote(null)
+    } catch (error) {
+      console.error('Failed to delete note:', error)
+    }
+  }
+
+  const handleDeleteWhiteboard = async (id: string) => {
+    try {
+      await whiteboardsAPI.deleteWhiteboard(id)
+      setWhiteboards(whiteboards.filter(w => w.id !== id))
+      setSelectedWhiteboard(null)
+    } catch (error) {
+      console.error('Failed to delete whiteboard:', error)
+    }
+  }
+
+  const handleDeleteNotebook = (id: string) => {
+    setNotebooks(notebooks.filter(n => n.id !== id))
+    if (selectedNotebook?.id === id) setSelectedNotebook(null)
+  }
+
+  const recentItems = [
+    ...notes.slice(0, 3).map(n => ({ type: 'note' as const, ...n })),
+    ...whiteboards.slice(0, 3).map(w => ({ type: 'whiteboard' as const, ...w })),
+  ].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 5)
 
   const sidebar = (
     <div className="bg-[var(--accent-color)]/8 rounded-3xl border-2 border-[var(--accent-color)] flex flex-col h-full m-4 md:m-0 md:rounded-2xl">
@@ -59,10 +129,23 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
       </div>
 
       <div className="flex-1 overflow-y-auto bg-transparent p-4 space-y-3">
-        {activeTab === 'notes' && <NoteList notes={notes} selectedNote={selectedNote} onSelectNote={(note) => {
-          setSelectedNote(note)
-          setSidebarOpen(false)
-        }} />}
+        {activeTab === 'notes' && (
+          <>
+            <button 
+              onClick={() => {
+                setTemplateType('note')
+                setShowTemplateModal(true)
+              }}
+              className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)]/60 hover:bg-[var(--accent-color)]/10 transition-all"
+            >
+              + New Note
+            </button>
+            <NoteList notes={notes} selectedNote={selectedNote} onSelectNote={(note) => {
+              setSelectedNote(note)
+              setSidebarOpen(false)
+            }} onDeleteNote={handleDeleteNote} />
+          </>
+        )}
         
         {activeTab === 'notebooks' && (
           <>
@@ -110,20 +193,64 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
               {folders.map(f => <option key={f} value={f}>{f}</option>)}
             </select>
             {notebooks.filter(n => n.folder === selectedFolder).map(nb => (
-              <button
-                key={nb.id}
-                onClick={() => {
-                  setSelectedNotebook(nb)
-                  setSidebarOpen(false)
-                }}
-                className={`w-full text-left p-3 rounded-xl transition-all ${
-                  selectedNotebook?.id === nb.id
-                    ? 'bg-[var(--accent-color)] text-white'
-                    : 'bg-[var(--accent-color)]/10 text-[var(--text-color)] hover:bg-[var(--accent-color)]/20'
-                }`}
-              >
-                {nb.name}
-              </button>
+              <div key={nb.id} className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setSelectedNotebook(nb)
+                    setSidebarOpen(false)
+                  }}
+                  className={`flex-1 text-left p-3 rounded-xl transition-all ${
+                    selectedNotebook?.id === nb.id
+                      ? 'bg-[var(--accent-color)] text-white'
+                      : 'bg-[var(--accent-color)]/10 text-[var(--text-color)] hover:bg-[var(--accent-color)]/20'
+                  }`}
+                >
+                  {nb.name}
+                </button>
+                <button
+                  onClick={() => handleDeleteNotebook(nb.id)}
+                  className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </>
+        )}
+
+        {activeTab === 'whiteboards' && (
+          <>
+            <button 
+              onClick={() => {
+                setTemplateType('whiteboard')
+                setShowTemplateModal(true)
+              }}
+              className="w-full p-4 border-2 border-dashed border-[var(--accent-color)]/30 rounded-2xl text-[var(--text-color)] hover:border-[var(--accent-color)]/60 hover:bg-[var(--accent-color)]/10 transition-all"
+            >
+              + New Whiteboard
+            </button>
+            {whiteboards.map(wb => (
+              <div key={wb.id} className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setSelectedWhiteboard(wb)
+                    setSidebarOpen(false)
+                  }}
+                  className={`flex-1 text-left p-3 rounded-xl transition-all text-sm ${
+                    selectedWhiteboard?.id === wb.id
+                      ? 'bg-[var(--accent-color)] text-white'
+                      : 'bg-[var(--accent-color)]/10 text-[var(--text-color)] hover:bg-[var(--accent-color)]/20'
+                  }`}
+                >
+                  {wb.title}
+                </button>
+                <button
+                  onClick={() => handleDeleteWhiteboard(wb.id)}
+                  className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg"
+                >
+                  ✕
+                </button>
+              </div>
             ))}
           </>
         )}
@@ -171,16 +298,49 @@ export default function DashboardContent({ notes, onLoadNotes, user, syncing }: 
             setNotebooks(notebooks.map(n => n.id === nb.id ? nb : n))
             setSelectedNotebook(nb)
           }} />
+        ) : selectedWhiteboard ? (
+          <Whiteboard whiteboard={selectedWhiteboard} onSave={(content) => {
+            handleDeleteWhiteboard(selectedWhiteboard.id)
+            whiteboardsAPI.updateWhiteboard(selectedWhiteboard.id, selectedWhiteboard.title, content)
+          }} />
         ) : selectedNote ? (
           <NoteEditor note={selectedNote} onSave={onLoadNotes} />
         ) : (
-          <div className="flex items-center justify-center h-full bg-[var(--surface-color,white)]">
-            <div className="text-center">
-              <p className="text-[var(--accent-color)]/70 text-xl">Select a note or create a notebook</p>
+          <div className="flex flex-col items-center justify-center h-full bg-[var(--surface-color,white)] p-8">
+            <div className="text-center max-w-md">
+              <h2 className="text-2xl font-bold text-[var(--text-color)] mb-4">Welcome to Drafty</h2>
+              <p className="text-[var(--text-color)]/70 mb-6">Select an item from the sidebar or create a new one to get started</p>
+              <div className="space-y-2">
+                {recentItems.length > 0 && (
+                  <>
+                    <p className="text-sm font-semibold text-[var(--text-color)]/60 mb-3">Recent Items</p>
+                    {recentItems.map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          if (item.type === 'note') setSelectedNote(item as Note)
+                          else setSelectedWhiteboard(item as Whiteboard)
+                        }}
+                        className="w-full p-3 text-left bg-[var(--accent-color)]/10 hover:bg-[var(--accent-color)]/20 rounded-lg text-[var(--text-color)] transition-all"
+                      >
+                        <div className="font-medium">{item.title}</div>
+                        <div className="text-xs text-[var(--text-color)]/60">{item.type}</div>
+                      </button>
+                    ))}
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}
       </div>
+
+      <TemplateModal 
+        isOpen={showTemplateModal}
+        onClose={() => setShowTemplateModal(false)}
+        onSelect={templateType === 'note' ? handleCreateNote : handleCreateWhiteboard}
+        type={templateType}
+      />
     </div>
   )
 }

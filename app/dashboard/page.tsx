@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/lib/store'
-import { notesAPI, authAPI } from '@/lib/api'
+import { notesAPI, authAPI, whiteboardsAPI } from '@/lib/api'
 import Navbar from '@/components/Navbar'
 import LoadingScreen from '@/components/LoadingScreen'
 import DashboardContent from './dashboard-content'
@@ -14,6 +14,8 @@ export default function Dashboard() {
   const setUser = useStore((state) => state.setUser)
   const notes = useStore((state) => state.notes)
   const setNotes = useStore((state) => state.setNotes)
+  const whiteboards = useStore((state) => state.whiteboards)
+  const setWhiteboards = useStore((state) => state.setWhiteboards)
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
 
@@ -30,8 +32,15 @@ export default function Dashboard() {
       setNotes(response.data)
     } catch (error) {
       console.error('Failed to load notes:', error)
-    } finally {
-      setLoading(false)
+    }
+  }
+
+  const loadWhiteboards = async () => {
+    try {
+      const response = await whiteboardsAPI.getWhiteboards()
+      setWhiteboards(response.data)
+    } catch (error) {
+      console.error('Failed to load whiteboards:', error)
     }
   }
 
@@ -45,11 +54,14 @@ export default function Dashboard() {
     const { loadTheme } = require('@/lib/theme')
     loadTheme()
     loadNotes()
+    loadWhiteboards()
     
     authAPI.getMe().then(response => {
       setUser(response.data)
     }).catch(() => {
       router.push('/login')
+    }).finally(() => {
+      setLoading(false)
     })
   }, [])
 
@@ -59,6 +71,7 @@ export default function Dashboard() {
     try {
       await notesAPI.syncNotes()
       await loadNotes()
+      await loadWhiteboards()
     } catch (error) {
       console.error('Sync failed:', error)
     } finally {
