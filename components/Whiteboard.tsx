@@ -17,7 +17,6 @@ export default function WhiteboardEditor({ whiteboard, onSave }: WhiteboardEdito
   const [textInput, setTextInput] = useState('')
   const [nodes, setNodes] = useState<{id: string, text: string, x: number, y: number}[]>([])
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
-  const [isDrawing, setIsDrawing] = useState(false)
 
   useEffect(() => {
     if (mode === 'draw') drawSpider()
