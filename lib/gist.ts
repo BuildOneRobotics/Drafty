@@ -1,10 +1,6 @@
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 const GIST_ID = process.env.GIST_ID
 
-function getFileName(userId: string) {
-  return `drafty-${userId}.json`
-}
-
 export async function saveToGist(data: any) {
   if (!GIST_ID || typeof GIST_ID !== 'string' || !/^[a-f0-9]+$/.test(GIST_ID)) {
     throw new Error('Invalid GIST_ID')

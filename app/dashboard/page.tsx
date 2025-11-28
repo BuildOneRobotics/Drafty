@@ -23,7 +23,7 @@ export default function Dashboard() {
       handleSync()
     }, 30000)
     return () => clearInterval(interval)
-  }, [syncing])
+  }, [syncing, handleSync])
 
   const loadNotes = async () => {
     try {
@@ -107,7 +107,7 @@ export default function Dashboard() {
           <div className="flex gap-4">
             <a href="/" className="hover:text-[var(--accent-color)]">Home</a>
             <a href="/settings" className="hover:text-[var(--accent-color)]">Settings</a>
-            <a href="https://github.com/BuildOneRobotics/Drafty" target="_blank" className="hover:text-[var(--accent-color)]">GitHub</a>
+            <a href="https://github.com/BuildOneRobotics/Drafty" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent-color)]">GitHub</a>
           </div>
           <div>© 2025 Drafty • CC BY-NC-ND 4.0 License</div>
         </div>
