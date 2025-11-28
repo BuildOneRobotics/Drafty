@@ -20,7 +20,6 @@ export default function FileManager({ user }: FileManagerProps) {
   const [showNewFile, setShowNewFile] = useState(false)
   const [newFileName, setNewFileName] = useState('')
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
-  const [shareWith, setShareWith] = useState<string>('')
   const [friends, setFriends] = useState<{id: string, name: string, canShare: boolean}[]>([])
 
   useEffect(() => {
