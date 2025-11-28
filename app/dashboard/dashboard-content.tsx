@@ -36,7 +36,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
   ])
   const [draggedFile, setDraggedFile] = useState<string | null>(null)
   const [draggedFlashcard, setDraggedFlashcard] = useState<string | null>(null)
-  const [dragOverFolder, setDragOverFolder] = useState<string | null>(null)
 
   useEffect(() => {
     loadWhiteboards()
@@ -156,7 +155,6 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
     }
     setNotebooks([...notebooks, newNotebook])
     setNotebookName('')
-    setShowNewNotebook(false)
     setView('notebooks')
   }
 
@@ -240,7 +238,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
                 {flashcardFolders.map(folder => {
                   const folderCards = flashcards.filter(fc => fc.folderId === folder.id)
                   return (
-                    <div key={folder.id} className="bg-white rounded-2xl border border-[var(--accent-color)]/20 overflow-hidden" onDragOver={(e) => { e.preventDefault(); setDragOverFolder(folder.id) }} onDragLeave={() => setDragOverFolder(null)} onDrop={(e) => { e.preventDefault(); if (draggedFlashcard) handleMoveFlashcard(draggedFlashcard, folder.id); setDraggedFlashcard(null); setDragOverFolder(null) }}>
+                    <div key={folder.id} className="bg-white rounded-2xl border border-[var(--accent-color)]/20 overflow-hidden" onDragOver={(e) => { e.preventDefault() }} onDrop={(e) => { e.preventDefault(); if (draggedFlashcard) handleMoveFlashcard(draggedFlashcard, folder.id); setDraggedFlashcard(null) }}>
                       <button onClick={() => setExpandedFolder(expandedFolder === folder.id ? null : folder.id)} className="w-full p-4 flex items-center justify-between hover:bg-[var(--accent-color)]/5 transition-all">
                         <div className="flex items-center gap-3">
                           <div className="w-4 h-4 rounded-full" style={{backgroundColor: folder.color}}></div>
@@ -264,7 +262,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
                   )
                 })}
                 {flashcards.filter(fc => !fc.folderId).length > 0 && (
-                  <div className="bg-white rounded-2xl border border-[var(--accent-color)]/20 p-4 space-y-2" onDragOver={(e) => { e.preventDefault(); setDragOverFolder('root') }} onDragLeave={() => setDragOverFolder(null)} onDrop={(e) => { e.preventDefault(); if (draggedFlashcard) handleMoveFlashcard(draggedFlashcard); setDraggedFlashcard(null); setDragOverFolder(null) }}>
+                  <div className="bg-white rounded-2xl border border-[var(--accent-color)]/20 p-4 space-y-2" onDragOver={(e) => { e.preventDefault() }} onDrop={(e) => { e.preventDefault(); if (draggedFlashcard) handleMoveFlashcard(draggedFlashcard); setDraggedFlashcard(null) }}>
                     <h3 className="font-semibold text-[var(--text-color)] mb-3">Ungrouped</h3>
                     {flashcards.filter(fc => !fc.folderId).map(fc => (
                       <div key={fc.id} draggable onDragStart={() => setDraggedFlashcard(fc.id)} onDragEnd={() => setDraggedFlashcard(null)} className="p-3 bg-[var(--accent-color)]/5 rounded-lg cursor-move hover:bg-[var(--accent-color)]/10" onClick={() => setSelectedFlashcard(fc)}>
