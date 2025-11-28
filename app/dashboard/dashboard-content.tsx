@@ -124,19 +124,6 @@ export default function DashboardContent({ notes, user }: DashboardContentProps)
     setFlashcards(flashcards.map(fc => fc.id === flashcardId ? { ...fc, folderId } : fc))
   }
 
-  const handleAddNotebook = () => {
-    if (!notebookName.trim()) return
-    const newNotebook: Notebook = {
-      id: Date.now().toString(),
-      name: notebookName,
-      folder: 'General',
-      pages: [{ id: '1', number: 1, title: 'Page 1', content: '' }]
-    }
-    setNotebooks([...notebooks, newNotebook])
-    setNotebookName('')
-    setView('notebooks')
-  }
-
   const navItems = [
     { id: 'notes', label: 'Notes', Icon: NoteIcon },
     { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon },
