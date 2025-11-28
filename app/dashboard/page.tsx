@@ -50,8 +50,12 @@ export default function Dashboard() {
       return
     }
 
-    const { loadTheme } = require('@/lib/theme')
-    loadTheme()
+    try {
+      const { loadTheme } = require('@/lib/theme')
+      loadTheme()
+    } catch (error) {
+      console.error('Failed to load theme:', error)
+    }
     loadNotes()
     loadWhiteboards()
     
