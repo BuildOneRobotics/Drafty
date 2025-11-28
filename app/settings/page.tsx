@@ -64,21 +64,33 @@ export default function Settings() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const theme = localStorage.getItem('theme') || 'forest'
-      const font = localStorage.getItem('font') || 'inter'
-      const br = parseInt(localStorage.getItem('brightness') || '50')
-      const dm = localStorage.getItem('darkMode') === 'true'
-      const savedFriends = localStorage.getItem('friends')
-      const savedFolders = localStorage.getItem('folders')
-      setSelectedTheme(theme)
-      setSelectedFont(font)
-      setBrightness(br)
-      setDarkMode(dm)
-      if (savedFriends) {
-        setFriends(JSON.parse(savedFriends))
-      }
-      if (savedFolders) {
-        setFolders(JSON.parse(savedFolders))
+      try {
+        const theme = localStorage.getItem('theme') || 'forest'
+        const font = localStorage.getItem('font') || 'inter'
+        const br = parseInt(localStorage.getItem('brightness') || '50')
+        const dm = localStorage.getItem('darkMode') === 'true'
+        const savedFriends = localStorage.getItem('friends')
+        const savedFolders = localStorage.getItem('folders')
+        setSelectedTheme(theme)
+        setSelectedFont(font)
+        setBrightness(br)
+        setDarkMode(dm)
+        if (savedFriends) {
+          try {
+            setFriends(JSON.parse(savedFriends))
+          } catch (error) {
+            console.error('Failed to parse friends:', error)
+          }
+        }
+        if (savedFolders) {
+          try {
+            setFolders(JSON.parse(savedFolders))
+          } catch (error) {
+            console.error('Failed to parse folders:', error)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load settings:', error)
       }
     }
   }, [])
