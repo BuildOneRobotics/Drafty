@@ -95,9 +95,10 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
           <select
             onChange={(e) => formatText('fontSize', e.target.value)}
             className="px-3 py-2 bg-[var(--surface-color,white)] border border-[var(--accent-color)]/30 rounded-xl text-sm hover:border-[var(--accent-color)] transition-all duration-[2000ms] shadow-sm"
+            defaultValue="4"
           >
             <option value="3">Small</option>
-            <option value="4" selected>Normal</option>
+            <option value="4">Normal</option>
             <option value="5">Large</option>
             <option value="6">Huge</option>
           </select>
