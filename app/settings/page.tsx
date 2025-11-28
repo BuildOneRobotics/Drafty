@@ -38,10 +38,7 @@ export default function Settings() {
   const [darkMode, setDarkMode] = useState(false)
   const [searchUsername, setSearchUsername] = useState('')
   const [friends, setFriends] = useState<string[]>([])
-  const [pendingRequests, setPendingRequests] = useState<string[]>([])
-  const [sentRequests, setSentRequests] = useState<string[]>([])
   const [searchResults, setSearchResults] = useState<string[]>([])
-  const [selectedNotes, setSelectedNotes] = useState<string[]>([])
 
   const handleTabChange = (tab: 'account' | 'customize' | 'friends' | 'files' | 'privacy') => {
     if (tab !== activeTab) {
@@ -82,27 +79,15 @@ export default function Settings() {
   }
 
   const handleSendRequest = (username: string) => {
-    if (!friends.includes(username) && !sentRequests.includes(username)) {
-      setSentRequests([...sentRequests, username])
+    if (!friends.includes(username)) {
+      setFriends([...friends, username])
       setSearchUsername('')
       setSearchResults([])
     }
   }
 
-  const handleRejectRequest = (username: string) => {
-    setPendingRequests(pendingRequests.filter(u => u !== username))
-  }
-
   const handleRemoveFriend = (username: string) => {
     setFriends(friends.filter(f => f !== username))
-  }
-
-  const handleToggleNote = (noteId: string) => {
-    if (selectedNotes.includes(noteId)) {
-      setSelectedNotes(selectedNotes.filter(id => id !== noteId))
-    } else {
-      setSelectedNotes([...selectedNotes, noteId])
-    }
   }
 
   return (
