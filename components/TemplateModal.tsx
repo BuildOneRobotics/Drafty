@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-
 interface TemplateModalProps {
   isOpen: boolean
   onClose: () => void
