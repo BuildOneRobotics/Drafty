@@ -112,7 +112,7 @@ export default function Settings() {
                 key={tab}
                 onClick={() => handleTabChange(tab as any)}
                 className={`w-full text-left px-4 py-3 rounded-xl mb-2 transition-all ${
-                  activeTab === tab ? 'bg-[var(--accent-color)]/20 text-[var(--accent-color)] font-semibold' : 'hover:bg-[var(--accent-color)]/5'
+                  activeTab === tab ? 'bg-[var(--accent-color)]/20 text-[var(--accent-color)] font-semibold' : 'text-[var(--text-color)] hover:bg-[var(--accent-color)]/5'
                 }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -137,7 +137,7 @@ export default function Settings() {
               <div className="space-y-6">
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Theme</h2>
-                  <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="grid grid-cols-3 gap-4">
                     {['forest', 'phoenix', 'pink'].map((theme) => (
                       <button
                         key={theme}
@@ -145,7 +145,7 @@ export default function Settings() {
                           setSelectedTheme(theme)
                           applyTheme(theme, selectedFont, brightness, darkMode)
                         }}
-                        className={`p-4 rounded-xl border-2 transition-all capitalize ${
+                        className={`p-4 rounded-xl border-2 transition-all capitalize font-medium text-[var(--text-color)] ${
                           selectedTheme === theme ? 'border-[var(--accent-color)] bg-[var(--accent-color)]/20' : 'border-[var(--accent-color)]/20'
                         }`}
                       >
@@ -158,6 +158,11 @@ export default function Settings() {
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Brightness</h2>
                   <div className="flex items-center gap-4">
+                    <style>{`
+                      input[type="range"] {
+                        accent-color: var(--accent-color);
+                      }
+                    `}</style>
                     <input
                       type="range"
                       min="0"
@@ -168,7 +173,8 @@ export default function Settings() {
                         setBrightness(val)
                         applyTheme(selectedTheme, selectedFont, val, darkMode)
                       }}
-                      className="flex-1 h-2 bg-[var(--accent-color)]/20 rounded-lg appearance-none cursor-pointer"
+                      className="flex-1 h-2 rounded-lg appearance-none cursor-pointer"
+                      style={{background: `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${brightness}%, rgba(0,0,0,0.1) ${brightness}%, rgba(0,0,0,0.1) 100%)`}}
                     />
                     <span className="text-sm font-semibold text-[var(--text-color)] w-12">{brightness}%</span>
                   </div>
@@ -207,7 +213,7 @@ export default function Settings() {
                         }`}
                       >
                         <div className="font-semibold text-[var(--text-color)] mb-2">{font.name}</div>
-                        <p style={{ fontFamily: font.family }} className="text-sm text-[var(--text-color)]/70">
+                        <p style={{ fontFamily: font.family }} className="text-sm text-[var(--text-color)]">
                           The quick brown fox
                         </p>
                       </button>
@@ -251,7 +257,7 @@ export default function Settings() {
                   <h3 className="font-bold text-[var(--text-color)] mb-4 mt-6">Your Friends</h3>
                   <div className="space-y-2">
                     {friends.length === 0 ? (
-                      <p className="text-[var(--text-color)]/70 text-sm">No friends yet</p>
+                      <p className="text-[var(--text-color)] text-sm">No friends yet</p>
                     ) : (
                       friends.map((friend) => (
                         <div key={friend} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
@@ -276,7 +282,7 @@ export default function Settings() {
                 {!showNewFolder ? (
                   <button 
                     onClick={() => setShowNewFolder(true)}
-                    className="w-full p-3 mb-4 border-2 border-dashed border-[var(--accent-color)]/20 rounded-xl hover:bg-[var(--accent-color)]/5"
+                    className="w-full p-3 mb-4 border-2 border-dashed border-[var(--accent-color)]/20 rounded-xl hover:bg-[var(--accent-color)]/5 text-[var(--text-color)]"
                   >
                     + New Folder
                   </button>
@@ -297,7 +303,7 @@ export default function Settings() {
                         onChange={(e) => setNewFolderColor(e.target.value)}
                         className="w-12 h-10 rounded cursor-pointer"
                       />
-                      <span className="text-sm text-[var(--text-color)]/70">{newFolderColor}</span>
+                      <span className="text-sm text-[var(--text-color)]">{newFolderColor}</span>
                     </div>
                     <div className="flex gap-2">
                       <button 
@@ -382,7 +388,7 @@ export default function Settings() {
             {activeTab === 'privacy' && (
               <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                 <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Export Data</h2>
-                <p className="text-[var(--text-color)]/70 mb-4">Your data is private and stored securely. Export as CSV.</p>
+                <p className="text-[var(--text-color)] mb-4">Your data is private and stored securely. Export as CSV.</p>
                 <div className="space-y-2 mb-4">
                   <label className="flex items-center space-x-3 p-3 bg-[var(--accent-color)]/5 rounded-xl cursor-pointer">
                     <input type="checkbox" onChange={(e) => e.target.checked ? setExportSelected([...exportSelected, 'note1']) : setExportSelected(exportSelected.filter(id => id !== 'note1'))} />

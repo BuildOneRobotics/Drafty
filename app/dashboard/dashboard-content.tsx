@@ -133,7 +133,7 @@ export default function DashboardContent({ notes, onLoadNotes, user }: Dashboard
   const sidebar = (
     <div className="w-full md:w-80 bg-white border-r border-[var(--accent-color)]/20 flex flex-col h-full">
       <div className="p-6 bg-[var(--accent-color)] rounded-b-3xl">
-        <p className="text-sm text-white font-semibold">{user?.name || 'User'}</p>
+        <p className="text-sm text-white font-semibold">Hello, {user?.name || 'User'}</p>
       </div>
 
       <div className="p-6 space-y-3">

@@ -36,6 +36,10 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
     onUpdateNotebook(updated)
   }
 
+  const formatText = (command: string, value?: string) => {
+    document.execCommand(command, false, value)
+  }
+
   return (
     <div className="flex h-full gap-4 p-6 bg-[var(--surface-color,white)]">
       <div className="w-32 flex flex-col gap-3 bg-[var(--bg-color,#faf8f5)] p-4 rounded-lg">
@@ -62,7 +66,7 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
         {!showPageForm ? (
           <button
             onClick={() => setShowPageForm(true)}
-            className="w-full px-3 py-2 border-2 border-dashed border-[var(--accent-color)]/20 rounded-lg text-sm hover:border-[var(--accent-color)]/40 transition-all"
+            className="w-full px-3 py-2 border-2 border-dashed border-[var(--accent-color)]/20 rounded-lg text-sm hover:border-[var(--accent-color)]/40 transition-all text-[var(--text-color)]"
           >
             + Page
           </button>
@@ -87,6 +91,32 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
       <div className="flex-1 flex flex-col bg-[var(--bg-color,#faf8f5)] rounded-lg p-6">
         {selectedPage ? (
           <>
+            <div className="flex gap-2 mb-4 flex-wrap">
+              <button
+                onClick={() => formatText('bold')}
+                className="px-3 py-2 bg-white border border-[var(--accent-color)]/20 rounded-lg text-sm font-bold hover:bg-[var(--accent-color)]/5"
+              >
+                B
+              </button>
+              <button
+                onClick={() => formatText('italic')}
+                className="px-3 py-2 bg-white border border-[var(--accent-color)]/20 rounded-lg text-sm italic hover:bg-[var(--accent-color)]/5"
+              >
+                I
+              </button>
+              <button
+                onClick={() => formatText('underline')}
+                className="px-3 py-2 bg-white border border-[var(--accent-color)]/20 rounded-lg text-sm underline hover:bg-[var(--accent-color)]/5"
+              >
+                U
+              </button>
+              <button
+                onClick={() => formatText('insertUnorderedList')}
+                className="px-3 py-2 bg-white border border-[var(--accent-color)]/20 rounded-lg text-sm hover:bg-[var(--accent-color)]/5"
+              >
+                • List
+              </button>
+            </div>
             <input
               type="text"
               value={selectedPage.title}
@@ -100,10 +130,12 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
               }}
               className="text-2xl font-bold mb-4 outline-none bg-transparent text-[var(--text-color)]"
             />
-            <textarea
-              value={pageContent}
-              onChange={(e) => handleUpdatePageContent(e.target.value)}
-              className="flex-1 p-4 bg-[var(--surface-color,white)] rounded-lg outline-none text-[var(--text-color)] resize-none"
+            <div
+              contentEditable
+              onInput={(e) => handleUpdatePageContent((e.currentTarget as HTMLDivElement).innerHTML)}
+              className="flex-1 p-4 bg-[var(--surface-color,white)] rounded-lg outline-none text-[var(--text-color)] overflow-y-auto"
+              suppressContentEditableWarning
+              dangerouslySetInnerHTML={{__html: pageContent}}
             />
           </>
         ) : (
