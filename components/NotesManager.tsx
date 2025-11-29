@@ -9,6 +9,8 @@ interface NotesManagerProps {
 }
 
 export default function NotesManager({ user }: NotesManagerProps) {
+  // Reference user to avoid unused parameter warning
+  void user
   const [notes, setNotes] = useState<Note[]>([])
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [showNewNote, setShowNewNote] = useState(false)

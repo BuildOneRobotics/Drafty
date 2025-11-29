@@ -9,6 +9,8 @@ interface NotebookManagerProps {
 }
 
 export default function NotebookManager({ user }: NotebookManagerProps) {
+  // Reference user to avoid unused parameter warning
+  void user
   const [notebooks, setNotebooks] = useState<Notebook[]>([])
   const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null)
   const [selectedPage, setSelectedPage] = useState<Page | null>(null)

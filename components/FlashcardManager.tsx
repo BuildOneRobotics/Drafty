@@ -9,6 +9,8 @@ interface FlashcardManagerProps {
 }
 
 export default function FlashcardManager({ user }: FlashcardManagerProps) {
+  // Reference user to avoid unused parameter warning
+  void user
   const [flashcards, setFlashcards] = useState<Flashcard[]>([])
   const [folders, setFolders] = useState<FlashcardFolder[]>([])
   const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(null)
