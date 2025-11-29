@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Note, Whiteboard as WhiteboardType, Flashcard, FlashcardFolder } from '@/lib/store'
+import { Note, Whiteboard as WhiteboardType, Flashcard, FlashcardFolder, Notebook } from '@/lib/store'
 import FlashcardEditor from '@/components/FlashcardEditor'
+import NotebookEditor from '@/components/NotebookEditor'
+import FileManager from './dashboard-files'
 import { NoteIcon, NotebookIcon, FlashcardIcon, WhiteboardIcon, FilesIcon, FriendsIcon } from '@/components/Icons'
-import { whiteboardsAPI, flashcardsAPI } from '@/lib/api'
+import { whiteboardsAPI, flashcardsAPI, notebooksAPI } from '@/lib/api'
 import { autoCommit } from '@/lib/git'
 import { useMobile } from '@/lib/useMobile'
 
@@ -20,6 +22,8 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
   void onLoadNotes
   const [view, setView] = useState<'home' | 'notes' | 'notebooks' | 'flashcards' | 'whiteboards' | 'files' | 'friends'>('home')
   const [whiteboards, setWhiteboards] = useState<WhiteboardType[]>([])
+  const [notebooks, setNotebooks] = useState<Notebook[]>([])
+  const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null)
   const [flashcards, setFlashcards] = useState<Flashcard[]>([])
   const [flashcardFolders, setFlashcardFolders] = useState<FlashcardFolder[]>([])
   const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(null)
@@ -29,16 +33,11 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
   const [showNewFolder, setShowNewFolder] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
   const [newFolderColor, setNewFolderColor] = useState('#22c55e')
-  const [files, setFiles] = useState<{id: string, name: string, folder?: string}[]>([
-    {id: '1', name: 'Document.pdf'},
-    {id: '2', name: 'Image.png'},
-    {id: '3', name: 'Spreadsheet.xlsx'}
-  ])
-  const [draggedFile, setDraggedFile] = useState<string | null>(null)
   const [draggedFlashcard, setDraggedFlashcard] = useState<string | null>(null)
 
   useEffect(() => {
     loadWhiteboards()
+    loadNotebooks()
     loadFlashcards()
     loadSavedData()
   }, [])
@@ -48,18 +47,17 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
     if (saved) {
       const data = JSON.parse(saved)
       setFlashcardFolders(data.flashcardFolders || [])
-      setFiles(data.files || [])
     }
   }
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      const data = { flashcardFolders, files }
+      const data = { flashcardFolders }
       localStorage.setItem(`dashboardData-${user?.id}`, JSON.stringify(data))
       autoCommit(`Update dashboard data for ${user?.name}`)
     }, 2000)
     return () => clearTimeout(timer)
-  }, [flashcardFolders, files, user?.id, user?.name])
+  }, [flashcardFolders, user?.id, user?.name])
 
   const loadWhiteboards = async () => {
     try {
@@ -67,6 +65,15 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
       setWhiteboards(response.data)
     } catch (error) {
       console.error('Failed to load whiteboards:', error)
+    }
+  }
+
+  const loadNotebooks = async () => {
+    try {
+      const response = await notebooksAPI.getNotebooks()
+      setNotebooks(response.data)
+    } catch (error) {
+      console.error('Failed to load notebooks:', error)
     }
   }
 
@@ -245,22 +252,149 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
           </div>
         )}
 
-        {view === 'files' && (
+        {view === 'whiteboards' && (
           <div className={`flex-1 overflow-y-auto ${isPhone ? 'p-4' : 'p-8'}`}>
-            <h2 className={`${isPhone ? 'text-xl' : 'text-2xl'} font-bold text-[var(--text-color)] mb-6`}>Files</h2>
-            <div className="space-y-3">
-              {files.map(file => (
-                <div key={file.id} draggable onDragStart={() => setDraggedFile(file.id)} onDragEnd={() => setDraggedFile(null)} className={`p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 cursor-move transition-all ${draggedFile === file.id ? 'opacity-50' : 'hover:border-[var(--accent-color)]/40'}`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-[var(--text-color)]">{file.name}</p>
-                      {file.folder && <p className="text-xs text-[var(--text-color)]/60">Folder: {file.folder}</p>}
-                    </div>
-                    <span className="text-xs text-[var(--text-color)]/40">⋮⋮</span>
-                  </div>
-                </div>
-              ))}
+            <div className={`flex ${isPhone ? 'flex-col gap-3' : 'justify-between items-center'} mb-6`}>
+              <h2 className={`${isPhone ? 'text-xl' : 'text-2xl'} font-bold text-[var(--text-color)]`}>Whiteboards</h2>
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await whiteboardsAPI.createWhiteboard(`Whiteboard ${whiteboards.length + 1}`, 'plain')
+                    setWhiteboards([response.data, ...whiteboards])
+                  } catch (error) {
+                    console.error('Failed to create whiteboard:', error)
+                  }
+                }}
+                className={`${isPhone ? 'w-full' : ''} bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all`}
+              >
+                + New Whiteboard
+              </button>
             </div>
+            
+            <div className="space-y-3">
+              {whiteboards.length === 0 ? (
+                <p className="text-[var(--text-color)]/60">No whiteboards yet. Create one to get started!</p>
+              ) : (
+                whiteboards.map(whiteboard => (
+                  <div
+                    key={whiteboard.id}
+                    className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 cursor-pointer transition-all"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-[var(--text-color)]">{whiteboard.title}</p>
+                        <p className="text-xs text-[var(--text-color)]/60">
+                          Template: {whiteboard.template} • {new Date(whiteboard.updatedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation()
+                          try {
+                            await whiteboardsAPI.deleteWhiteboard(whiteboard.id)
+                            setWhiteboards(whiteboards.filter(wb => wb.id !== whiteboard.id))
+                          } catch (error) {
+                            console.error('Failed to delete whiteboard:', error)
+                          }
+                        }}
+                        className="text-red-400 hover:text-red-600 text-sm"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {view === 'files' && (
+          <FileManager user={user} />
+        )}
+
+        {view === 'notebooks' && (
+          <div className={`flex-1 overflow-y-auto ${isPhone ? 'p-4' : 'p-8'}`}>
+            <div className={`flex ${isPhone ? 'flex-col gap-3' : 'justify-between items-center'} mb-6`}>
+              <h2 className={`${isPhone ? 'text-xl' : 'text-2xl'} font-bold text-[var(--text-color)]`}>Notebooks</h2>
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await notebooksAPI.createNotebook(`Notebook ${notebooks.length + 1}`)
+                    setNotebooks([response.data, ...notebooks])
+                    setSelectedNotebook(response.data)
+                  } catch (error) {
+                    console.error('Failed to create notebook:', error)
+                  }
+                }}
+                className={`${isPhone ? 'w-full' : ''} bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all`}
+              >
+                + New Notebook
+              </button>
+            </div>
+            
+            {selectedNotebook ? (
+              <div className="bg-white rounded-2xl border border-[var(--accent-color)]/20 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-[var(--text-color)]">{selectedNotebook.name}</h3>
+                  <button
+                    onClick={() => setSelectedNotebook(null)}
+                    className="text-[var(--text-color)]/60 hover:text-[var(--text-color)] text-xl"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <NotebookEditor 
+                  notebook={selectedNotebook} 
+                  onUpdateNotebook={async (updated) => {
+                    try {
+                      await notebooksAPI.updateNotebook(updated.id, updated)
+                      setSelectedNotebook(updated)
+                      setNotebooks(notebooks.map(nb => nb.id === updated.id ? updated : nb))
+                    } catch (error) {
+                      console.error('Failed to update notebook:', error)
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {notebooks.length === 0 ? (
+                  <p className="text-[var(--text-color)]/60">No notebooks yet. Create one to get started!</p>
+                ) : (
+                  notebooks.map(notebook => (
+                    <div
+                      key={notebook.id}
+                      onClick={() => setSelectedNotebook(notebook)}
+                      className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 cursor-pointer transition-all"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold text-[var(--text-color)]">{notebook.name}</p>
+                          <p className="text-xs text-[var(--text-color)]/60">
+                            {notebook.pages.length} pages • {notebook.folder || 'Root'}
+                          </p>
+                        </div>
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            try {
+                              await notebooksAPI.deleteNotebook(notebook.id)
+                              setNotebooks(notebooks.filter(nb => nb.id !== notebook.id))
+                            } catch (error) {
+                              console.error('Failed to delete notebook:', error)
+                            }
+                          }}
+                          className="text-red-400 hover:text-red-600 text-sm"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -270,7 +404,7 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
             <div className={`grid ${isPhone ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-6`}>
               {[
                 { id: 'notes', label: 'Notes', Icon: NoteIcon, count: notes.length },
-                { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon, count: 0 },
+                { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon, count: notebooks.length },
                 { id: 'flashcards', label: 'Flashcards', Icon: FlashcardIcon, count: flashcards.length },
                 { id: 'whiteboards', label: 'Whiteboards', Icon: WhiteboardIcon, count: whiteboards.length }
               ].map(item => (

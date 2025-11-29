@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import FileListItem from '@/components/FileListItem'
 
 interface DraftyFile {
   id: string
@@ -8,6 +9,7 @@ interface DraftyFile {
   folder?: string
   sharedWith: string[]
   createdAt: string
+  updatedAt?: string
 }
 
 interface FileManagerProps {
@@ -21,6 +23,7 @@ export default function FileManager({ user }: FileManagerProps) {
   const [newFileName, setNewFileName] = useState('')
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
   const [friends, setFriends] = useState<{id: string, name: string, canShare: boolean}[]>([])
+  const [folders, setFolders] = useState<string[]>(['Documents', 'Images', 'Projects'])
 
   useEffect(() => {
     loadFiles()
@@ -63,7 +66,8 @@ export default function FileManager({ user }: FileManagerProps) {
       id: Date.now().toString(),
       name: newFileName,
       sharedWith: [],
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
     saveFiles([newFile, ...files])
     setNewFileName('')
@@ -73,6 +77,24 @@ export default function FileManager({ user }: FileManagerProps) {
   const handleDeleteFile = (id: string) => {
     saveFiles(files.filter(f => f.id !== id))
     setSelectedFile(null)
+  }
+
+  const handleRenameFile = (id: string, newName: string) => {
+    const updated = files.map(f => 
+      f.id === id 
+        ? { ...f, name: newName, updatedAt: new Date().toISOString() }
+        : f
+    )
+    saveFiles(updated)
+  }
+
+  const handleMoveFile = (id: string, newFolder?: string) => {
+    const updated = files.map(f => 
+      f.id === id 
+        ? { ...f, folder: newFolder, updatedAt: new Date().toISOString() }
+        : f
+    )
+    saveFiles(updated)
   }
 
   const handleShareFile = (fileId: string, friendId: string) => {
@@ -92,8 +114,6 @@ export default function FileManager({ user }: FileManagerProps) {
     )
     saveFiles(updated)
   }
-
-  
 
   const selectedFileData = files.find(f => f.id === selectedFile)
 
@@ -147,22 +167,17 @@ export default function FileManager({ user }: FileManagerProps) {
                 draggable
                 onDragStart={() => setDraggedFile(file.id)}
                 onDragEnd={() => setDraggedFile(null)}
-                onClick={() => setSelectedFile(file.id)}
-                className={`p-4 bg-white rounded-2xl border-2 cursor-move transition-all ${
-                  selectedFile === file.id
-                    ? 'border-[var(--accent-color)] bg-[var(--accent-color)]/5'
-                    : 'border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40'
-                } ${draggedFile === file.id ? 'opacity-50' : ''}`}
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-[var(--text-color)]">{file.name}</p>
-                    <p className="text-xs text-[var(--text-color)]/60">
-                      {file.folder ? `Folder: ${file.folder}` : 'Root'} • Shared with {file.sharedWith.length}
-                    </p>
-                  </div>
-                  <span className="text-xs text-[var(--text-color)]/40">⋮⋮</span>
-                </div>
+                <FileListItem
+                  file={file}
+                  onDelete={handleDeleteFile}
+                  onRename={handleRenameFile}
+                  onMove={handleMoveFile}
+                  onSelect={(f) => setSelectedFile(f.id)}
+                  isSelected={selectedFile === file.id}
+                  isDragging={draggedFile === file.id}
+                  folders={folders}
+                />
               </div>
             ))
           )}

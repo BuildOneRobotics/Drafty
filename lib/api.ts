@@ -52,4 +52,13 @@ export const flashcardsAPI = {
   deleteFlashcard: (id: string) => api.delete(`/flashcards/${id}`),
 }
 
+export const notebooksAPI = {
+  getNotebooks: () => api.get('/notebooks'),
+  createNotebook: (name: string, folder?: string) =>
+    api.post('/notebooks', { name, folder }),
+  updateNotebook: (id: string, updates: any) =>
+    api.put(`/notebooks/${id}`, updates),
+  deleteNotebook: (id: string) => api.delete(`/notebooks/${id}`),
+}
+
 export default api
