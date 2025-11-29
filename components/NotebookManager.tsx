@@ -35,10 +35,23 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
   const loadNotebooks = async () => {
     try {
       setLoading(true)
+      console.log('Loading notebooks...')
       const response = await notebooksAPI.getNotebooks()
+      console.log('Notebooks response:', response)
       setNotebooks(response.data || [])
     } catch (error) {
       console.error('Failed to load notebooks:', error)
+      // If API fails, try to load from localStorage as fallback
+      try {
+        const saved = localStorage.getItem(`notebooks-${user?.id}`)
+        if (saved) {
+          const notebooks = JSON.parse(saved)
+          setNotebooks(notebooks)
+          console.log('Loaded notebooks from localStorage:', notebooks)
+        }
+      } catch (localError) {
+        console.error('Failed to load from localStorage:', localError)
+      }
     } finally {
       setLoading(false)
     }
@@ -50,13 +63,40 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
     try {
       const response = await notebooksAPI.createNotebook(newNotebookName.trim())
       if (response?.data) {
-        setNotebooks([response.data, ...notebooks])
+        const updatedNotebooks = [response.data, ...notebooks]
+        setNotebooks(updatedNotebooks)
         setSelectedNotebook(response.data)
         setNewNotebookName('')
         setShowNewNotebook(false)
+        
+        // Save to localStorage as backup
+        localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
       }
     } catch (error) {
       console.error('Failed to create notebook:', error)
+      // Create notebook locally if API fails
+      const newNotebook = {
+        id: Date.now().toString(),
+        name: newNotebookName.trim(),
+        folder: '',
+        pages: [{
+          id: '1',
+          number: 1,
+          title: 'Page 1',
+          content: ''
+        }],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      
+      const updatedNotebooks = [newNotebook, ...notebooks]
+      setNotebooks(updatedNotebooks)
+      setSelectedNotebook(newNotebook)
+      setNewNotebookName('')
+      setShowNewNotebook(false)
+      
+      // Save to localStorage
+      localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
     }
   }
 
@@ -112,15 +152,25 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
 
     const updatedNotebook = {
       ...selectedNotebook,
-      pages: updatedPages
+      pages: updatedPages,
+      updatedAt: new Date().toISOString()
     }
+
+    const updatedNotebooks = notebooks.map(nb => nb.id === selectedNotebook.id ? updatedNotebook : nb)
 
     try {
       await notebooksAPI.updateNotebook(selectedNotebook.id, updatedNotebook)
       setSelectedNotebook(updatedNotebook)
-      setNotebooks(notebooks.map(nb => nb.id === selectedNotebook.id ? updatedNotebook : nb))
+      setNotebooks(updatedNotebooks)
+      
+      // Save to localStorage as backup
+      localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
     } catch (error) {
       console.error('Failed to update page:', error)
+      // Update locally even if API fails
+      setSelectedNotebook(updatedNotebook)
+      setNotebooks(updatedNotebooks)
+      localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
     } finally {
       setSaving(false)
     }
@@ -180,8 +230,16 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
     )
   }
 
+  // Debug info
+  console.log('NotebookManager render - notebooks:', notebooks.length, 'selected:', selectedNotebook?.name)
+
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
+      {/* Debug info */}
+      <div className="p-2 bg-yellow-100 text-black text-xs">
+        Debug: {notebooks.length} notebooks loaded, User: {user?.name || 'No user'}
+      </div>
+      
       {/* Header */}
       <div className="p-6 border-b border-[var(--accent-color)]/20 bg-white">
         <div className="flex justify-between items-center">
