@@ -27,7 +27,7 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", ".next/types/**/*.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", ".next/types/**/*.ts", "types/**/*.d.ts"],
   "plugins": [{ "name": "next" }],
   "exclude": ["node_modules"]
 }

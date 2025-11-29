@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import FileListItem from '@/components/FileListItem'
 
 interface DraftyFile {
@@ -12,8 +12,20 @@ interface DraftyFile {
   updatedAt?: string
 }
 
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
+interface Friend {
+  id: string
+  name: string
+  canShare: boolean
+}
+
 interface FileManagerProps {
-  user: any
+  user: User | null
 }
 
 export default function FileManager({ user }: FileManagerProps) {
@@ -22,8 +34,10 @@ export default function FileManager({ user }: FileManagerProps) {
   const [showNewFile, setShowNewFile] = useState(false)
   const [newFileName, setNewFileName] = useState('')
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
-  const [friends, setFriends] = useState<{id: string, name: string, canShare: boolean}[]>([])
+  const [friends, setFriends] = useState<Friend[]>([])
   const [folders, setFolders] = useState<string[]>(['Documents', 'Images', 'Projects'])
+  const [showNewFolder, setShowNewFolder] = useState(false)
+  const [newFolderName, setNewFolderName] = useState('')
 
   useEffect(() => {
     loadFiles()
@@ -47,7 +61,7 @@ export default function FileManager({ user }: FileManagerProps) {
     if (saved) {
       try {
         const allFriends = JSON.parse(saved)
-        setFriends(allFriends.filter((f: any) => f.canShare))
+        setFriends(allFriends.filter((f: Friend) => f.canShare))
       } catch (error) {
         console.error('Failed to parse friends:', error)
         setFriends([])
@@ -75,12 +89,12 @@ export default function FileManager({ user }: FileManagerProps) {
   }
 
   const handleDeleteFile = (id: string) => {
-    saveFiles(files.filter(f => f.id !== id))
+    saveFiles(files.filter((f: DraftyFile) => f.id !== id))
     setSelectedFile(null)
   }
 
   const handleRenameFile = (id: string, newName: string) => {
-    const updated = files.map(f => 
+    const updated = files.map((f: DraftyFile) => 
       f.id === id 
         ? { ...f, name: newName, updatedAt: new Date().toISOString() }
         : f
@@ -89,7 +103,7 @@ export default function FileManager({ user }: FileManagerProps) {
   }
 
   const handleMoveFile = (id: string, newFolder?: string) => {
-    const updated = files.map(f => 
+    const updated = files.map((f: DraftyFile) => 
       f.id === id 
         ? { ...f, folder: newFolder, updatedAt: new Date().toISOString() }
         : f
@@ -98,7 +112,7 @@ export default function FileManager({ user }: FileManagerProps) {
   }
 
   const handleShareFile = (fileId: string, friendId: string) => {
-    const updated = files.map(f => 
+    const updated = files.map((f: DraftyFile) => 
       f.id === fileId && !f.sharedWith.includes(friendId)
         ? { ...f, sharedWith: [...f.sharedWith, friendId] }
         : f
@@ -107,34 +121,76 @@ export default function FileManager({ user }: FileManagerProps) {
   }
 
   const handleUnshareFile = (fileId: string, friendId: string) => {
-    const updated = files.map(f =>
+    const updated = files.map((f: DraftyFile) =>
       f.id === fileId
-        ? { ...f, sharedWith: f.sharedWith.filter(id => id !== friendId) }
+        ? { ...f, sharedWith: f.sharedWith.filter((id: string) => id !== friendId) }
         : f
     )
     saveFiles(updated)
   }
 
-  const selectedFileData = files.find(f => f.id === selectedFile)
+  const handleAddFolder = () => {
+    if (!newFolderName.trim() || folders.includes(newFolderName.trim())) return
+    setFolders([...folders, newFolderName.trim()])
+    setNewFolderName('')
+    setShowNewFolder(false)
+  }
+
+  const selectedFileData = files.find((f: DraftyFile) => f.id === selectedFile)
 
   return (
     <div className="flex-1 overflow-y-auto p-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-[var(--text-color)]">Files</h2>
-        <button
-          onClick={() => setShowNewFile(true)}
-          className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all"
-        >
-          + New File
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowNewFolder(true)}
+            className="bg-[var(--accent-color)]/20 text-[var(--accent-color)] px-4 py-2 rounded-lg hover:bg-[var(--accent-color)]/30 transition-all"
+          >
+            + New Folder
+          </button>
+          <button
+            onClick={() => setShowNewFile(true)}
+            className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all"
+          >
+            + New File
+          </button>
+        </div>
       </div>
+
+      {showNewFolder && (
+        <div className="mb-6 p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 space-y-3">
+          <input
+            type="text"
+            value={newFolderName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFolderName(e.target.value)}
+            placeholder="Folder name"
+            className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]"
+            autoFocus
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={handleAddFolder}
+              className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-lg hover:opacity-90"
+            >
+              Create Folder
+            </button>
+            <button
+              onClick={() => setShowNewFolder(false)}
+              className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {showNewFile && (
         <div className="mb-6 p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 space-y-3">
           <input
             type="text"
             value={newFileName}
-            onChange={(e) => setNewFileName(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFileName(e.target.value)}
             placeholder="File name"
             className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]"
             autoFocus
@@ -161,7 +217,7 @@ export default function FileManager({ user }: FileManagerProps) {
           {files.length === 0 ? (
             <p className="text-[var(--text-color)]/60">No files yet. Create one to get started!</p>
           ) : (
-            files.map(file => (
+            files.map((file: DraftyFile) => (
               <div
                 key={file.id}
                 draggable
@@ -173,7 +229,7 @@ export default function FileManager({ user }: FileManagerProps) {
                   onDelete={handleDeleteFile}
                   onRename={handleRenameFile}
                   onMove={handleMoveFile}
-                  onSelect={(f) => setSelectedFile(f.id)}
+                  onSelect={(f: DraftyFile) => setSelectedFile(f.id)}
                   isSelected={selectedFile === file.id}
                   isDragging={draggedFile === file.id}
                   folders={folders}
@@ -198,12 +254,12 @@ export default function FileManager({ user }: FileManagerProps) {
               <div>
                 <p className="text-xs text-[var(--text-color)]/60 mb-2">Share with</p>
                 <div className="space-y-2">
-                  {friends.map(friend => (
+                  {friends.map((friend: Friend) => (
                     <label key={friend.id} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={selectedFileData.sharedWith.includes(friend.id)}
-                        onChange={(e) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           if (e.target.checked) {
                             handleShareFile(selectedFileData.id, friend.id)
                           } else {

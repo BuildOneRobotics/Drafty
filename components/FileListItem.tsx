@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 
 interface FileListItemProps {
   file: {
@@ -78,7 +78,7 @@ export default function FileListItem({
     setShowMenu(false)
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleRename()
     } else if (e.key === 'Escape') {
@@ -103,11 +103,11 @@ export default function FileListItem({
               ref={renameInputRef}
               type="text"
               value={newName}
-              onChange={(e) => setNewName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewName(e.target.value)}
               onBlur={handleRename}
               onKeyDown={handleKeyPress}
               className="w-full font-semibold text-[var(--text-color)] bg-transparent border-b border-[var(--accent-color)] outline-none"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
             />
           ) : (
             <p className="font-semibold text-[var(--text-color)] truncate">{file.name}</p>
@@ -133,7 +133,7 @@ export default function FileListItem({
         
         <div className="relative" ref={menuRef}>
           <button
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent) => {
               e.stopPropagation()
               setShowMenu(!showMenu)
             }}
@@ -146,7 +146,7 @@ export default function FileListItem({
           {showMenu && (
             <div className="absolute right-0 top-full mt-1 bg-white border border-[var(--accent-color)]/20 rounded-lg shadow-lg z-10 min-w-[120px]">
               <button
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation()
                   setIsRenaming(true)
                   setShowMenu(false)
@@ -157,7 +157,7 @@ export default function FileListItem({
               </button>
               
               <button
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation()
                   setShowMoveMenu(true)
                 }}
@@ -167,7 +167,7 @@ export default function FileListItem({
               </button>
               
               <button
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation()
                   setShowDeleteConfirm(true)
                 }}
@@ -181,7 +181,7 @@ export default function FileListItem({
           {showMoveMenu && (
             <div className="absolute right-0 top-full mt-1 bg-white border border-[var(--accent-color)]/20 rounded-lg shadow-lg z-20 min-w-[140px]">
               <button
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation()
                   handleMove()
                 }}
@@ -192,7 +192,7 @@ export default function FileListItem({
               {folders.map((folder) => (
                 <button
                   key={folder}
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent) => {
                     e.stopPropagation()
                     handleMove(folder)
                   }}
@@ -211,7 +211,7 @@ export default function FileListItem({
               </p>
               <div className="flex gap-2">
                 <button
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent) => {
                     e.stopPropagation()
                     handleDelete()
                   }}
@@ -220,7 +220,7 @@ export default function FileListItem({
                   Delete
                 </button>
                 <button
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent) => {
                     e.stopPropagation()
                     setShowDeleteConfirm(false)
                   }}

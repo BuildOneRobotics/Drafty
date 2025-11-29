@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Note, Whiteboard as WhiteboardType, Flashcard, FlashcardFolder, Notebook } from '@/lib/store'
 import FlashcardEditor from '@/components/FlashcardEditor'
 import NotebookEditor from '@/components/NotebookEditor'
@@ -10,9 +10,15 @@ import { whiteboardsAPI, flashcardsAPI, notebooksAPI } from '@/lib/api'
 import { autoCommit } from '@/lib/git'
 import { useMobile } from '@/lib/useMobile'
 
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
 interface DashboardContentProps {
   notes: Note[]
-  user: any
+  user: User | null
   onLoadNotes?: () => Promise<void>
 }
 
@@ -103,7 +109,7 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
   const handleDeleteFlashcard = async (id: string) => {
     try {
       await flashcardsAPI.deleteFlashcard(id)
-      setFlashcards(flashcards.filter(f => f.id !== id))
+      setFlashcards(flashcards.filter((f: Flashcard) => f.id !== id))
       setSelectedFlashcard(null)
     } catch (error) {
       console.error('Failed to delete flashcard:', error)
@@ -124,12 +130,12 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
   }
 
   const handleDeleteFolder = (id: string) => {
-    setFlashcardFolders(flashcardFolders.filter(f => f.id !== id))
-    setFlashcards(flashcards.map(fc => fc.folderId === id ? { ...fc, folderId: undefined } : fc))
+    setFlashcardFolders(flashcardFolders.filter((f: FlashcardFolder) => f.id !== id))
+    setFlashcards(flashcards.map((fc: Flashcard) => fc.folderId === id ? { ...fc, folderId: undefined } : fc))
   }
 
   const handleMoveFlashcard = (flashcardId: string, folderId?: string) => {
-    setFlashcards(flashcards.map(fc => fc.id === flashcardId ? { ...fc, folderId } : fc))
+    setFlashcards(flashcards.map((fc: Flashcard) => fc.id === flashcardId ? { ...fc, folderId } : fc))
   }
 
   const navItems = [
@@ -185,9 +191,9 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
             </div>
             {showNewFolder && (
               <div className="mb-6 p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 space-y-3">
-                <input type="text" value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} placeholder="Folder name" className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]" autoFocus />
+                <input type="text" value={newFolderName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFolderName(e.target.value)} placeholder="Folder name" className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]" autoFocus />
                 <div className="flex items-center gap-2">
-                  <input type="color" value={newFolderColor} onChange={(e) => setNewFolderColor(e.target.value)} className="w-12 h-10 rounded cursor-pointer" />
+                  <input type="color" value={newFolderColor} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFolderColor(e.target.value)} className="w-12 h-10 rounded cursor-pointer" />
                   <span className="text-sm text-[var(--text-color)]">{newFolderColor}</span>
                 </div>
                 <div className="flex gap-2">
@@ -198,7 +204,7 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
             )}
             {showNewFlashcard && (
               <div className="mb-6 p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 space-y-3">
-                <input type="text" value={flashcardName} onChange={(e) => setFlashcardName(e.target.value)} placeholder="Flashcard set name" className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]" autoFocus />
+                <input type="text" value={flashcardName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFlashcardName(e.target.value)} placeholder="Flashcard set name" className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]" autoFocus />
                 <div className="flex gap-2">
                   <button onClick={handleAddFlashcard} className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-lg hover:opacity-90">Create</button>
                   <button onClick={() => setShowNewFlashcard(false)} className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-400">Cancel</button>
@@ -209,10 +215,10 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
               <FlashcardEditor flashcard={selectedFlashcard} onSave={loadFlashcards} />
             ) : (
               <div className="space-y-4">
-                {flashcardFolders.map(folder => {
-                  const folderCards = flashcards.filter(fc => fc.folderId === folder.id)
+                {flashcardFolders.map((folder: FlashcardFolder) => {
+                  const folderCards = flashcards.filter((fc: Flashcard) => fc.folderId === folder.id)
                   return (
-                    <div key={folder.id} className="bg-white rounded-2xl border border-[var(--accent-color)]/20 overflow-hidden" onDragOver={(e) => { e.preventDefault() }} onDrop={(e) => { e.preventDefault(); if (draggedFlashcard) handleMoveFlashcard(draggedFlashcard, folder.id); setDraggedFlashcard(null) }}>
+                    <div key={folder.id} className="bg-white rounded-2xl border border-[var(--accent-color)]/20 overflow-hidden" onDragOver={(e: React.DragEvent) => { e.preventDefault() }} onDrop={(e: React.DragEvent) => { e.preventDefault(); if (draggedFlashcard) handleMoveFlashcard(draggedFlashcard, folder.id); setDraggedFlashcard(null) }}>
                       <button onClick={() => setExpandedFolder(expandedFolder === folder.id ? null : folder.id)} className="w-full p-4 flex items-center justify-between hover:bg-[var(--accent-color)]/5 transition-all">
                         <div className="flex items-center gap-3">
                           <div className="w-4 h-4 rounded-full" style={{backgroundColor: folder.color}}></div>
@@ -223,7 +229,7 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
                       </button>
                       {expandedFolder === folder.id && (
                         <div className="border-t border-[var(--accent-color)]/20 p-4 space-y-2">
-                          {folderCards.map(fc => (
+                          {folderCards.map((fc: Flashcard) => (
                             <div key={fc.id} draggable onDragStart={() => setDraggedFlashcard(fc.id)} onDragEnd={() => setDraggedFlashcard(null)} className="p-3 bg-[var(--accent-color)]/5 rounded-lg cursor-move hover:bg-[var(--accent-color)]/10" onClick={() => setSelectedFlashcard(fc)}>
                               <p className="font-semibold text-[var(--text-color)]">{fc.title}</p>
                               <p className="text-xs text-[var(--text-color)]/60">{fc.cards.length} cards</p>
@@ -235,10 +241,10 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
                     </div>
                   )
                 })}
-                {flashcards.filter(fc => !fc.folderId).length > 0 && (
-                  <div className="bg-white rounded-2xl border border-[var(--accent-color)]/20 p-4 space-y-2" onDragOver={(e) => { e.preventDefault() }} onDrop={(e) => { e.preventDefault(); if (draggedFlashcard) handleMoveFlashcard(draggedFlashcard); setDraggedFlashcard(null) }}>
+                {flashcards.filter((fc: Flashcard) => !fc.folderId).length > 0 && (
+                  <div className="bg-white rounded-2xl border border-[var(--accent-color)]/20 p-4 space-y-2" onDragOver={(e: React.DragEvent) => { e.preventDefault() }} onDrop={(e: React.DragEvent) => { e.preventDefault(); if (draggedFlashcard) handleMoveFlashcard(draggedFlashcard); setDraggedFlashcard(null) }}>
                     <h3 className="font-semibold text-[var(--text-color)] mb-3">Ungrouped</h3>
-                    {flashcards.filter(fc => !fc.folderId).map(fc => (
+                    {flashcards.filter((fc: Flashcard) => !fc.folderId).map((fc: Flashcard) => (
                       <div key={fc.id} draggable onDragStart={() => setDraggedFlashcard(fc.id)} onDragEnd={() => setDraggedFlashcard(null)} className="p-3 bg-[var(--accent-color)]/5 rounded-lg cursor-move hover:bg-[var(--accent-color)]/10" onClick={() => setSelectedFlashcard(fc)}>
                         <p className="font-semibold text-[var(--text-color)]">{fc.title}</p>
                         <p className="text-xs text-[var(--text-color)]/60">{fc.cards.length} cards</p>
@@ -275,7 +281,7 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
               {whiteboards.length === 0 ? (
                 <p className="text-[var(--text-color)]/60">No whiteboards yet. Create one to get started!</p>
               ) : (
-                whiteboards.map(whiteboard => (
+                whiteboards.map((whiteboard: WhiteboardType) => (
                   <div
                     key={whiteboard.id}
                     className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 cursor-pointer transition-all"
@@ -288,11 +294,11 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
                         </p>
                       </div>
                       <button
-                        onClick={async (e) => {
+                        onClick={async (e: React.MouseEvent) => {
                           e.stopPropagation()
                           try {
                             await whiteboardsAPI.deleteWhiteboard(whiteboard.id)
-                            setWhiteboards(whiteboards.filter(wb => wb.id !== whiteboard.id))
+                            setWhiteboards(whiteboards.filter((wb: WhiteboardType) => wb.id !== whiteboard.id))
                           } catch (error) {
                             console.error('Failed to delete whiteboard:', error)
                           }
@@ -350,7 +356,7 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
                     try {
                       await notebooksAPI.updateNotebook(updated.id, updated)
                       setSelectedNotebook(updated)
-                      setNotebooks(notebooks.map(nb => nb.id === updated.id ? updated : nb))
+                      setNotebooks(notebooks.map((nb: Notebook) => nb.id === updated.id ? updated : nb))
                     } catch (error) {
                       console.error('Failed to update notebook:', error)
                     }
@@ -362,7 +368,7 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
                 {notebooks.length === 0 ? (
                   <p className="text-[var(--text-color)]/60">No notebooks yet. Create one to get started!</p>
                 ) : (
-                  notebooks.map(notebook => (
+                  notebooks.map((notebook: Notebook) => (
                     <div
                       key={notebook.id}
                       onClick={() => setSelectedNotebook(notebook)}
@@ -376,11 +382,11 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
                           </p>
                         </div>
                         <button
-                          onClick={async (e) => {
+                          onClick={async (e: React.MouseEvent) => {
                             e.stopPropagation()
                             try {
                               await notebooksAPI.deleteNotebook(notebook.id)
-                              setNotebooks(notebooks.filter(nb => nb.id !== notebook.id))
+                              setNotebooks(notebooks.filter((nb: Notebook) => nb.id !== notebook.id))
                             } catch (error) {
                               console.error('Failed to delete notebook:', error)
                             }
