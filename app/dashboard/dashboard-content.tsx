@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Note, Whiteboard as WhiteboardType, Flashcard, FlashcardFolder, Notebook } from '@/lib/store'
-import FlashcardEditor from '@/components/FlashcardEditor'
-import NotebookEditor from '@/components/NotebookEditor'
+import { Note, Whiteboard as WhiteboardType } from '@/lib/store'
+import NotesManager from '@/components/NotesManager'
+import NotebookManager from '@/components/NotebookManager'
+import FlashcardManager from '@/components/FlashcardManager'
 import FileManager from './dashboard-files'
 import { NoteIcon, NotebookIcon, FlashcardIcon, WhiteboardIcon, FilesIcon, FriendsIcon } from '@/components/Icons'
-import { whiteboardsAPI, flashcardsAPI, notebooksAPI } from '@/lib/api'
-import { autoCommit } from '@/lib/git'
+import { whiteboardsAPI } from '@/lib/api'
 import { useMobile } from '@/lib/useMobile'
 
 interface User {
@@ -28,115 +28,44 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
   void onLoadNotes
   const [view, setView] = useState<'home' | 'notes' | 'notebooks' | 'flashcards' | 'whiteboards' | 'files' | 'friends'>('home')
   const [whiteboards, setWhiteboards] = useState<WhiteboardType[]>([])
-  const [notebooks, setNotebooks] = useState<Notebook[]>([])
-  const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null)
-  const [flashcards, setFlashcards] = useState<Flashcard[]>([])
-  const [flashcardFolders, setFlashcardFolders] = useState<FlashcardFolder[]>([])
-  const [selectedFlashcard, setSelectedFlashcard] = useState<Flashcard | null>(null)
-  const [expandedFolder, setExpandedFolder] = useState<string | null>(null)
-  const [flashcardName, setFlashcardName] = useState('')
-  const [showNewFlashcard, setShowNewFlashcard] = useState(false)
-  const [showNewFolder, setShowNewFolder] = useState(false)
-  const [newFolderName, setNewFolderName] = useState('')
-  const [newFolderColor, setNewFolderColor] = useState('#22c55e')
-  const [draggedFlashcard, setDraggedFlashcard] = useState<string | null>(null)
+  const [notebookCount, setNotebookCount] = useState(0)
+  const [flashcardCount, setFlashcardCount] = useState(0)
 
   useEffect(() => {
     loadWhiteboards()
-    loadNotebooks()
-    loadFlashcards()
-    loadSavedData()
+    loadCounts()
   }, [])
-
-  const loadSavedData = () => {
-    const saved = localStorage.getItem(`dashboardData-${user?.id}`)
-    if (saved) {
-      const data = JSON.parse(saved)
-      setFlashcardFolders(data.flashcardFolders || [])
-    }
-  }
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const data = { flashcardFolders }
-      localStorage.setItem(`dashboardData-${user?.id}`, JSON.stringify(data))
-      autoCommit(`Update dashboard data for ${user?.name}`)
-    }, 2000)
-    return () => clearTimeout(timer)
-  }, [flashcardFolders, user?.id, user?.name])
 
   const loadWhiteboards = async () => {
     try {
       const response = await whiteboardsAPI.getWhiteboards()
-      setWhiteboards(response.data)
+      setWhiteboards(response.data || [])
     } catch (error) {
       console.error('Failed to load whiteboards:', error)
     }
   }
 
-  const loadNotebooks = async () => {
+  const loadCounts = () => {
+    // Load counts from localStorage for display purposes
     try {
-      const response = await notebooksAPI.getNotebooks()
-      setNotebooks(response.data)
+      const notebooksData = localStorage.getItem(`notebooks-${user?.id}`)
+      const flashcardsData = localStorage.getItem(`flashcards-${user?.id}`)
+      
+      if (notebooksData) {
+        const notebooks = JSON.parse(notebooksData)
+        setNotebookCount(notebooks.length || 0)
+      }
+      
+      if (flashcardsData) {
+        const flashcards = JSON.parse(flashcardsData)
+        setFlashcardCount(flashcards.length || 0)
+      }
     } catch (error) {
-      console.error('Failed to load notebooks:', error)
+      console.error('Failed to load counts:', error)
     }
   }
 
-  const loadFlashcards = async () => {
-    try {
-      const response = await flashcardsAPI.getFlashcards()
-      setFlashcards(response.data)
-    } catch (error) {
-      console.error('Failed to load flashcards:', error)
-    }
-  }
 
-  const handleAddFlashcard = async () => {
-    if (!flashcardName.trim()) return
-    try {
-      const response = await flashcardsAPI.createFlashcard(flashcardName)
-      setFlashcards([response.data, ...flashcards])
-      setSelectedFlashcard(response.data)
-      setFlashcardName('')
-      setShowNewFlashcard(false)
-      setView('flashcards')
-    } catch (error) {
-      console.error('Failed to create flashcard:', error)
-    }
-  }
-
-  const handleDeleteFlashcard = async (id: string) => {
-    try {
-      await flashcardsAPI.deleteFlashcard(id)
-      setFlashcards(flashcards.filter((f: Flashcard) => f.id !== id))
-      setSelectedFlashcard(null)
-    } catch (error) {
-      console.error('Failed to delete flashcard:', error)
-    }
-  }
-
-  const handleAddFolder = () => {
-    if (!newFolderName.trim()) return
-    const folder: FlashcardFolder = {
-      id: Date.now().toString(),
-      name: newFolderName,
-      color: newFolderColor
-    }
-    setFlashcardFolders([...flashcardFolders, folder])
-    setNewFolderName('')
-    setNewFolderColor('#22c55e')
-    setShowNewFolder(false)
-  }
-
-  const handleDeleteFolder = (id: string) => {
-    setFlashcardFolders(flashcardFolders.filter((f: FlashcardFolder) => f.id !== id))
-    setFlashcards(flashcards.map((fc: Flashcard) => fc.folderId === id ? { ...fc, folderId: undefined } : fc))
-  }
-
-  const handleMoveFlashcard = (flashcardId: string, folderId?: string) => {
-    setFlashcards(flashcards.map((fc: Flashcard) => fc.id === flashcardId ? { ...fc, folderId } : fc))
-  }
 
   const navItems = [
     { id: 'notes', label: 'Notes', Icon: NoteIcon },
@@ -180,83 +109,11 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
       {isPhone ? sidebar : <div className="hidden md:flex md:flex-col">{sidebar}</div>}
 
       <div className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-color,#f0fdf4)]">
-        {view === 'flashcards' && (
-          <div className={`flex-1 overflow-y-auto ${isPhone ? 'p-4' : 'p-8'}`}>
-            <div className={`flex ${isPhone ? 'flex-col gap-3' : 'justify-between items-center'} mb-6`}>
-              <h2 className={`${isPhone ? 'text-xl' : 'text-2xl'} font-bold text-[var(--text-color)]`}>Flashcards</h2>
-              <div className={`flex ${isPhone ? 'flex-col w-full' : 'gap-2'} gap-2`}>
-                <button onClick={() => setShowNewFolder(true)} className={`${isPhone ? 'w-full' : ''} bg-[var(--accent-color)]/20 text-[var(--accent-color)] px-4 py-2 rounded-lg hover:bg-[var(--accent-color)]/30 transition-all text-sm`}>+ New Folder</button>
-                <button onClick={() => setShowNewFlashcard(true)} className={`${isPhone ? 'w-full' : ''} bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all text-sm`}>+ New Flashcard Set</button>
-              </div>
-            </div>
-            {showNewFolder && (
-              <div className="mb-6 p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 space-y-3">
-                <input type="text" value={newFolderName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFolderName(e.target.value)} placeholder="Folder name" className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]" autoFocus />
-                <div className="flex items-center gap-2">
-                  <input type="color" value={newFolderColor} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFolderColor(e.target.value)} className="w-12 h-10 rounded cursor-pointer" />
-                  <span className="text-sm text-[var(--text-color)]">{newFolderColor}</span>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={handleAddFolder} className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-lg hover:opacity-90">Create</button>
-                  <button onClick={() => setShowNewFolder(false)} className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-400">Cancel</button>
-                </div>
-              </div>
-            )}
-            {showNewFlashcard && (
-              <div className="mb-6 p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 space-y-3">
-                <input type="text" value={flashcardName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFlashcardName(e.target.value)} placeholder="Flashcard set name" className="w-full px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]" autoFocus />
-                <div className="flex gap-2">
-                  <button onClick={handleAddFlashcard} className="flex-1 bg-[var(--accent-color)] text-white px-3 py-2 rounded-lg hover:opacity-90">Create</button>
-                  <button onClick={() => setShowNewFlashcard(false)} className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-400">Cancel</button>
-                </div>
-              </div>
-            )}
-            {selectedFlashcard ? (
-              <FlashcardEditor flashcard={selectedFlashcard} onSave={loadFlashcards} />
-            ) : (
-              <div className="space-y-4">
-                {flashcardFolders.map((folder: FlashcardFolder) => {
-                  const folderCards = flashcards.filter((fc: Flashcard) => fc.folderId === folder.id)
-                  return (
-                    <div key={folder.id} className="bg-white rounded-2xl border border-[var(--accent-color)]/20 overflow-hidden" onDragOver={(e: React.DragEvent) => { e.preventDefault() }} onDrop={(e: React.DragEvent) => { e.preventDefault(); if (draggedFlashcard) handleMoveFlashcard(draggedFlashcard, folder.id); setDraggedFlashcard(null) }}>
-                      <button onClick={() => setExpandedFolder(expandedFolder === folder.id ? null : folder.id)} className="w-full p-4 flex items-center justify-between hover:bg-[var(--accent-color)]/5 transition-all">
-                        <div className="flex items-center gap-3">
-                          <div className="w-4 h-4 rounded-full" style={{backgroundColor: folder.color}}></div>
-                          <span className="font-semibold text-[var(--text-color)]">{folder.name}</span>
-                          <span className="text-xs text-[var(--text-color)]/60">({folderCards.length})</span>
-                        </div>
-                        <span className="text-[var(--text-color)]/60">{expandedFolder === folder.id ? '▼' : '▶'}</span>
-                      </button>
-                      {expandedFolder === folder.id && (
-                        <div className="border-t border-[var(--accent-color)]/20 p-4 space-y-2">
-                          {folderCards.map((fc: Flashcard) => (
-                            <div key={fc.id} draggable onDragStart={() => setDraggedFlashcard(fc.id)} onDragEnd={() => setDraggedFlashcard(null)} className="p-3 bg-[var(--accent-color)]/5 rounded-lg cursor-move hover:bg-[var(--accent-color)]/10" onClick={() => setSelectedFlashcard(fc)}>
-                              <p className="font-semibold text-[var(--text-color)]">{fc.title}</p>
-                              <p className="text-xs text-[var(--text-color)]/60">{fc.cards.length} cards</p>
-                            </div>
-                          ))}
-                          <button onClick={() => handleDeleteFolder(folder.id)} className="w-full mt-2 text-red-500 hover:text-red-700 text-sm py-2">Delete Folder</button>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-                {flashcards.filter((fc: Flashcard) => !fc.folderId).length > 0 && (
-                  <div className="bg-white rounded-2xl border border-[var(--accent-color)]/20 p-4 space-y-2" onDragOver={(e: React.DragEvent) => { e.preventDefault() }} onDrop={(e: React.DragEvent) => { e.preventDefault(); if (draggedFlashcard) handleMoveFlashcard(draggedFlashcard); setDraggedFlashcard(null) }}>
-                    <h3 className="font-semibold text-[var(--text-color)] mb-3">Ungrouped</h3>
-                    {flashcards.filter((fc: Flashcard) => !fc.folderId).map((fc: Flashcard) => (
-                      <div key={fc.id} draggable onDragStart={() => setDraggedFlashcard(fc.id)} onDragEnd={() => setDraggedFlashcard(null)} className="p-3 bg-[var(--accent-color)]/5 rounded-lg cursor-move hover:bg-[var(--accent-color)]/10" onClick={() => setSelectedFlashcard(fc)}>
-                        <p className="font-semibold text-[var(--text-color)]">{fc.title}</p>
-                        <p className="text-xs text-[var(--text-color)]/60">{fc.cards.length} cards</p>
-                        <button onClick={() => handleDeleteFlashcard(fc.id)} className="mt-2 text-red-500 hover:text-red-700 text-xs">Delete</button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+        {view === 'notes' && <NotesManager user={user} />}
+        
+        {view === 'notebooks' && <NotebookManager user={user} />}
+        
+        {view === 'flashcards' && <FlashcardManager user={user} />}
 
         {view === 'whiteboards' && (
           <div className={`flex-1 overflow-y-auto ${isPhone ? 'p-4' : 'p-8'}`}>
@@ -321,92 +178,7 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
           </div>
         )}
 
-        {view === 'notebooks' && (
-          <div className={`flex-1 overflow-y-auto ${isPhone ? 'p-4' : 'p-8'}`}>
-            <div className={`flex ${isPhone ? 'flex-col gap-3' : 'justify-between items-center'} mb-6`}>
-              <h2 className={`${isPhone ? 'text-xl' : 'text-2xl'} font-bold text-[var(--text-color)]`}>Notebooks</h2>
-              <button
-                onClick={async () => {
-                  try {
-                    const response = await notebooksAPI.createNotebook(`Notebook ${notebooks.length + 1}`)
-                    if (response && response.data) {
-                      setNotebooks([response.data, ...notebooks])
-                      setSelectedNotebook(response.data)
-                    }
-                  } catch (error) {
-                    console.error('Failed to create notebook:', error)
-                  }
-                }}
-                className={`${isPhone ? 'w-full' : ''} bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all`}
-              >
-                + New Notebook
-              </button>
-            </div>
-            
-            {selectedNotebook && selectedNotebook.pages ? (
-              <div className="bg-white rounded-2xl border border-[var(--accent-color)]/20 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-[var(--text-color)]">{selectedNotebook.name}</h3>
-                  <button
-                    onClick={() => setSelectedNotebook(null)}
-                    className="text-[var(--text-color)]/60 hover:text-[var(--text-color)] text-xl"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <NotebookEditor 
-                  notebook={selectedNotebook} 
-                  onUpdateNotebook={async (updated) => {
-                    try {
-                      await notebooksAPI.updateNotebook(updated.id, updated)
-                      setSelectedNotebook(updated)
-                      setNotebooks(notebooks.map((nb: Notebook) => nb.id === updated.id ? updated : nb))
-                    } catch (error) {
-                      console.error('Failed to update notebook:', error)
-                    }
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {notebooks.length === 0 ? (
-                  <p className="text-[var(--text-color)]/60">No notebooks yet. Create one to get started!</p>
-                ) : (
-                  notebooks.map((notebook: Notebook) => (
-                    <div
-                      key={notebook.id}
-                      onClick={() => setSelectedNotebook(notebook)}
-                      className="p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 cursor-pointer transition-all"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-semibold text-[var(--text-color)]">{notebook.name}</p>
-                          <p className="text-xs text-[var(--text-color)]/60">
-                            {notebook.pages.length} pages • {notebook.folder || 'Root'}
-                          </p>
-                        </div>
-                        <button
-                          onClick={async (e: React.MouseEvent) => {
-                            e.stopPropagation()
-                            try {
-                              await notebooksAPI.deleteNotebook(notebook.id)
-                              setNotebooks(notebooks.filter((nb: Notebook) => nb.id !== notebook.id))
-                            } catch (error) {
-                              console.error('Failed to delete notebook:', error)
-                            }
-                          }}
-                          className="text-red-400 hover:text-red-600 text-sm"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
-        )}
+
 
         {view === 'home' && (
           <div className={`flex-1 overflow-y-auto ${isPhone ? 'p-4' : 'p-8'}`}>
@@ -414,8 +186,8 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
             <div className={`grid ${isPhone ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-6`}>
               {[
                 { id: 'notes', label: 'Notes', Icon: NoteIcon, count: notes.length },
-                { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon, count: notebooks.length },
-                { id: 'flashcards', label: 'Flashcards', Icon: FlashcardIcon, count: flashcards.length },
+                { id: 'notebooks', label: 'Notebooks', Icon: NotebookIcon, count: notebookCount },
+                { id: 'flashcards', label: 'Flashcards', Icon: FlashcardIcon, count: flashcardCount },
                 { id: 'whiteboards', label: 'Whiteboards', Icon: WhiteboardIcon, count: whiteboards.length }
               ].map(item => (
                 <button key={item.id} onClick={() => setView(item.id as any)} className="p-6 bg-white rounded-3xl border border-[var(--accent-color)]/20 hover:border-[var(--accent-color)]/40 hover:shadow-lg transition-all text-left hover:scale-105 transform duration-200">
