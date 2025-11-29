@@ -316,7 +316,9 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
         )}
 
         {view === 'files' && (
-          <FileManager user={user} />
+          <div className="flex-1 overflow-hidden">
+            <FileManager user={user} />
+          </div>
         )}
 
         {view === 'notebooks' && (
@@ -327,8 +329,10 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
                 onClick={async () => {
                   try {
                     const response = await notebooksAPI.createNotebook(`Notebook ${notebooks.length + 1}`)
-                    setNotebooks([response.data, ...notebooks])
-                    setSelectedNotebook(response.data)
+                    if (response && response.data) {
+                      setNotebooks([response.data, ...notebooks])
+                      setSelectedNotebook(response.data)
+                    }
                   } catch (error) {
                     console.error('Failed to create notebook:', error)
                   }
@@ -339,7 +343,7 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
               </button>
             </div>
             
-            {selectedNotebook ? (
+            {selectedNotebook && selectedNotebook.pages ? (
               <div className="bg-white rounded-2xl border border-[var(--accent-color)]/20 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-bold text-[var(--text-color)]">{selectedNotebook.name}</h3>
