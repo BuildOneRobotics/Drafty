@@ -109,25 +109,13 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
   }
 
   const deleteFolder = (folderId: string) => {
-    saveFolders(folders.filter(f => f.id !== folderId))
+    saveFolders(folders.filter((f: FlashcardFolder) => f.id !== folderId))
     // Remove folder association from flashcards
-    const updatedFlashcards = flashcards.map(fc => 
+    const updatedFlashcards = flashcards.map((fc: Flashcard) => 
       fc.folderId === folderId ? { ...fc, folderId: undefined } : fc
     )
     setFlashcards(updatedFlashcards)
     setDeleteConfirm(null)
-  }
-
-  const moveToFolder = async (flashcardId: string, folderId?: string) => {
-    const updatedFlashcards = flashcards.map(fc =>
-      fc.id === flashcardId ? { ...fc, folderId } : fc
-    )
-    setFlashcards(updatedFlashcards)
-    
-    // Update the selected flashcard if it's the one being moved
-    if (selectedFlashcard?.id === flashcardId) {
-      setSelectedFlashcard({ ...selectedFlashcard, folderId })
-    }
   }
 
   const addCard = async () => {
@@ -147,7 +135,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
     try {
       await flashcardsAPI.updateFlashcard(selectedFlashcard.id, updatedFlashcard.title, updatedFlashcard.cards)
       setSelectedFlashcard(updatedFlashcard)
-      setFlashcards(flashcards.map(fc => fc.id === selectedFlashcard.id ? updatedFlashcard : fc))
+      setFlashcards(flashcards.map((fc: Flashcard) => fc.id === selectedFlashcard.id ? updatedFlashcard : fc))
     } catch (error) {
       console.error('Failed to add card:', error)
     }
@@ -156,7 +144,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
   const updateCard = async (cardId: string, question: string, answer: string) => {
     if (!selectedFlashcard) return
 
-    const updatedCards = selectedFlashcard.cards.map(card =>
+    const updatedCards = selectedFlashcard.cards.map((card: Card) =>
       card.id === cardId ? { ...card, question, answer } : card
     )
 
@@ -168,7 +156,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
     try {
       await flashcardsAPI.updateFlashcard(selectedFlashcard.id, updatedFlashcard.title, updatedFlashcard.cards)
       setSelectedFlashcard(updatedFlashcard)
-      setFlashcards(flashcards.map(fc => fc.id === selectedFlashcard.id ? updatedFlashcard : fc))
+      setFlashcards(flashcards.map((fc: Flashcard) => fc.id === selectedFlashcard.id ? updatedFlashcard : fc))
     } catch (error) {
       console.error('Failed to update card:', error)
     }
@@ -177,7 +165,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
   const deleteCard = async (cardId: string) => {
     if (!selectedFlashcard || selectedFlashcard.cards.length <= 1) return
 
-    const updatedCards = selectedFlashcard.cards.filter(card => card.id !== cardId)
+    const updatedCards = selectedFlashcard.cards.filter((card: Card) => card.id !== cardId)
     const updatedFlashcard = {
       ...selectedFlashcard,
       cards: updatedCards
@@ -186,7 +174,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
     try {
       await flashcardsAPI.updateFlashcard(selectedFlashcard.id, updatedFlashcard.title, updatedFlashcard.cards)
       setSelectedFlashcard(updatedFlashcard)
-      setFlashcards(flashcards.map(fc => fc.id === selectedFlashcard.id ? updatedFlashcard : fc))
+      setFlashcards(flashcards.map((fc: Flashcard) => fc.id === selectedFlashcard.id ? updatedFlashcard : fc))
       
       if (currentCardIndex >= updatedCards.length) {
         setCurrentCardIndex(Math.max(0, updatedCards.length - 1))
