@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Notebook, Page } from '@/lib/store'
 import { notebooksAPI } from '@/lib/api'
+import ConfirmDialog from './ConfirmDialog'
 
 interface NotebookManagerProps {
   user: { id: string; name: string; email: string } | null
@@ -19,6 +20,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
   const [newNotebookName, setNewNotebookName] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'notebook' | 'page', id: string, name: string } | null>(null)
 
   useEffect(() => {
     loadNotebooks()
@@ -103,14 +105,29 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
   const deleteNotebook = async (notebookId: string) => {
     try {
       await notebooksAPI.deleteNotebook(notebookId)
-      setNotebooks(notebooks.filter(nb => nb.id !== notebookId))
+      const updatedNotebooks = notebooks.filter(nb => nb.id !== notebookId)
+      setNotebooks(updatedNotebooks)
+      localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
+      
       if (selectedNotebook?.id === notebookId) {
         setSelectedNotebook(null)
         setSelectedPage(null)
         setPageContent('')
       }
+      setDeleteConfirm(null)
     } catch (error) {
       console.error('Failed to delete notebook:', error)
+      // Delete locally even if API fails
+      const updatedNotebooks = notebooks.filter(nb => nb.id !== notebookId)
+      setNotebooks(updatedNotebooks)
+      localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
+      
+      if (selectedNotebook?.id === notebookId) {
+        setSelectedNotebook(null)
+        setSelectedPage(null)
+        setPageContent('')
+      }
+      setDeleteConfirm(null)
     }
   }
 
@@ -207,18 +224,33 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
       pages: updatedPages
     }
 
+    const updatedNotebooks = notebooks.map(nb => nb.id === selectedNotebook.id ? updatedNotebook : nb)
+
     try {
       await notebooksAPI.updateNotebook(selectedNotebook.id, updatedNotebook)
       setSelectedNotebook(updatedNotebook)
-      setNotebooks(notebooks.map(nb => nb.id === selectedNotebook.id ? updatedNotebook : nb))
+      setNotebooks(updatedNotebooks)
+      localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
       
       if (selectedPage?.id === pageId) {
         const newSelectedPage = updatedPages[0] || null
         setSelectedPage(newSelectedPage)
         setPageContent(newSelectedPage?.content || '')
       }
+      setDeleteConfirm(null)
     } catch (error) {
       console.error('Failed to delete page:', error)
+      // Delete locally even if API fails
+      setSelectedNotebook(updatedNotebook)
+      setNotebooks(updatedNotebooks)
+      localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
+      
+      if (selectedPage?.id === pageId) {
+        const newSelectedPage = updatedPages[0] || null
+        setSelectedPage(newSelectedPage)
+        setPageContent(newSelectedPage?.content || '')
+      }
+      setDeleteConfirm(null)
     }
   }
 
@@ -230,16 +262,8 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
     )
   }
 
-  // Debug info
-  console.log('NotebookManager render - notebooks:', notebooks.length, 'selected:', selectedNotebook?.name)
-
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
-      {/* Debug info */}
-      <div className="p-2 bg-yellow-100 text-black text-xs">
-        Debug: {notebooks.length} notebooks loaded, User: {user?.name || 'No user'}
-      </div>
-      
       {/* Header */}
       <div className="p-6 border-b border-[var(--accent-color)]/20 bg-white">
         <div className="flex justify-between items-center">
@@ -316,7 +340,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          deleteNotebook(notebook.id)
+                          setDeleteConfirm({ type: 'notebook', id: notebook.id, name: notebook.name })
                         }}
                         className={`ml-2 text-xs hover:opacity-70 ${
                           selectedNotebook?.id === notebook.id ? 'text-white' : 'text-red-500'
@@ -374,7 +398,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
-                              deletePage(page.id)
+                              setDeleteConfirm({ type: 'page', id: page.id, name: page.title })
                             }}
                             className={`ml-1 text-xs hover:opacity-70 ${
                               selectedPage?.id === page.id ? 'text-white' : 'text-red-500'
@@ -428,6 +452,24 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
           </div>
         )}
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteConfirm !== null}
+        title={`Delete ${deleteConfirm?.type === 'notebook' ? 'Notebook' : 'Page'}?`}
+        message={`Are you sure you want to delete "${deleteConfirm?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+        onConfirm={() => {
+          if (deleteConfirm?.type === 'notebook') {
+            deleteNotebook(deleteConfirm.id)
+          } else if (deleteConfirm?.type === 'page') {
+            deletePage(deleteConfirm.id)
+          }
+        }}
+        onCancel={() => setDeleteConfirm(null)}
+      />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
+import ConfirmDialog from './ConfirmDialog'
 
 interface FileListItemProps {
   file: {
@@ -70,6 +71,10 @@ export default function FileListItem({
     onDelete(file.id)
     setShowDeleteConfirm(false)
     setShowMenu(false)
+  }
+
+  const handleConfirmDelete = () => {
+    handleDelete()
   }
 
   const handleMove = (folder?: string) => {
@@ -203,36 +208,21 @@ export default function FileListItem({
               ))}
             </div>
           )}
-          
-          {showDeleteConfirm && (
-            <div className="absolute right-0 top-full mt-1 bg-white border border-red-200 rounded-lg shadow-lg z-20 p-3 min-w-[200px]">
-              <p className="text-sm text-[var(--text-color)] mb-3">
-                Delete "{file.name}"?
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation()
-                    handleDelete()
-                  }}
-                  className="flex-1 bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                >
-                  Delete
-                </button>
-                <button
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation()
-                    setShowDeleteConfirm(false)
-                  }}
-                  className="flex-1 bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
+
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Delete File?"
+        message={`Are you sure you want to delete "${file.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   )
 }

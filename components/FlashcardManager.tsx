@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Flashcard, Card, FlashcardFolder } from '@/lib/store'
 import { flashcardsAPI } from '@/lib/api'
+import ConfirmDialog from './ConfirmDialog'
 
 interface FlashcardManagerProps {
   user: { id: string; name: string; email: string } | null
@@ -24,6 +25,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
   const [newFolderName, setNewFolderName] = useState('')
   const [newFolderColor, setNewFolderColor] = useState('#22c55e')
   const [loading, setLoading] = useState(true)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'flashcard' | 'folder' | 'card', id: string, name: string } | null>(null)
 
   useEffect(() => {
     loadFlashcards()
@@ -84,8 +86,10 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
         setStudyMode(false)
         setEditMode(false)
       }
+      setDeleteConfirm(null)
     } catch (error) {
       console.error('Failed to delete flashcard:', error)
+      setDeleteConfirm(null)
     }
   }
 
@@ -111,6 +115,19 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
       fc.folderId === folderId ? { ...fc, folderId: undefined } : fc
     )
     setFlashcards(updatedFlashcards)
+    setDeleteConfirm(null)
+  }
+
+  const moveToFolder = async (flashcardId: string, folderId?: string) => {
+    const updatedFlashcards = flashcards.map(fc =>
+      fc.id === flashcardId ? { ...fc, folderId } : fc
+    )
+    setFlashcards(updatedFlashcards)
+    
+    // Update the selected flashcard if it's the one being moved
+    if (selectedFlashcard?.id === flashcardId) {
+      setSelectedFlashcard({ ...selectedFlashcard, folderId })
+    }
   }
 
   const addCard = async () => {
@@ -174,8 +191,10 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
       if (currentCardIndex >= updatedCards.length) {
         setCurrentCardIndex(Math.max(0, updatedCards.length - 1))
       }
+      setDeleteConfirm(null)
     } catch (error) {
       console.error('Failed to delete card:', error)
+      setDeleteConfirm(null)
     }
   }
 
@@ -291,7 +310,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
                       <span className="text-xs text-[var(--text-color)]/60">({folderFlashcards.length})</span>
                     </div>
                     <button
-                      onClick={() => deleteFolder(folder.id)}
+                      onClick={() => setDeleteConfirm({ type: 'folder', id: folder.id, name: folder.name })}
                       className="text-red-500 hover:text-red-700 text-xs"
                     >
                       ✕
@@ -324,7 +343,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
-                              deleteFlashcard(flashcard.id)
+                              setDeleteConfirm({ type: 'flashcard', id: flashcard.id, name: flashcard.title })
                             }}
                             className={`ml-1 text-xs hover:opacity-70 ${
                               selectedFlashcard?.id === flashcard.id ? 'text-white' : 'text-red-500'
@@ -445,7 +464,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
                           <span className="text-sm font-medium text-[var(--text-color)]">Card {index + 1}</span>
                           {selectedFlashcard.cards.length > 1 && (
                             <button
-                              onClick={() => deleteCard(card.id)}
+                              onClick={() => setDeleteConfirm({ type: 'card', id: card.id, name: `Card ${index + 1}` })}
                               className="text-red-500 hover:text-red-700 text-sm"
                             >
                               Delete
@@ -541,6 +560,26 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
           </div>
         )}
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteConfirm !== null}
+        title={`Delete ${deleteConfirm?.type === 'flashcard' ? 'Flashcard Set' : deleteConfirm?.type === 'folder' ? 'Folder' : 'Card'}?`}
+        message={`Are you sure you want to delete "${deleteConfirm?.name}"? ${deleteConfirm?.type === 'folder' ? 'Flashcards in this folder will be moved to Ungrouped.' : 'This action cannot be undone.'}`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+        onConfirm={() => {
+          if (deleteConfirm?.type === 'flashcard') {
+            deleteFlashcard(deleteConfirm.id)
+          } else if (deleteConfirm?.type === 'folder') {
+            deleteFolder(deleteConfirm.id)
+          } else if (deleteConfirm?.type === 'card') {
+            deleteCard(deleteConfirm.id)
+          }
+        }}
+        onCancel={() => setDeleteConfirm(null)}
+      />
     </div>
   )
 }

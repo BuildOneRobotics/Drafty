@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Note } from '@/lib/store'
 import { notesAPI } from '@/lib/api'
+import ConfirmDialog from './ConfirmDialog'
 
 interface NotesManagerProps {
   user: { id: string; name: string; email: string } | null
@@ -18,6 +19,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string, title: string } | null>(null)
 
   useEffect(() => {
     loadNotes()
@@ -72,8 +74,10 @@ export default function NotesManager({ user }: NotesManagerProps) {
       if (selectedNote?.id === noteId) {
         setSelectedNote(null)
       }
+      setDeleteConfirm(null)
     } catch (error) {
       console.error('Failed to delete note:', error)
+      setDeleteConfirm(null)
     }
   }
 
@@ -234,7 +238,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          deleteNote(note.id)
+                          setDeleteConfirm({ id: note.id, title: note.title })
                         }}
                         className={`ml-2 text-xs hover:opacity-70 ${
                           selectedNote?.id === note.id ? 'text-white' : 'text-red-500'
@@ -292,6 +296,22 @@ export default function NotesManager({ user }: NotesManagerProps) {
           </div>
         )}
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteConfirm !== null}
+        title="Delete Note?"
+        message={`Are you sure you want to delete "${deleteConfirm?.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+        onConfirm={() => {
+          if (deleteConfirm) {
+            deleteNote(deleteConfirm.id)
+          }
+        }}
+        onCancel={() => setDeleteConfirm(null)}
+      />
     </div>
   )
 }
