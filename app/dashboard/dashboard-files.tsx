@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import FileListItem from '@/components/FileListItem'
+import TemplateSelector from '@/components/TemplateSelector'
+import { fileTemplates, Template } from '@/lib/templates'
 
 interface DraftyFile {
   id: string
@@ -32,7 +34,9 @@ export default function FileManager({ user }: FileManagerProps) {
   const [files, setFiles] = useState<DraftyFile[]>([])
   const [draggedFile, setDraggedFile] = useState<string | null>(null)
   const [showNewFile, setShowNewFile] = useState(false)
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false)
   const [newFileName, setNewFileName] = useState('')
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null)
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
   const [friends, setFriends] = useState<Friend[]>([])
   const [folders, setFolders] = useState<string[]>(['Documents', 'Images', 'Projects'])
@@ -74,6 +78,21 @@ export default function FileManager({ user }: FileManagerProps) {
     localStorage.setItem(`files-${user?.id}`, JSON.stringify(updated))
   }
 
+  const handleNewFileClick = () => {
+    setShowTemplateSelector(true)
+  }
+
+  const handleTemplateSelect = (template: Template) => {
+    setSelectedTemplate(template)
+    setShowTemplateSelector(false)
+    setShowNewFile(true)
+    if (template.id === 'blank') {
+      setNewFileName('')
+    } else {
+      setNewFileName(template.name)
+    }
+  }
+
   const handleAddFile = () => {
     if (!newFileName.trim()) return
     const newFile: DraftyFile = {
@@ -86,6 +105,7 @@ export default function FileManager({ user }: FileManagerProps) {
     saveFiles([newFile, ...files])
     setNewFileName('')
     setShowNewFile(false)
+    setSelectedTemplate(null)
   }
 
   const handleDeleteFile = (id: string) => {
@@ -150,7 +170,7 @@ export default function FileManager({ user }: FileManagerProps) {
             + New Folder
           </button>
           <button
-            onClick={() => setShowNewFile(true)}
+            onClick={handleNewFileClick}
             className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all"
           >
             + New File
@@ -185,6 +205,15 @@ export default function FileManager({ user }: FileManagerProps) {
         </div>
       )}
 
+      {showTemplateSelector && (
+        <TemplateSelector
+          templates={fileTemplates}
+          onSelect={handleTemplateSelect}
+          onCancel={() => setShowTemplateSelector(false)}
+          title="Choose a File Template"
+        />
+      )}
+
       {showNewFile && (
         <div className="mb-6 p-4 bg-white rounded-2xl border border-[var(--accent-color)]/20 space-y-3">
           <input
@@ -203,7 +232,10 @@ export default function FileManager({ user }: FileManagerProps) {
               Create
             </button>
             <button
-              onClick={() => setShowNewFile(false)}
+              onClick={() => {
+                setShowNewFile(false)
+                setSelectedTemplate(null)
+              }}
               className="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-400"
             >
               Cancel

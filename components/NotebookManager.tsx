@@ -4,7 +4,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Notebook, Page } from '@/lib/store'
 import { notebooksAPI } from '@/lib/api'
 import ConfirmDialog from './ConfirmDialog'
+import TemplateSelector from './TemplateSelector'
 import { useMobile } from '@/lib/useMobile'
+import { notebookTemplates, Template } from '@/lib/templates'
 
 interface NotebookManagerProps {
   user: { id: string; name: string; email: string } | null
@@ -17,7 +19,9 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
   const [selectedPage, setSelectedPage] = useState<Page | null>(null)
   const [pageContent, setPageContent] = useState('')
   const [showNewNotebook, setShowNewNotebook] = useState(false)
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false)
   const [newNotebookName, setNewNotebookName] = useState('')
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'notebook' | 'page', id: string, name: string } | null>(null)
@@ -63,17 +67,49 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
     }
   }
 
+  const handleNewNotebookClick = () => {
+    setShowTemplateSelector(true)
+  }
+
+  const handleTemplateSelect = (template: Template) => {
+    setSelectedTemplate(template)
+    setShowTemplateSelector(false)
+    setShowNewNotebook(true)
+    if (template.id === 'blank') {
+      setNewNotebookName('')
+    } else {
+      setNewNotebookName(template.name)
+    }
+  }
+
   const createNotebook = async () => {
     if (!newNotebookName.trim()) return
+    
+    const initialContent = selectedTemplate?.content || ''
     
     try {
       const response = await notebooksAPI.createNotebook(newNotebookName.trim())
       if (response?.data) {
-        const updatedNotebooks = [response.data, ...notebooks]
+        // Update first page with template content
+        const notebookWithTemplate = {
+          ...response.data,
+          pages: [{
+            ...response.data.pages[0],
+            content: initialContent
+          }]
+        }
+        
+        const updatedNotebooks = [notebookWithTemplate, ...notebooks]
         setNotebooks(updatedNotebooks)
-        setSelectedNotebook(response.data)
+        setSelectedNotebook(notebookWithTemplate)
         setNewNotebookName('')
         setShowNewNotebook(false)
+        setSelectedTemplate(null)
+        
+        if (isPhone) {
+          setShowNotebookList(false)
+          setShowPageList(true)
+        }
         
         // Save to localStorage as backup
         localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
@@ -89,7 +125,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
           id: '1',
           number: 1,
           title: 'Page 1',
-          content: ''
+          content: initialContent
         }],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -100,6 +136,12 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
       setSelectedNotebook(newNotebook)
       setNewNotebookName('')
       setShowNewNotebook(false)
+      setSelectedTemplate(null)
+      
+      if (isPhone) {
+        setShowNotebookList(false)
+        setShowPageList(true)
+      }
       
       // Save to localStorage
       localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
@@ -301,7 +343,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
             </h2>
           )}
           <button
-            onClick={() => setShowNewNotebook(true)}
+            onClick={handleNewNotebookClick}
             className={`bg-[var(--accent-color)] text-white ${isPhone ? 'px-3 py-2 text-sm' : 'px-4 py-2'} rounded-lg hover:opacity-90 transition-all`}
           >
             + {isPhone ? 'New' : 'New Notebook'}
@@ -581,6 +623,16 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
           )
         )}
       </div>
+
+      {/* Template Selector */}
+      {showTemplateSelector && (
+        <TemplateSelector
+          templates={notebookTemplates}
+          onSelect={handleTemplateSelect}
+          onCancel={() => setShowTemplateSelector(false)}
+          title="Choose a Notebook Template"
+        />
+      )}
 
       {/* Confirmation Dialog */}
       <ConfirmDialog

@@ -4,7 +4,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Note } from '@/lib/store'
 import { notesAPI } from '@/lib/api'
 import ConfirmDialog from './ConfirmDialog'
+import TemplateSelector from './TemplateSelector'
 import { useMobile } from '@/lib/useMobile'
+import { noteTemplates, Template } from '@/lib/templates'
 
 interface NotesManagerProps {
   user: { id: string; name: string; email: string } | null
@@ -15,7 +17,9 @@ export default function NotesManager({ user }: NotesManagerProps) {
   const [notes, setNotes] = useState<Note[]>([])
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [showNewNote, setShowNewNote] = useState(false)
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false)
   const [newNoteTitle, setNewNoteTitle] = useState('')
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -40,16 +44,35 @@ export default function NotesManager({ user }: NotesManagerProps) {
     }
   }
 
+  const handleNewNoteClick = () => {
+    setShowTemplateSelector(true)
+  }
+
+  const handleTemplateSelect = (template: Template) => {
+    setSelectedTemplate(template)
+    setShowTemplateSelector(false)
+    setShowNewNote(true)
+    if (template.id === 'blank') {
+      setNewNoteTitle('')
+    } else {
+      setNewNoteTitle(template.name)
+    }
+  }
+
   const createNote = async () => {
     if (!newNoteTitle.trim()) return
 
+    const content = selectedTemplate?.content || ''
+
     try {
-      const response = await notesAPI.createNote(newNoteTitle.trim(), '', [])
+      const response = await notesAPI.createNote(newNoteTitle.trim(), content, [])
       if (response?.data) {
         setNotes([response.data, ...notes])
         setSelectedNote(response.data)
         setNewNoteTitle('')
         setShowNewNote(false)
+        setSelectedTemplate(null)
+        if (isPhone) setShowNotesList(false)
       }
     } catch (error) {
       console.error('Failed to create note:', error)
@@ -147,7 +170,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
             <h2 className={`${isPhone ? 'text-xl' : 'text-2xl'} font-bold text-[var(--text-color)]`}>Notes</h2>
           )}
           <button
-            onClick={() => setShowNewNote(true)}
+            onClick={handleNewNoteClick}
             className={`bg-[var(--accent-color)] text-white ${isPhone ? 'px-3 py-2 text-sm' : 'px-4 py-2'} rounded-lg hover:opacity-90 transition-all`}
           >
             + {isPhone ? 'New' : 'New Note'}
@@ -397,6 +420,16 @@ export default function NotesManager({ user }: NotesManagerProps) {
           )
         )}
       </div>
+
+      {/* Template Selector */}
+      {showTemplateSelector && (
+        <TemplateSelector
+          templates={noteTemplates}
+          onSelect={handleTemplateSelect}
+          onCancel={() => setShowTemplateSelector(false)}
+          title="Choose a Note Template"
+        />
+      )}
 
       {/* Confirmation Dialog */}
       <ConfirmDialog
