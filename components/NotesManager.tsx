@@ -86,9 +86,9 @@ export default function NotesManager({ user }: NotesManagerProps) {
     }
 
     // Update local state immediately
-    const updatedNote = { ...selectedNote!, title, content, tags, updatedAt: new Date().toISOString() }
+    const updatedNote: Note = { ...selectedNote!, title, content, tags, updatedAt: new Date().toISOString() }
     setSelectedNote(updatedNote)
-    setNotes(notes.map(note => note.id === noteId ? updatedNote : note))
+    setNotes(notes.map((note: Note) => note.id === noteId ? updatedNote : note))
 
     // Debounce save for 1 second
     saveTimeoutRef.current = setTimeout(async () => {
@@ -96,11 +96,11 @@ export default function NotesManager({ user }: NotesManagerProps) {
         setSaving(true)
         await notesAPI.updateNote(noteId, title, content, tags)
         // Save to localStorage as backup
-        localStorage.setItem(`notes-${user?.id}`, JSON.stringify(notes.map(note => note.id === noteId ? updatedNote : note)))
+        localStorage.setItem(`notes-${user?.id}`, JSON.stringify(notes.map((note: Note) => note.id === noteId ? updatedNote : note)))
       } catch (error) {
         console.error('Failed to update note:', error)
         // Save locally even if API fails
-        localStorage.setItem(`notes-${user?.id}`, JSON.stringify(notes.map(note => note.id === noteId ? updatedNote : note)))
+        localStorage.setItem(`notes-${user?.id}`, JSON.stringify(notes.map((note: Note) => note.id === noteId ? updatedNote : note)))
       } finally {
         setSaving(false)
       }
@@ -115,7 +115,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
   const deleteNote = async (noteId: string) => {
     try {
       await notesAPI.deleteNote(noteId)
-      setNotes(notes.filter(note => note.id !== noteId))
+      setNotes(notes.filter((note: Note) => note.id !== noteId))
       if (selectedNote?.id === noteId) {
         setSelectedNote(null)
       }
@@ -126,10 +126,10 @@ export default function NotesManager({ user }: NotesManagerProps) {
     }
   }
 
-  const filteredNotes = notes.filter(note =>
+  const filteredNotes = notes.filter((note: Note) =>
     note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     note.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    note.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+    note.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
   const formatDate = (dateString: string) => {
@@ -205,7 +205,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
               placeholder="Note title"
               className="flex-1 px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]"
               autoFocus
-              onKeyDown={(e) => {
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key === 'Enter') createNote()
                 if (e.key === 'Escape') setShowNewNote(false)
               }}
@@ -245,7 +245,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
                 </p>
               ) : (
                 <div className="space-y-2">
-                  {filteredNotes.map((note) => (
+                  {filteredNotes.map((note: Note) => (
                     <div
                       key={note.id}
                       onClick={() => {
@@ -274,7 +274,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
                             </p>
                             {note.tags.length > 0 && (
                               <div className="flex gap-1">
-                                {note.tags.slice(0, 2).map((tag, index) => (
+                                {note.tags.slice(0, 2).map((tag: string, index: number) => (
                                   <span
                                     key={index}
                                     className={`text-xs px-2 py-1 rounded ${
@@ -298,7 +298,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
                           </div>
                         </div>
                         <button
-                          onClick={(e) => {
+                          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                             e.stopPropagation()
                             setDeleteConfirm({ id: note.id, title: note.title })
                           }}
@@ -330,7 +330,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
               />
               <div className="flex items-center justify-between mt-2">
                 <div className="flex gap-2 flex-wrap">
-                  {selectedNote.tags.map((tag, index) => (
+                  {selectedNote.tags.map((tag: string, index: number) => (
                     <span
                       key={index}
                       className="text-xs px-2 py-1 bg-[var(--accent-color)]/20 text-[var(--accent-color)] rounded"
@@ -383,7 +383,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
                 1. List
               </button>
               <select
-                onChange={(e) => formatText('fontSize', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => formatText('fontSize', e.target.value)}
                 className="px-2 py-1.5 bg-white border border-[var(--accent-color)]/20 rounded hover:bg-[var(--accent-color)]/10 text-sm"
                 defaultValue="3"
               >
@@ -395,7 +395,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
               </select>
               <input
                 type="color"
-                onChange={(e) => formatText('foreColor', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => formatText('foreColor', e.target.value)}
                 className="w-10 h-8 border border-[var(--accent-color)]/20 rounded cursor-pointer"
                 title="Text Color"
               />

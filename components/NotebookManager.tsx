@@ -99,7 +99,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
           }]
         }
         
-        const updatedNotebooks = [notebookWithTemplate, ...notebooks]
+        const updatedNotebooks: Notebook[] = [notebookWithTemplate, ...notebooks]
         setNotebooks(updatedNotebooks)
         setSelectedNotebook(notebookWithTemplate)
         setNewNotebookName('')
@@ -131,7 +131,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
         updatedAt: new Date().toISOString(),
       }
       
-      const updatedNotebooks = [newNotebook, ...notebooks]
+      const updatedNotebooks: Notebook[] = [newNotebook, ...notebooks]
       setNotebooks(updatedNotebooks)
       setSelectedNotebook(newNotebook)
       setNewNotebookName('')
@@ -151,7 +151,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
   const deleteNotebook = async (notebookId: string) => {
     try {
       await notebooksAPI.deleteNotebook(notebookId)
-      const updatedNotebooks = notebooks.filter(nb => nb.id !== notebookId)
+      const updatedNotebooks: Notebook[] = notebooks.filter((nb: Notebook) => nb.id !== notebookId)
       setNotebooks(updatedNotebooks)
       localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
       
@@ -164,7 +164,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
     } catch (error) {
       console.error('Failed to delete notebook:', error)
       // Delete locally even if API fails
-      const updatedNotebooks = notebooks.filter(nb => nb.id !== notebookId)
+      const updatedNotebooks: Notebook[] = notebooks.filter((nb: Notebook) => nb.id !== notebookId)
       setNotebooks(updatedNotebooks)
       localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
       
@@ -195,7 +195,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
     try {
       await notebooksAPI.updateNotebook(selectedNotebook.id, updatedNotebook)
       setSelectedNotebook(updatedNotebook)
-      setNotebooks(notebooks.map(nb => nb.id === selectedNotebook.id ? updatedNotebook : nb))
+      setNotebooks(notebooks.map((nb: Notebook) => nb.id === selectedNotebook.id ? updatedNotebook : nb))
       setSelectedPage(newPage)
       setPageContent('')
     } catch (error) {
@@ -217,17 +217,17 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
     saveTimeoutRef.current = setTimeout(async () => {
       setSaving(true)
 
-      const updatedPages = selectedNotebook.pages.map(page =>
+      const updatedPages: Page[] = selectedNotebook.pages.map((page: Page) =>
         page.id === selectedPage.id ? { ...page, content } : page
       )
 
-      const updatedNotebook = {
+      const updatedNotebook: Notebook = {
         ...selectedNotebook,
         pages: updatedPages,
         updatedAt: new Date().toISOString()
       }
 
-      const updatedNotebooks = notebooks.map(nb => nb.id === selectedNotebook.id ? updatedNotebook : nb)
+      const updatedNotebooks: Notebook[] = notebooks.map((nb: Notebook) => nb.id === selectedNotebook.id ? updatedNotebook : nb)
 
       try {
         await notebooksAPI.updateNotebook(selectedNotebook.id, updatedNotebook)
@@ -256,11 +256,11 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
   const updatePageTitle = async (title: string) => {
     if (!selectedNotebook || !selectedPage) return
 
-    const updatedPages = selectedNotebook.pages.map(page =>
+    const updatedPages: Page[] = selectedNotebook.pages.map((page: Page) =>
       page.id === selectedPage.id ? { ...page, title } : page
     )
 
-    const updatedNotebook = {
+    const updatedNotebook: Notebook = {
       ...selectedNotebook,
       pages: updatedPages
     }
@@ -268,7 +268,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
     try {
       await notebooksAPI.updateNotebook(selectedNotebook.id, updatedNotebook)
       setSelectedNotebook(updatedNotebook)
-      setNotebooks(notebooks.map(nb => nb.id === selectedNotebook.id ? updatedNotebook : nb))
+      setNotebooks(notebooks.map((nb: Notebook) => nb.id === selectedNotebook.id ? updatedNotebook : nb))
       setSelectedPage({ ...selectedPage, title })
     } catch (error) {
       console.error('Failed to update page title:', error)
@@ -278,13 +278,13 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
   const deletePage = async (pageId: string) => {
     if (!selectedNotebook || selectedNotebook.pages.length <= 1) return
 
-    const updatedPages = selectedNotebook.pages.filter(page => page.id !== pageId)
-    const updatedNotebook = {
+    const updatedPages: Page[] = selectedNotebook.pages.filter((page: Page) => page.id !== pageId)
+    const updatedNotebook: Notebook = {
       ...selectedNotebook,
       pages: updatedPages
     }
 
-    const updatedNotebooks = notebooks.map(nb => nb.id === selectedNotebook.id ? updatedNotebook : nb)
+    const updatedNotebooks: Notebook[] = notebooks.map((nb: Notebook) => nb.id === selectedNotebook.id ? updatedNotebook : nb)
 
     try {
       await notebooksAPI.updateNotebook(selectedNotebook.id, updatedNotebook)
@@ -362,7 +362,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
               placeholder="Notebook name"
               className="flex-1 px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]"
               autoFocus
-              onKeyDown={(e) => {
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key === 'Enter') createNotebook()
                 if (e.key === 'Escape') setShowNewNotebook(false)
               }}
@@ -395,7 +395,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                 <p className="text-[var(--text-color)]/60 text-sm">No notebooks yet. Create one to get started!</p>
               ) : (
                 <div className="space-y-2">
-                  {notebooks.map((notebook) => (
+                  {notebooks.map((notebook: Notebook) => (
                     <div
                       key={notebook.id}
                       onClick={() => {
@@ -421,7 +421,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                           </p>
                         </div>
                         <button
-                          onClick={(e) => {
+                          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                             e.stopPropagation()
                             setDeleteConfirm({ type: 'notebook', id: notebook.id, name: notebook.name })
                           }}
@@ -468,7 +468,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                     </button>
                   </div>
                   <div className="space-y-1">
-                    {selectedNotebook.pages.map((page) => (
+                    {selectedNotebook.pages.map((page: Page) => (
                       <div
                         key={page.id}
                         onClick={() => {
@@ -493,7 +493,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                           </div>
                           {selectedNotebook.pages.length > 1 && (
                             <button
-                              onClick={(e) => {
+                              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                 e.stopPropagation()
                                 setDeleteConfirm({ type: 'page', id: page.id, name: page.title })
                               }}
@@ -578,7 +578,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                         1. List
                       </button>
                       <select
-                        onChange={(e) => formatText('fontSize', e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => formatText('fontSize', e.target.value)}
                         className="px-2 py-1.5 bg-white border border-[var(--accent-color)]/20 rounded hover:bg-[var(--accent-color)]/10 text-sm"
                         defaultValue="3"
                       >
@@ -590,7 +590,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                       </select>
                       <input
                         type="color"
-                        onChange={(e) => formatText('foreColor', e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => formatText('foreColor', e.target.value)}
                         className="w-10 h-8 border border-[var(--accent-color)]/20 rounded cursor-pointer"
                         title="Text Color"
                       />
