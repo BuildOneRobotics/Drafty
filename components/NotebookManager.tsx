@@ -1,17 +1,17 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Notebook, Page } from '@/lib/store'
 import { notebooksAPI } from '@/lib/api'
 import ConfirmDialog from './ConfirmDialog'
+import { useMobile } from '@/lib/useMobile'
 
 interface NotebookManagerProps {
   user: { id: string; name: string; email: string } | null
 }
 
 export default function NotebookManager({ user }: NotebookManagerProps) {
-  // Reference user to avoid unused parameter warning
-  void user
+  const { isPhone } = useMobile()
   const [notebooks, setNotebooks] = useState<Notebook[]>([])
   const [selectedNotebook, setSelectedNotebook] = useState<Notebook | null>(null)
   const [selectedPage, setSelectedPage] = useState<Page | null>(null)
@@ -21,6 +21,10 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'notebook' | 'page', id: string, name: string } | null>(null)
+  const [showNotebookList, setShowNotebookList] = useState(true)
+  const [showPageList, setShowPageList] = useState(false)
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const editorRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     loadNotebooks()
@@ -161,36 +165,50 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
     if (!selectedNotebook || !selectedPage) return
 
     setPageContent(content)
-    setSaving(true)
-
-    const updatedPages = selectedNotebook.pages.map(page =>
-      page.id === selectedPage.id ? { ...page, content } : page
-    )
-
-    const updatedNotebook = {
-      ...selectedNotebook,
-      pages: updatedPages,
-      updatedAt: new Date().toISOString()
+    
+    // Clear existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
     }
 
-    const updatedNotebooks = notebooks.map(nb => nb.id === selectedNotebook.id ? updatedNotebook : nb)
+    // Debounce save for 1 second
+    saveTimeoutRef.current = setTimeout(async () => {
+      setSaving(true)
 
-    try {
-      await notebooksAPI.updateNotebook(selectedNotebook.id, updatedNotebook)
-      setSelectedNotebook(updatedNotebook)
-      setNotebooks(updatedNotebooks)
-      
-      // Save to localStorage as backup
-      localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
-    } catch (error) {
-      console.error('Failed to update page:', error)
-      // Update locally even if API fails
-      setSelectedNotebook(updatedNotebook)
-      setNotebooks(updatedNotebooks)
-      localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
-    } finally {
-      setSaving(false)
-    }
+      const updatedPages = selectedNotebook.pages.map(page =>
+        page.id === selectedPage.id ? { ...page, content } : page
+      )
+
+      const updatedNotebook = {
+        ...selectedNotebook,
+        pages: updatedPages,
+        updatedAt: new Date().toISOString()
+      }
+
+      const updatedNotebooks = notebooks.map(nb => nb.id === selectedNotebook.id ? updatedNotebook : nb)
+
+      try {
+        await notebooksAPI.updateNotebook(selectedNotebook.id, updatedNotebook)
+        setSelectedNotebook(updatedNotebook)
+        setNotebooks(updatedNotebooks)
+        
+        // Save to localStorage as backup
+        localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
+      } catch (error) {
+        console.error('Failed to update page:', error)
+        // Update locally even if API fails
+        setSelectedNotebook(updatedNotebook)
+        setNotebooks(updatedNotebooks)
+        localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
+      } finally {
+        setSaving(false)
+      }
+    }, 1000)
+  }
+
+  const formatText = (command: string, value?: string) => {
+    document.execCommand(command, false, value)
+    editorRef.current?.focus()
   }
 
   const updatePageTitle = async (title: string) => {
@@ -265,22 +283,36 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="p-6 border-b border-[var(--accent-color)]/20 bg-white">
+      <div className={`${isPhone ? 'p-4' : 'p-6'} border-b border-[var(--accent-color)]/20 bg-white`}>
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-[var(--text-color)]">Notebooks</h2>
+          {isPhone && selectedNotebook && !showNotebookList ? (
+            <button
+              onClick={() => {
+                setShowNotebookList(true)
+                setShowPageList(false)
+              }}
+              className="text-[var(--accent-color)] hover:opacity-70"
+            >
+              ← Back
+            </button>
+          ) : (
+            <h2 className={`${isPhone ? 'text-xl' : 'text-2xl'} font-bold text-[var(--text-color)]`}>
+              {selectedNotebook && !showNotebookList ? selectedNotebook.name : 'Notebooks'}
+            </h2>
+          )}
           <button
             onClick={() => setShowNewNotebook(true)}
-            className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-all"
+            className={`bg-[var(--accent-color)] text-white ${isPhone ? 'px-3 py-2 text-sm' : 'px-4 py-2'} rounded-lg hover:opacity-90 transition-all`}
           >
-            + New Notebook
+            + {isPhone ? 'New' : 'New Notebook'}
           </button>
         </div>
       </div>
 
       {/* New Notebook Form */}
       {showNewNotebook && (
-        <div className="p-6 bg-[var(--accent-color)]/5 border-b border-[var(--accent-color)]/20">
-          <div className="flex gap-3">
+        <div className={`${isPhone ? 'p-4' : 'p-6'} bg-[var(--accent-color)]/5 border-b border-[var(--accent-color)]/20`}>
+          <div className={`flex ${isPhone ? 'flex-col' : 'flex-row'} gap-3`}>
             <input
               type="text"
               value={newNotebookName}
@@ -293,163 +325,260 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                 if (e.key === 'Escape') setShowNewNotebook(false)
               }}
             />
-            <button
-              onClick={createNotebook}
-              className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90"
-            >
-              Create
-            </button>
-            <button
-              onClick={() => setShowNewNotebook(false)}
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
-            >
-              Cancel
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={createNotebook}
+                className="flex-1 bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90"
+              >
+                Create
+              </button>
+              <button
+                onClick={() => setShowNewNotebook(false)}
+                className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       <div className="flex-1 flex overflow-hidden">
         {/* Notebooks List */}
-        <div className="w-80 border-r border-[var(--accent-color)]/20 bg-white overflow-y-auto">
-          <div className="p-4">
-            <h3 className="font-semibold text-[var(--text-color)] mb-3">Your Notebooks</h3>
-            {notebooks.length === 0 ? (
-              <p className="text-[var(--text-color)]/60 text-sm">No notebooks yet. Create one to get started!</p>
-            ) : (
-              <div className="space-y-2">
-                {notebooks.map((notebook) => (
-                  <div
-                    key={notebook.id}
-                    onClick={() => setSelectedNotebook(notebook)}
-                    className={`p-3 rounded-lg cursor-pointer transition-all ${
-                      selectedNotebook?.id === notebook.id
-                        ? 'bg-[var(--accent-color)] text-white'
-                        : 'bg-[var(--accent-color)]/5 hover:bg-[var(--accent-color)]/10 text-[var(--text-color)]'
-                    }`}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{notebook.name}</p>
-                        <p className={`text-xs mt-1 ${
-                          selectedNotebook?.id === notebook.id ? 'text-white/70' : 'text-[var(--text-color)]/60'
-                        }`}>
-                          {notebook.pages.length} pages
-                        </p>
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setDeleteConfirm({ type: 'notebook', id: notebook.id, name: notebook.name })
-                        }}
-                        className={`ml-2 text-xs hover:opacity-70 ${
-                          selectedNotebook?.id === notebook.id ? 'text-white' : 'text-red-500'
-                        }`}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Notebook Editor */}
-        {selectedNotebook ? (
-          <div className="flex-1 flex overflow-hidden">
-            {/* Pages Sidebar */}
-            <div className="w-64 border-r border-[var(--accent-color)]/20 bg-[var(--accent-color)]/5 overflow-y-auto">
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-3">
-                  <h4 className="font-semibold text-[var(--text-color)]">Pages</h4>
-                  <button
-                    onClick={addPage}
-                    className="text-[var(--accent-color)] hover:bg-[var(--accent-color)]/10 p-1 rounded"
-                  >
-                    +
-                  </button>
-                </div>
-                <div className="space-y-1">
-                  {selectedNotebook.pages.map((page) => (
+        {(!isPhone || showNotebookList) && (
+          <div className={`${isPhone ? 'w-full' : 'w-80'} border-r border-[var(--accent-color)]/20 bg-white overflow-y-auto`}>
+            <div className="p-4">
+              <h3 className="font-semibold text-[var(--text-color)] mb-3">Your Notebooks</h3>
+              {notebooks.length === 0 ? (
+                <p className="text-[var(--text-color)]/60 text-sm">No notebooks yet. Create one to get started!</p>
+              ) : (
+                <div className="space-y-2">
+                  {notebooks.map((notebook) => (
                     <div
-                      key={page.id}
+                      key={notebook.id}
                       onClick={() => {
-                        setSelectedPage(page)
-                        setPageContent(page.content || '')
+                        setSelectedNotebook(notebook)
+                        if (isPhone) {
+                          setShowNotebookList(false)
+                          setShowPageList(true)
+                        }
                       }}
-                      className={`p-2 rounded cursor-pointer transition-all ${
-                        selectedPage?.id === page.id
+                      className={`p-3 rounded-lg cursor-pointer transition-all ${
+                        selectedNotebook?.id === notebook.id
                           ? 'bg-[var(--accent-color)] text-white'
-                          : 'hover:bg-[var(--accent-color)]/10 text-[var(--text-color)]'
+                          : 'bg-[var(--accent-color)]/5 hover:bg-[var(--accent-color)]/10 text-[var(--text-color)]'
                       }`}
                     >
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-start">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{page.title}</p>
-                          <p className={`text-xs ${
-                            selectedPage?.id === page.id ? 'text-white/70' : 'text-[var(--text-color)]/60'
+                          <p className="font-medium truncate">{notebook.name}</p>
+                          <p className={`text-xs mt-1 ${
+                            selectedNotebook?.id === notebook.id ? 'text-white/70' : 'text-[var(--text-color)]/60'
                           }`}>
-                            Page {page.number}
+                            {notebook.pages.length} pages
                           </p>
                         </div>
-                        {selectedNotebook.pages.length > 1 && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setDeleteConfirm({ type: 'page', id: page.id, name: page.title })
-                            }}
-                            className={`ml-1 text-xs hover:opacity-70 ${
-                              selectedPage?.id === page.id ? 'text-white' : 'text-red-500'
-                            }`}
-                          >
-                            ✕
-                          </button>
-                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setDeleteConfirm({ type: 'notebook', id: notebook.id, name: notebook.name })
+                          }}
+                          className={`ml-2 text-xs hover:opacity-70 ${
+                            selectedNotebook?.id === notebook.id ? 'text-white' : 'text-red-500'
+                          }`}
+                        >
+                          ✕
+                        </button>
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
-
-            {/* Page Editor */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-white">
-              {selectedPage ? (
-                <>
-                  <div className="p-4 border-b border-[var(--accent-color)]/20">
-                    <input
-                      type="text"
-                      value={selectedPage.title}
-                      onChange={(e) => updatePageTitle(e.target.value)}
-                      className="text-xl font-bold w-full outline-none text-[var(--text-color)] bg-transparent"
-                      placeholder="Page title"
-                    />
-                    {saving && (
-                      <p className="text-xs text-[var(--accent-color)] mt-1">Saving...</p>
-                    )}
-                  </div>
-                  <div className="flex-1 p-4">
-                    <textarea
-                      value={pageContent}
-                      onChange={(e) => updatePageContent(e.target.value)}
-                      className="w-full h-full resize-none outline-none text-[var(--text-color)] bg-transparent"
-                      placeholder="Start writing your notes here..."
-                    />
-                  </div>
-                </>
-              ) : (
-                <div className="flex-1 flex items-center justify-center text-[var(--text-color)]/60">
-                  Select a page to start editing
-                </div>
               )}
             </div>
           </div>
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-[var(--text-color)]/60">
-            {notebooks.length === 0 ? 'Create your first notebook to get started' : 'Select a notebook to open'}
+        )}
+
+        {/* Notebook Editor */}
+        {selectedNotebook && (!isPhone || !showNotebookList) ? (
+          <div className="flex-1 flex overflow-hidden">
+            {/* Pages Sidebar */}
+            {(!isPhone || showPageList) && (
+              <div className={`${isPhone ? 'w-full' : 'w-64'} border-r border-[var(--accent-color)]/20 bg-[var(--accent-color)]/5 overflow-y-auto`}>
+                <div className="p-4">
+                  <div className="flex justify-between items-center mb-3">
+                    {isPhone && (
+                      <button
+                        onClick={() => {
+                          setShowPageList(false)
+                          setShowNotebookList(true)
+                        }}
+                        className="text-[var(--accent-color)] hover:opacity-70"
+                      >
+                        ← Notebooks
+                      </button>
+                    )}
+                    <h4 className="font-semibold text-[var(--text-color)]">Pages</h4>
+                    <button
+                      onClick={addPage}
+                      className="text-[var(--accent-color)] hover:bg-[var(--accent-color)]/10 px-2 py-1 rounded"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                  <div className="space-y-1">
+                    {selectedNotebook.pages.map((page) => (
+                      <div
+                        key={page.id}
+                        onClick={() => {
+                          setSelectedPage(page)
+                          setPageContent(page.content || '')
+                          if (isPhone) setShowPageList(false)
+                        }}
+                        className={`p-2 rounded cursor-pointer transition-all ${
+                          selectedPage?.id === page.id
+                            ? 'bg-[var(--accent-color)] text-white'
+                            : 'hover:bg-[var(--accent-color)]/10 text-[var(--text-color)]'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{page.title}</p>
+                            <p className={`text-xs ${
+                              selectedPage?.id === page.id ? 'text-white/70' : 'text-[var(--text-color)]/60'
+                            }`}>
+                              Page {page.number}
+                            </p>
+                          </div>
+                          {selectedNotebook.pages.length > 1 && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setDeleteConfirm({ type: 'page', id: page.id, name: page.title })
+                              }}
+                              className={`ml-1 text-xs hover:opacity-70 ${
+                                selectedPage?.id === page.id ? 'text-white' : 'text-red-500'
+                              }`}
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Page Editor */}
+            {(!isPhone || (!showPageList && !showNotebookList)) && (
+              <div className="flex-1 flex flex-col overflow-hidden bg-white">
+                {selectedPage ? (
+                  <>
+                    <div className={`${isPhone ? 'p-3' : 'p-4'} border-b border-[var(--accent-color)]/20`}>
+                      {isPhone && (
+                        <button
+                          onClick={() => setShowPageList(true)}
+                          className="text-[var(--accent-color)] hover:opacity-70 mb-2"
+                        >
+                          ← Pages
+                        </button>
+                      )}
+                      <input
+                        type="text"
+                        value={selectedPage.title}
+                        onChange={(e) => updatePageTitle(e.target.value)}
+                        className={`${isPhone ? 'text-lg' : 'text-xl'} font-bold w-full outline-none text-[var(--text-color)] bg-transparent`}
+                        placeholder="Page title"
+                      />
+                      <div className="flex items-center justify-between mt-2">
+                        {saving && (
+                          <p className="text-xs text-[var(--accent-color)]">Saving...</p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Rich Text Toolbar */}
+                    <div className={`${isPhone ? 'p-2' : 'p-3'} border-b border-[var(--accent-color)]/20 bg-[var(--accent-color)]/5 flex gap-2 overflow-x-auto`}>
+                      <button
+                        onClick={() => formatText('bold')}
+                        className="px-3 py-1.5 bg-white border border-[var(--accent-color)]/20 rounded hover:bg-[var(--accent-color)]/10 font-bold text-sm"
+                        title="Bold"
+                      >
+                        B
+                      </button>
+                      <button
+                        onClick={() => formatText('italic')}
+                        className="px-3 py-1.5 bg-white border border-[var(--accent-color)]/20 rounded hover:bg-[var(--accent-color)]/10 italic text-sm"
+                        title="Italic"
+                      >
+                        I
+                      </button>
+                      <button
+                        onClick={() => formatText('underline')}
+                        className="px-3 py-1.5 bg-white border border-[var(--accent-color)]/20 rounded hover:bg-[var(--accent-color)]/10 underline text-sm"
+                        title="Underline"
+                      >
+                        U
+                      </button>
+                      <button
+                        onClick={() => formatText('insertUnorderedList')}
+                        className="px-3 py-1.5 bg-white border border-[var(--accent-color)]/20 rounded hover:bg-[var(--accent-color)]/10 text-sm"
+                        title="Bullet List"
+                      >
+                        • List
+                      </button>
+                      <button
+                        onClick={() => formatText('insertOrderedList')}
+                        className="px-3 py-1.5 bg-white border border-[var(--accent-color)]/20 rounded hover:bg-[var(--accent-color)]/10 text-sm"
+                        title="Numbered List"
+                      >
+                        1. List
+                      </button>
+                      <select
+                        onChange={(e) => formatText('fontSize', e.target.value)}
+                        className="px-2 py-1.5 bg-white border border-[var(--accent-color)]/20 rounded hover:bg-[var(--accent-color)]/10 text-sm"
+                        defaultValue="3"
+                      >
+                        <option value="1">Tiny</option>
+                        <option value="2">Small</option>
+                        <option value="3">Normal</option>
+                        <option value="4">Large</option>
+                        <option value="5">Huge</option>
+                      </select>
+                      <input
+                        type="color"
+                        onChange={(e) => formatText('foreColor', e.target.value)}
+                        className="w-10 h-8 border border-[var(--accent-color)]/20 rounded cursor-pointer"
+                        title="Text Color"
+                      />
+                    </div>
+
+                    <div className={`flex-1 ${isPhone ? 'p-3' : 'p-4'} overflow-y-auto`}>
+                      <div
+                        ref={editorRef}
+                        contentEditable
+                        onInput={(e) => updatePageContent((e.currentTarget as HTMLDivElement).innerHTML)}
+                        className="w-full h-full outline-none text-[var(--text-color)] bg-transparent leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: pageContent }}
+                        suppressContentEditableWarning
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center text-[var(--text-color)]/60">
+                    Select a page to start editing
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+        ) : (
+          !isPhone && (
+            <div className="flex-1 flex items-center justify-center text-[var(--text-color)]/60">
+              {notebooks.length === 0 ? 'Create your first notebook to get started' : 'Select a notebook to open'}
+            </div>
+          )
         )}
       </div>
 

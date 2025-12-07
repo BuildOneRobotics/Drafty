@@ -196,13 +196,13 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
 
   const nextCard = () => {
     if (!selectedFlashcard) return
-    setCurrentCardIndex((prev) => (prev + 1) % selectedFlashcard.cards.length)
+    setCurrentCardIndex((prev: number) => (prev + 1) % selectedFlashcard.cards.length)
     setShowAnswer(false)
   }
 
   const prevCard = () => {
     if (!selectedFlashcard) return
-    setCurrentCardIndex((prev) => (prev - 1 + selectedFlashcard.cards.length) % selectedFlashcard.cards.length)
+    setCurrentCardIndex((prev: number) => (prev - 1 + selectedFlashcard.cards.length) % selectedFlashcard.cards.length)
     setShowAnswer(false)
   }
 
@@ -244,11 +244,11 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
             <input
               type="text"
               value={newFlashcardName}
-              onChange={(e) => setNewFlashcardName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFlashcardName(e.target.value)}
               placeholder="Flashcard set name"
               className="flex-1 px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]"
               autoFocus
-              onKeyDown={(e) => {
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key === 'Enter') createFlashcard()
                 if (e.key === 'Escape') setShowNewFlashcard(false)
               }}
@@ -265,7 +265,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
             <input
               type="text"
               value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFolderName(e.target.value)}
               placeholder="Folder name"
               className="flex-1 px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]"
               autoFocus
@@ -273,7 +273,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
             <input
               type="color"
               value={newFolderColor}
-              onChange={(e) => setNewFolderColor(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewFolderColor(e.target.value)}
               className="w-12 h-10 rounded cursor-pointer"
             />
             <button onClick={createFolder} className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90">Create</button>
@@ -287,8 +287,8 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
         <div className="w-80 border-r border-[var(--accent-color)]/20 bg-white overflow-y-auto">
           <div className="p-4">
             {/* Folders */}
-            {folders.map((folder) => {
-              const folderFlashcards = flashcards.filter(fc => fc.folderId === folder.id)
+            {folders.map((folder: FlashcardFolder) => {
+              const folderFlashcards = flashcards.filter((fc: Flashcard) => fc.folderId === folder.id)
               return (
                 <div key={folder.id} className="mb-4">
                   <div className="flex items-center justify-between mb-2">
@@ -305,7 +305,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
                     </button>
                   </div>
                   <div className="space-y-1 ml-5">
-                    {folderFlashcards.map((flashcard) => (
+                    {folderFlashcards.map((flashcard: Flashcard) => (
                       <div
                         key={flashcard.id}
                         onClick={() => {
@@ -329,7 +329,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
                             </p>
                           </div>
                           <button
-                            onClick={(e) => {
+                            onClick={(e: React.MouseEvent) => {
                               e.stopPropagation()
                               setDeleteConfirm({ type: 'flashcard', id: flashcard.id, name: flashcard.title })
                             }}
