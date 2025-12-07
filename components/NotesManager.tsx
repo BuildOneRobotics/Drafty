@@ -405,9 +405,12 @@ export default function NotesManager({ user }: NotesManagerProps) {
               <div
                 ref={editorRef}
                 contentEditable
-                onInput={(e) => updateNote(selectedNote.id, selectedNote.title, (e.currentTarget as HTMLDivElement).innerHTML, selectedNote.tags)}
-                className="w-full h-full outline-none text-[var(--text-color)] bg-transparent leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: selectedNote.content }}
+                onInput={(e) => {
+                  const content = (e.currentTarget as HTMLDivElement).innerHTML
+                  updateNote(selectedNote.id, selectedNote.title, content, selectedNote.tags)
+                }}
+                className="w-full h-full outline-none text-[var(--text-color)] bg-transparent leading-relaxed min-h-[200px]"
+                dangerouslySetInnerHTML={{ __html: selectedNote.content || '' }}
                 suppressContentEditableWarning
               />
             </div>

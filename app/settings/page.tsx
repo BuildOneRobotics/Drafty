@@ -151,41 +151,7 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-[var(--bg-color,#f0fdf4)]" style={{ fontFamily: 'var(--font-family, Inter, sans-serif)' }}>
       <Navbar />
-      <style>{`
-        input[type="range"] {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 100%;
-          height: 6px;
-          border-radius: 3px;
-          background: linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${brightness}%, rgba(0,0,0,0.1) ${brightness}%, rgba(0,0,0,0.1) 100%);
-          outline: none;
-          cursor: pointer;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          background: var(--accent-color);
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        input[type="range"]::-moz-range-thumb {
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          background: var(--accent-color);
-          cursor: pointer;
-          border: none;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        input[type="range"]::-moz-range-track {
-          background: transparent;
-          border: none;
-        }
-      `}</style>
+
       
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-3xl md:text-4xl font-bold text-[var(--text-color)] mb-8">Settings</h1>
@@ -259,6 +225,7 @@ export default function Settings() {
                         setBrightness(val)
                         applyTheme(selectedTheme, selectedFont, val, darkMode)
                       }}
+                      style={{ '--range-progress': `${brightness}%` } as React.CSSProperties}
                       className="flex-1"
                     />
                     <span className="text-sm font-semibold text-[var(--text-color)] w-12">{brightness}%</span>

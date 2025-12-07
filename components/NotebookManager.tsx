@@ -600,9 +600,12 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                       <div
                         ref={editorRef}
                         contentEditable
-                        onInput={(e) => updatePageContent((e.currentTarget as HTMLDivElement).innerHTML)}
-                        className="w-full h-full outline-none text-[var(--text-color)] bg-transparent leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: pageContent }}
+                        onInput={(e) => {
+                          const content = (e.currentTarget as HTMLDivElement).innerHTML
+                          updatePageContent(content)
+                        }}
+                        className="w-full h-full outline-none text-[var(--text-color)] bg-transparent leading-relaxed min-h-[200px]"
+                        dangerouslySetInnerHTML={{ __html: pageContent || '' }}
                         suppressContentEditableWarning
                       />
                     </div>
