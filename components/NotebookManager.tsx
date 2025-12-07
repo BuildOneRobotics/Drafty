@@ -358,7 +358,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
             <input
               type="text"
               value={newNotebookName}
-              onChange={(e) => setNewNotebookName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewNotebookName(e.target.value)}
               placeholder="Notebook name"
               className="flex-1 px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]"
               autoFocus
@@ -529,7 +529,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                       <input
                         type="text"
                         value={selectedPage.title}
-                        onChange={(e) => updatePageTitle(e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePageTitle(e.target.value)}
                         className={`${isPhone ? 'text-lg' : 'text-xl'} font-bold w-full outline-none text-[var(--text-color)] bg-transparent`}
                         placeholder="Page title"
                       />
@@ -600,7 +600,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                       <div
                         ref={editorRef}
                         contentEditable
-                        onInput={(e) => {
+                        onInput={(e: React.FormEvent<HTMLDivElement>) => {
                           const content = (e.currentTarget as HTMLDivElement).innerHTML
                           updatePageContent(content)
                         }}

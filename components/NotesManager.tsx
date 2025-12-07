@@ -183,7 +183,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
             <input
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
               placeholder="Search notes..."
               className="w-full px-4 py-2 pl-10 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]"
             />
@@ -201,7 +201,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
             <input
               type="text"
               value={newNoteTitle}
-              onChange={(e) => setNewNoteTitle(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewNoteTitle(e.target.value)}
               placeholder="Note title"
               className="flex-1 px-3 py-2 border border-[var(--accent-color)]/20 rounded-lg focus:outline-none focus:border-[var(--accent-color)] text-[var(--text-color)]"
               autoFocus
@@ -324,7 +324,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
               <input
                 type="text"
                 value={selectedNote.title}
-                onChange={(e) => updateNote(selectedNote.id, e.target.value, selectedNote.content, selectedNote.tags)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateNote(selectedNote.id, e.target.value, selectedNote.content, selectedNote.tags)}
                 className={`${isPhone ? 'text-lg' : 'text-xl'} font-bold w-full outline-none text-[var(--text-color)] bg-transparent`}
                 placeholder="Note title"
               />
@@ -405,7 +405,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
               <div
                 ref={editorRef}
                 contentEditable
-                onInput={(e) => {
+                onInput={(e: React.FormEvent<HTMLDivElement>) => {
                   const content = (e.currentTarget as HTMLDivElement).innerHTML
                   updateNote(selectedNote.id, selectedNote.title, content, selectedNote.tags)
                 }}
