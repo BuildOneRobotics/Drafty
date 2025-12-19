@@ -36,6 +36,11 @@ export function applyTheme(themeId: string, fontId: string, brightness: number, 
   const font = fonts[fontId] || fonts.inter
   document.documentElement.style.setProperty('--font-family', font)
   
+  // Apply brightness as CSS filter (0-100 scale, where 50 is normal)
+  // Convert to CSS brightness: 50 = 1.0 (normal), 0 = 0.5 (darker), 100 = 1.5 (brighter)
+  const brightnessValue = 0.5 + (brightness / 100)
+  document.documentElement.style.setProperty('filter', `brightness(${brightnessValue})`)
+  
   localStorage.setItem('theme', themeId)
   localStorage.setItem('font', fontId)
   localStorage.setItem('brightness', brightness.toString())
