@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Analytics } from '@vercel/analytics/next'
+import ThemeLoader from '@/components/ThemeLoader'
 
 export const metadata: Metadata = {
   title: 'Drafty - Ideas & Notes',
@@ -18,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <ThemeLoader />
         {children}
         <Analytics />
       </body>

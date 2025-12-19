@@ -18,6 +18,11 @@ const themes: {[key: string]: {accent: string, text: string, bg: string}} = {
   sunshine: { accent: '#eab308', text: '#713f12', bg: '#fefce8' },
 }
 
+// Brightness constants
+const MIN_BRIGHTNESS = 0.5
+const MAX_BRIGHTNESS = 1.5
+const NORMAL_BRIGHTNESS = 1.0
+
 export function applyTheme(themeId: string, fontId: string, brightness: number, darkMode: boolean) {
   const theme = themes[themeId] || themes.forest
   
@@ -35,6 +40,12 @@ export function applyTheme(themeId: string, fontId: string, brightness: number, 
   
   const font = fonts[fontId] || fonts.inter
   document.documentElement.style.setProperty('--font-family', font)
+  
+  // Apply brightness as CSS filter (0-100 scale, where 50 is normal)
+  // Clamp brightness to valid range and convert to CSS brightness value
+  const clampedBrightness = Math.max(0, Math.min(100, brightness))
+  const brightnessValue = MIN_BRIGHTNESS + (clampedBrightness / 100) * (MAX_BRIGHTNESS - MIN_BRIGHTNESS)
+  document.documentElement.style.setProperty('filter', `brightness(${brightnessValue})`)
   
   localStorage.setItem('theme', themeId)
   localStorage.setItem('font', fontId)

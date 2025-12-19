@@ -20,7 +20,7 @@ interface User {
   email: string
 }
 
-interface Friend {
+interface Collaborator {
   id: string
   name: string
   canShare: boolean
@@ -38,14 +38,14 @@ export default function FileManager({ user }: FileManagerProps) {
   const [newFileName, setNewFileName] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null)
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
-  const [friends, setFriends] = useState<Friend[]>([])
+  const [collaborators, setCollaborators] = useState<Collaborator[]>([])
   const [folders, setFolders] = useState<string[]>(['Documents', 'Images', 'Projects'])
   const [showNewFolder, setShowNewFolder] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
 
   useEffect(() => {
     loadFiles()
-    loadFriends()
+    loadCollaborators()
   }, [])
 
   const loadFiles = () => {
@@ -60,15 +60,20 @@ export default function FileManager({ user }: FileManagerProps) {
     }
   }
 
-  const loadFriends = () => {
-    const saved = localStorage.getItem('friends')
+  const loadCollaborators = () => {
+    // Try new key first, fallback to old key for migration
+    const saved = localStorage.getItem('collaborators') || localStorage.getItem('friends')
     if (saved) {
       try {
-        const allFriends = JSON.parse(saved)
-        setFriends(allFriends.filter((f: Friend) => f.canShare))
+        const allCollaborators = JSON.parse(saved)
+        setCollaborators(allCollaborators.filter((f: Collaborator) => f.canShare))
+        // Migrate from old key to new key
+        if (localStorage.getItem('friends') && !localStorage.getItem('collaborators')) {
+          localStorage.setItem('collaborators', saved)
+        }
       } catch (error) {
-        console.error('Failed to parse friends:', error)
-        setFriends([])
+        console.error('Failed to parse collaborators:', error)
+        setCollaborators([])
       }
     }
   }
@@ -131,19 +136,19 @@ export default function FileManager({ user }: FileManagerProps) {
     saveFiles(updated)
   }
 
-  const handleShareFile = (fileId: string, friendId: string) => {
+  const handleShareFile = (fileId: string, collaboratorId: string) => {
     const updated = files.map((f: DraftyFile) => 
-      f.id === fileId && !f.sharedWith.includes(friendId)
-        ? { ...f, sharedWith: [...f.sharedWith, friendId] }
+      f.id === fileId && !f.sharedWith.includes(collaboratorId)
+        ? { ...f, sharedWith: [...f.sharedWith, collaboratorId] }
         : f
     )
     saveFiles(updated)
   }
 
-  const handleUnshareFile = (fileId: string, friendId: string) => {
+  const handleUnshareFile = (fileId: string, collaboratorId: string) => {
     const updated = files.map((f: DraftyFile) =>
       f.id === fileId
-        ? { ...f, sharedWith: f.sharedWith.filter((id: string) => id !== friendId) }
+        ? { ...f, sharedWith: f.sharedWith.filter((id: string) => id !== collaboratorId) }
         : f
     )
     saveFiles(updated)
@@ -286,25 +291,25 @@ export default function FileManager({ user }: FileManagerProps) {
               <div>
                 <p className="text-xs text-[var(--text-color)]/60 mb-2">Share with</p>
                 <div className="space-y-2">
-                  {friends.map((friend: Friend) => (
-                    <label key={friend.id} className="flex items-center gap-2 cursor-pointer">
+                  {collaborators.map((collaborator: Collaborator) => (
+                    <label key={collaborator.id} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={selectedFileData.sharedWith.includes(friend.id)}
+                        checked={selectedFileData.sharedWith.includes(collaborator.id)}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           if (e.target.checked) {
-                            handleShareFile(selectedFileData.id, friend.id)
+                            handleShareFile(selectedFileData.id, collaborator.id)
                           } else {
-                            handleUnshareFile(selectedFileData.id, friend.id)
+                            handleUnshareFile(selectedFileData.id, collaborator.id)
                           }
                         }}
                         className="w-4 h-4"
                       />
-                      <span className="text-sm text-[var(--text-color)]">{friend.name}</span>
+                      <span className="text-sm text-[var(--text-color)]">{collaborator.name}</span>
                     </label>
                   ))}
-                  {friends.length === 0 && (
-                    <p className="text-xs text-[var(--text-color)]/60">No friends available for sharing</p>
+                  {collaborators.length === 0 && (
+                    <p className="text-xs text-[var(--text-color)]/60">No collaborators available for sharing</p>
                   )}
                 </div>
               </div>
