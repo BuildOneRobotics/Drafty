@@ -27,7 +27,7 @@ const themes = [
 
 export default function Settings() {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<'account' | 'customize' | 'friends' | 'files' | 'privacy'>('account')
+  const [activeTab, setActiveTab] = useState<'account' | 'customize' | 'collaborate' | 'files' | 'privacy'>('account')
   const [folders, setFolders] = useState([{id: '1', name: 'General', color: '#22c55e'}])
   const [exportSelected, setExportSelected] = useState<string[]>([])
   const [fadeOut, setFadeOut] = useState(false)
@@ -42,7 +42,7 @@ export default function Settings() {
   const [brightness, setBrightness] = useState(50)
   const [darkMode, setDarkMode] = useState(false)
   const [searchUsername, setSearchUsername] = useState('')
-  const [friends, setFriends] = useState<{id: string, name: string, canShare: boolean}[]>([])
+  const [collaborators, setCollaborators] = useState<{id: string, name: string, canShare: boolean}[]>([])
   const allUsers: {id: string, name: string}[] = [
     {id: '1', name: 'alex_dev'},
     {id: '2', name: 'jordan_design'},
@@ -52,7 +52,7 @@ export default function Settings() {
   ]
   const [searchResults, setSearchResults] = useState<{id: string, name: string}[]>([])
 
-  const handleTabChange = (tab: 'account' | 'customize' | 'friends' | 'files' | 'privacy') => {
+  const handleTabChange = (tab: 'account' | 'customize' | 'collaborate' | 'files' | 'privacy') => {
     if (tab !== activeTab) {
       setFadeOut(true)
       setTimeout(() => {
@@ -69,17 +69,24 @@ export default function Settings() {
         const font = localStorage.getItem('font') || 'inter'
         const br = parseInt(localStorage.getItem('brightness') || '50')
         const dm = localStorage.getItem('darkMode') === 'true'
-        const savedFriends = localStorage.getItem('friends')
+        // Try new key first, fallback to old key for migration
+        const savedCollaborators = localStorage.getItem('collaborators') || localStorage.getItem('friends')
         const savedFolders = localStorage.getItem('folders')
         setSelectedTheme(theme)
         setSelectedFont(font)
         setBrightness(br)
         setDarkMode(dm)
-        if (savedFriends) {
+        if (savedCollaborators) {
           try {
-            setFriends(JSON.parse(savedFriends))
+            const parsed = JSON.parse(savedCollaborators)
+            setCollaborators(parsed)
+            // Migrate from old key to new key
+            if (localStorage.getItem('friends') && !localStorage.getItem('collaborators')) {
+              localStorage.setItem('collaborators', savedCollaborators)
+              localStorage.removeItem('friends')
+            }
           } catch (error) {
-            console.error('Failed to parse friends:', error)
+            console.error('Failed to parse collaborators:', error)
           }
         }
         if (savedFolders) {
@@ -105,7 +112,7 @@ export default function Settings() {
     if (value.length > 0) {
       const results = allUsers.filter(u => 
         u.name.toLowerCase().includes(value.toLowerCase()) &&
-        !friends.some(f => f.id === u.id)
+        !collaborators.some(f => f.id === u.id)
       )
       setSearchResults(results)
     } else {
@@ -113,27 +120,27 @@ export default function Settings() {
     }
   }
 
-  const handleAddFriend = (user: {id: string, name: string}) => {
-    const newFriend = { ...user, canShare: false }
-    const updated = [...friends, newFriend]
-    setFriends(updated)
-    localStorage.setItem('friends', JSON.stringify(updated))
+  const handleAddCollaborator = (user: {id: string, name: string}) => {
+    const newCollaborator = { ...user, canShare: false }
+    const updated = [...collaborators, newCollaborator]
+    setCollaborators(updated)
+    localStorage.setItem('collaborators', JSON.stringify(updated))
     setSearchUsername('')
     setSearchResults([])
   }
 
-  const handleRemoveFriend = (userId: string) => {
-    const updated = friends.filter(f => f.id !== userId)
-    setFriends(updated)
-    localStorage.setItem('friends', JSON.stringify(updated))
+  const handleRemoveCollaborator = (userId: string) => {
+    const updated = collaborators.filter(f => f.id !== userId)
+    setCollaborators(updated)
+    localStorage.setItem('collaborators', JSON.stringify(updated))
   }
 
   const handleToggleShare = (userId: string) => {
-    const updated = friends.map(f => 
+    const updated = collaborators.map(f => 
       f.id === userId ? { ...f, canShare: !f.canShare } : f
     )
-    setFriends(updated)
-    localStorage.setItem('friends', JSON.stringify(updated))
+    setCollaborators(updated)
+    localStorage.setItem('collaborators', JSON.stringify(updated))
   }
 
   const exportAsCSV = () => {
@@ -158,7 +165,7 @@ export default function Settings() {
 
         <div className="flex flex-col md:flex-row gap-6">
           <div className="md:w-64 bg-white rounded-2xl p-4 border border-[var(--accent-color)]/20 h-fit">
-            {['account', 'customize', 'friends', 'files', 'privacy'].map((tab) => (
+            {['account', 'customize', 'collaborate', 'files', 'privacy'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => handleTabChange(tab as any)}
@@ -283,7 +290,7 @@ export default function Settings() {
               </div>
             )}
 
-            {activeTab === 'friends' && (
+            {activeTab === 'collaborate' && (
               <div className="space-y-6">
                 <div className="bg-white rounded-2xl p-6 md:p-8 border border-[var(--accent-color)]/20">
                   <h2 className="text-2xl font-bold text-[var(--text-color)] mb-6">Find Users</h2>
@@ -302,7 +309,7 @@ export default function Settings() {
                         <div key={user.id} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
                           <span className="font-medium text-[var(--text-color)]">{user.name}</span>
                           <button
-                            onClick={() => handleAddFriend(user)}
+                            onClick={() => handleAddCollaborator(user)}
                             className="bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg hover:opacity-90 text-sm font-medium"
                           >
                             Add
@@ -311,27 +318,27 @@ export default function Settings() {
                       ))}
                     </div>
                   )}
-                  <h3 className="font-bold text-[var(--text-color)] mb-4 mt-6">Your Connections</h3>
+                  <h3 className="font-bold text-[var(--text-color)] mb-4 mt-6">Your Collaborators</h3>
                   <div className="space-y-2">
-                    {friends.length === 0 ? (
-                      <p className="text-[var(--text-color)] text-sm">No connections yet</p>
+                    {collaborators.length === 0 ? (
+                      <p className="text-[var(--text-color)] text-sm">No collaborators yet</p>
                     ) : (
-                      friends.map((friend) => (
-                        <div key={friend.id} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
+                      collaborators.map((collaborator) => (
+                        <div key={collaborator.id} className="flex items-center justify-between p-3 bg-[var(--accent-color)]/10 rounded-xl">
                           <div className="flex-1">
-                            <p className="font-medium text-[var(--text-color)]">{friend.name}</p>
+                            <p className="font-medium text-[var(--text-color)]">{collaborator.name}</p>
                             <label className="flex items-center gap-2 mt-1 cursor-pointer">
                               <input
                                 type="checkbox"
-                                checked={friend.canShare}
-                                onChange={() => handleToggleShare(friend.id)}
+                                checked={collaborator.canShare}
+                                onChange={() => handleToggleShare(collaborator.id)}
                                 className="w-4 h-4"
                               />
                               <span className="text-xs text-[var(--text-color)]/60">Can share files</span>
                             </label>
                           </div>
                           <button 
-                            onClick={() => handleRemoveFriend(friend.id)}
+                            onClick={() => handleRemoveCollaborator(collaborator.id)}
                             className="text-red-500 hover:text-red-700 text-sm font-medium"
                           >
                             Remove

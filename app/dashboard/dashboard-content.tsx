@@ -6,7 +6,7 @@ import NotesManager from '@/components/NotesManager'
 import NotebookManager from '@/components/NotebookManager'
 import FlashcardManager from '@/components/FlashcardManager'
 import FileManager from './dashboard-files'
-import { NoteIcon, NotebookIcon, FlashcardIcon, WhiteboardIcon, FilesIcon, FriendsIcon } from '@/components/Icons'
+import { NoteIcon, NotebookIcon, FlashcardIcon, WhiteboardIcon, FilesIcon, CollaborateIcon } from '@/components/Icons'
 import { whiteboardsAPI } from '@/lib/api'
 import { useMobile } from '@/lib/useMobile'
 
@@ -26,7 +26,7 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
   const { isPhone } = useMobile()
   // reference the prop so it's considered used by TypeScript (some strict configs flag unused params)
   void onLoadNotes
-  const [view, setView] = useState<'home' | 'notes' | 'notebooks' | 'flashcards' | 'whiteboards' | 'files' | 'friends'>('home')
+  const [view, setView] = useState<'home' | 'notes' | 'notebooks' | 'flashcards' | 'whiteboards' | 'files' | 'collaborate'>('home')
   const [whiteboards, setWhiteboards] = useState<WhiteboardType[]>([])
   const [notebookCount, setNotebookCount] = useState(0)
   const [flashcardCount, setFlashcardCount] = useState(0)
@@ -73,7 +73,7 @@ export default function DashboardContent({ notes, user, onLoadNotes }: Dashboard
     { id: 'flashcards', label: 'Flashcards', Icon: FlashcardIcon },
     { id: 'whiteboards', label: 'Whiteboards', Icon: WhiteboardIcon },
     { id: 'files', label: 'Files', Icon: FilesIcon },
-    { id: 'friends', label: 'Friends', Icon: FriendsIcon }
+    { id: 'collaborate', label: 'Collaborate', Icon: CollaborateIcon }
   ]
 
   const sidebar = (
