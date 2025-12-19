@@ -1,12 +1,10 @@
 // Template definitions for notes, notebooks, and files
 
-import { ReactNode } from 'react'
-
 export interface Template {
   id: string
   name: string
   description: string
-  icon: ReactNode
+  icon: string  // Icon component name as string
   content: string
   preview?: string
   category?: string
