@@ -29,6 +29,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
   const [showPageList, setShowPageList] = useState(false)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const editorRef = useRef<HTMLDivElement>(null)
+  const lastPageIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     loadNotebooks()
@@ -38,7 +39,10 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
     if (selectedNotebook && selectedNotebook.pages.length > 0) {
       const firstPage = selectedNotebook.pages[0]
       setSelectedPage(firstPage)
+      // Only set content when notebook (and therefore page selection) changes
       setPageContent(firstPage.content || '')
+      lastPageIdRef.current = firstPage.id
+      if (editorRef.current) editorRef.current.innerHTML = firstPage.content || ''
     }
   }, [selectedNotebook])
 
@@ -247,6 +251,7 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
         localStorage.setItem(`notebooks-${user?.id}`, JSON.stringify(updatedNotebooks))
       } finally {
         setSaving(false)
+        // don't overwrite editor DOM here to avoid moving caret
       }
     }, 1000)
   }
@@ -608,7 +613,6 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
                           updatePageContent(content)
                         }}
                         className="w-full h-full outline-none text-[var(--text-color)] bg-transparent leading-relaxed min-h-[200px]"
-                        dangerouslySetInnerHTML={{ __html: pageContent || '' }}
                         suppressContentEditableWarning
                       />
                     </div>
