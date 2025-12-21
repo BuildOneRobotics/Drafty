@@ -18,16 +18,23 @@ export default function NoteEditor({ note, onSave }: NoteEditorProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  const lastNoteIdRef = useRef<string | null>(null)
+
   useEffect(() => {
     setTitle(note.title)
-    setContent(note.content)
     setTags(note.tags.join(', '))
-    if (contentRef.current) {
-      contentRef.current.textContent = note.content
+    // Only replace the editor content when a different note is loaded
+    if (lastNoteIdRef.current !== note.id) {
+      setContent(note.content)
+      if (contentRef.current) {
+        contentRef.current.innerHTML = note.content
+      }
+      lastNoteIdRef.current = note.id
     }
   }, [note])
 
   useEffect(() => {
+    // Autosave when title or tags change (debounced)
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
     saveTimeoutRef.current = setTimeout(() => {
       if (title || contentRef.current?.innerHTML) handleSave()
