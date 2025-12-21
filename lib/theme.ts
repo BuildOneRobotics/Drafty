@@ -37,6 +37,18 @@ export function applyTheme(themeId: string, fontId: string, brightness: number, 
     document.documentElement.style.setProperty('--text-color', theme.text)
     document.documentElement.style.setProperty('--surface-color', '#ffffff')
   }
+
+  // Set a data attribute and toggle a `dark` class on <html> for easier CSS targeting
+  try {
+    document.documentElement.setAttribute('data-theme', themeId)
+    if (darkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  } catch (e) {
+    // ignore in non-browser environments
+  }
   
   const font = fonts[fontId] || fonts.inter
   document.documentElement.style.setProperty('--font-family', font)

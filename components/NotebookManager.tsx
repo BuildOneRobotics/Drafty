@@ -48,7 +48,9 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
       console.log('Loading notebooks...')
       const response = await notebooksAPI.getNotebooks()
       console.log('Notebooks response:', response)
-      setNotebooks(response.data || [])
+      // Axios responses may wrap payload in `data` key (e.g. { data: [...] })
+      const payload = response?.data?.data ?? response?.data ?? []
+      setNotebooks(payload || [])
     } catch (error) {
       console.error('Failed to load notebooks:', error)
       // If API fails, try to load from localStorage as fallback
@@ -89,12 +91,13 @@ export default function NotebookManager({ user }: NotebookManagerProps) {
     
     try {
       const response = await notebooksAPI.createNotebook(newNotebookName.trim())
-      if (response?.data) {
+      const created = response?.data?.data ?? response?.data ?? null
+      if (created) {
         // Update first page with template content
         const notebookWithTemplate = {
-          ...response.data,
+          ...created,
           pages: [{
-            ...response.data.pages[0],
+            ...((created.pages && created.pages[0]) || { id: '1', number: 1, title: 'Page 1' }),
             content: initialContent
           }]
         }
