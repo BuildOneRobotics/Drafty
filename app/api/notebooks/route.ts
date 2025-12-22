@@ -1,41 +1,57 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { loadFromGist, saveToGist } from '@/lib/gist'
 
-function getUserId(request: NextRequest): string | null {
-  const authHeader = request.headers.get('authorization')
+function decodeBase64(input: string) {
+  try {
+    // Prefer Buffer when available (Node). Use globalThis to avoid TS 'Buffer' name errors.
+    const g: any = globalThis as any
+    if (g?.Buffer?.from) {
+      return g.Buffer.from(input, 'base64').toString()
+    }
+    if (typeof atob !== 'undefined') {
+      return atob(input)
+    }
+  } catch (e) {
+    // fall through
+  }
+  return ''
+}
+
+function getUserId(request: any): string | null {
+  const authHeader = request?.headers?.get?.('authorization')
   if (!authHeader) return null
   try {
     const token = authHeader.replace('Bearer ', '')
-    const userData = JSON.parse(Buffer.from(token, 'base64').toString())
-    return userData.id
+    const decoded = decodeBase64(token)
+    const userData = JSON.parse(decoded || '{}')
+    return userData.id || null
   } catch {
     return null
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: any) {
   const userId = getUserId(request)
   if (!userId) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401, headers: { 'content-type': 'application/json' } })
   }
 
   try {
     const data = await loadFromGist()
     if (!data || !data.notebooks) {
-      return NextResponse.json({ data: [] })
+      return new Response(JSON.stringify({ data: [] }), { headers: { 'content-type': 'application/json' } })
     }
     const userNotebooks = data.notebooks[userId] || []
-    return NextResponse.json({ data: userNotebooks })
+    return new Response(JSON.stringify({ data: userNotebooks }), { headers: { 'content-type': 'application/json' } })
   } catch (error) {
     console.error('Failed to load notebooks:', error)
-    return NextResponse.json({ message: 'Failed to load notebooks' }, { status: 500 })
+    return new Response(JSON.stringify({ message: 'Failed to load notebooks' }), { status: 500, headers: { 'content-type': 'application/json' } })
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: any) {
   const userId = getUserId(request)
   if (!userId) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401, headers: { 'content-type': 'application/json' } })
   }
 
   try {
@@ -46,7 +62,7 @@ export async function POST(request: NextRequest) {
       data = await loadFromGist()
     } catch (gistError) {
       console.error('Gist load error:', gistError)
-      return NextResponse.json({ message: 'Failed to load data' }, { status: 500 })
+      return new Response(JSON.stringify({ message: 'Failed to load data' }), { status: 500, headers: { 'content-type': 'application/json' } })
     }
 
     if (!data) {
@@ -79,12 +95,12 @@ export async function POST(request: NextRequest) {
       await saveToGist(data)
     } catch (saveError) {
       console.error('Gist save error:', saveError)
-      return NextResponse.json({ message: 'Failed to save data' }, { status: 500 })
+      return new Response(JSON.stringify({ message: 'Failed to save data' }), { status: 500, headers: { 'content-type': 'application/json' } })
     }
 
-    return NextResponse.json({ data: notebook }, { status: 201 })
+    return new Response(JSON.stringify({ data: notebook }), { status: 201, headers: { 'content-type': 'application/json' } })
   } catch (error) {
     console.error('Create notebook error:', error)
-    return NextResponse.json({ message: 'Failed to create notebook' }, { status: 500 })
+    return new Response(JSON.stringify({ message: 'Failed to create notebook' }), { status: 500, headers: { 'content-type': 'application/json' } })
   }
 }
