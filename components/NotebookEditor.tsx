@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Notebook, Page } from '@/lib/store'
 
 interface NotebookEditorProps {
@@ -12,6 +12,24 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
   const [selectedPage, setSelectedPage] = useState<Page | null>(notebook.pages[0] || null)
   const [pageContent, setPageContent] = useState(selectedPage?.content || '')
   const [showPageForm, setShowPageForm] = useState(false)
+  const contentRef = useRef<HTMLDivElement | null>(null)
+
+  // Sync selectedPage when notebook prop changes (keep reference in sync)
+  useEffect(() => {
+    if (!selectedPage) return
+    const updated = notebook.pages.find(p => p.id === selectedPage.id)
+    if (updated) {
+      setSelectedPage(updated)
+      setPageContent(updated.content || '')
+      if (contentRef.current) contentRef.current.innerHTML = updated.content || ''
+    }
+  }, [notebook.pages])
+
+  // When selectedPage changes, update editor content
+  useEffect(() => {
+    setPageContent(selectedPage?.content || '')
+    if (contentRef.current) contentRef.current.innerHTML = selectedPage?.content || ''
+  }, [selectedPage])
 
   const handleAddPage = () => {
     const newPage: Page = {
@@ -131,13 +149,12 @@ export default function NotebookEditor({ notebook, onUpdateNotebook }: NotebookE
               className="text-2xl font-bold mb-4 outline-none bg-transparent text-[var(--text-color)]"
             />
             <div
+              ref={contentRef}
               contentEditable
-              onInput={(e) => handleUpdatePageContent((e.currentTarget as HTMLDivElement).textContent || '')}
+              onInput={(e) => handleUpdatePageContent((e.currentTarget as HTMLDivElement).innerHTML || '')}
               className="flex-1 p-4 bg-[var(--surface-color,white)] rounded-lg outline-none text-[var(--text-color)] overflow-y-auto"
               suppressContentEditableWarning
-            >
-              {pageContent}
-            </div>
+            />
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-[var(--text-color)]/50">

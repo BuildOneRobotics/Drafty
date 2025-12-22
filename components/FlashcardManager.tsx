@@ -163,7 +163,7 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
   }
 
   const deleteCard = async (cardId: string) => {
-    if (!selectedFlashcard || selectedFlashcard.cards.length <= 1) return
+    if (!selectedFlashcard) return
 
     const updatedCards = selectedFlashcard.cards.filter((card: Card) => card.id !== cardId)
     const updatedFlashcard = {
@@ -175,10 +175,16 @@ export default function FlashcardManager({ user }: FlashcardManagerProps) {
       await flashcardsAPI.updateFlashcard(selectedFlashcard.id, updatedFlashcard.title, updatedFlashcard.cards)
       setSelectedFlashcard(updatedFlashcard)
       setFlashcards(flashcards.map((fc: Flashcard) => fc.id === selectedFlashcard.id ? updatedFlashcard : fc))
-      
-      if (currentCardIndex >= updatedCards.length) {
+
+      // Adjust current index to valid range
+      if (updatedCards.length === 0) {
+        setCurrentCardIndex(0)
+        setEditMode(false)
+        setStudyMode(false)
+      } else if (currentCardIndex >= updatedCards.length) {
         setCurrentCardIndex(Math.max(0, updatedCards.length - 1))
       }
+
       setDeleteConfirm(null)
     } catch (error) {
       console.error('Failed to delete card:', error)

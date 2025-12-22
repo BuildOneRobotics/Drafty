@@ -27,6 +27,7 @@ export default function NotesManager({ user }: NotesManagerProps) {
   const [showNotesList, setShowNotesList] = useState(true)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const editorRef = useRef<HTMLDivElement>(null)
+  const lastSelectedNoteIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     loadNotes()
@@ -111,6 +112,21 @@ export default function NotesManager({ user }: NotesManagerProps) {
     document.execCommand(command, false, value)
     editorRef.current?.focus()
   }
+
+  // When a different note is selected, populate the editor without forcing updates on every render
+  useEffect(() => {
+    if (!selectedNote) {
+      if (editorRef.current) editorRef.current.innerHTML = ''
+      lastSelectedNoteIdRef.current = null
+      return
+    }
+
+    // Only reset the innerHTML when the selected note id actually changes
+    if (lastSelectedNoteIdRef.current !== selectedNote.id) {
+      if (editorRef.current) editorRef.current.innerHTML = selectedNote.content || ''
+      lastSelectedNoteIdRef.current = selectedNote.id
+    }
+  }, [selectedNote])
 
   const deleteNote = async (noteId: string) => {
     try {
@@ -410,7 +426,6 @@ export default function NotesManager({ user }: NotesManagerProps) {
                   updateNote(selectedNote.id, selectedNote.title, content, selectedNote.tags)
                 }}
                 className="w-full h-full outline-none text-[var(--text-color)] bg-transparent leading-relaxed min-h-[200px]"
-                dangerouslySetInnerHTML={{ __html: selectedNote.content || '' }}
                 suppressContentEditableWarning
               />
             </div>
